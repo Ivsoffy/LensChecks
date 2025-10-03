@@ -111,8 +111,7 @@ target_lti_3_eng = 'Grant 3 Target Fair Value Granted as % of Base Pay'
 lti_pay_freq_3_eng = 'LTI Grant Frequency 3'
 comments_eng = 'Comments'
 
-# Expected Columns
-expected_columns = [company_name, dep_level_1, dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6,
+expected_columns_rus = [company_name, dep_level_1, dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6,
                              job_title, employee_code, manager_code, man_emp, performance, n_level, expat, gender_id, bod,
                              hired_date, tenure, region_client_fill, region, internal_grade, grade, function_code,
                              subfunction_code, specialization_code, function, subfunction, specialization, salary_rate,
@@ -131,10 +130,6 @@ expected_columns_eng = [company_name_eng, dep_level_1_eng, dep_level_2_eng, dep_
                                  target_lti_per_eng, lti_prog_1_eng, fact_lti_1_eng, target_lti_1_eng, lti_pay_freq_1_eng, 
                                  lti_prog_2_eng, fact_lti_2_eng, target_lti_2_eng, lti_pay_freq_2_eng, lti_prog_3_eng, 
                                  fact_lti_3_eng, target_lti_3_eng, lti_pay_freq_3_eng, comments_eng]
-
-
-
-
 
 # Company Info Defitions
 gi_company_name = 'Название компании на английском языке'
@@ -2063,3 +2058,9 @@ def check_gi_info(df, input_column, output_column, dictionary):
     df_copy[output_column] = df_copy[input_column].isin(all_dict_values)
     
     return df_copy
+
+def set_expected_columns(lang):
+    if lang == 'RUS':
+        return expected_columns_rus
+    else:
+        return expected_columns_eng
