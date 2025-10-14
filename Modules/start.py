@@ -1,6 +1,7 @@
 from src.module_1.main import module_1
 from src.module_2.main import module_2
 from src.module_3.main import module_3
+from src.module_4.main import module_4
 from yaml import load, SafeLoader
 import warnings
 
@@ -8,7 +9,7 @@ warnings.filterwarnings("ignore", category=UserWarning)
 
 
 if __name__ == "__main__":
-    modules = [module_1, module_2, module_3]
+    modules = [module_1, module_2, module_3, module_4]
 
     params_for_each_module = [
         # module_1
@@ -16,7 +17,9 @@ if __name__ == "__main__":
         # module_2
         ['folder_past_year'],
         # module_3
-        ['folder_past_year']
+        ['folder_past_year'], 
+        # module_4
+        []
     ]
 
     with open('config.yml', 'r') as f:

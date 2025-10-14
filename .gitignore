@@ -1,9 +1,5 @@
 Modules/src/module_1/companies/*
-Modules/src/module_1/output/*
-Modules/src/module_2/output/*
-Modules/src/module_3/output/*
-Modules/src/module_2/input/*
-Modules/src/module_1/__pycache__/
-Modules/src/module_2/__pycache__/
-Modules/src/module_3/__pycache__/
-Modules/src/__pycache__
+Modules/src/module_*/output/*
+Modules/src/module_*/input/*
+Modules/src/module_*/__pycache__/
+Modules/src/__pycache__/
