@@ -25,9 +25,9 @@ sys.path.insert(0, parent_dir)
 
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
-from LP import *
+from ..LP import *
 
-print('Calculating compensation elements and running checks on data\nProperty of Lens Consulting & Lens Digital\nRelease version: 1.0\n\n')
+# print('Calculating compensation elements and running checks on data\nProperty of Lens Consulting & Lens Digital\nRelease version: 1.0\n\n')
 
 # Function to enter the file paths
 def get_valid_path(prompt):
@@ -43,11 +43,9 @@ def get_valid_path(prompt):
 # input_folder = get_valid_path("Please enter the path to the input folder: ")
 # output_folder = get_valid_path("Please enter the path to the output folder: ")
 
-print(f'\n')
+# print(f'\n')
 
 # ## Модуль 1. Техническая проверка
-
-# %%
 # добавить проверку на выпадающий список в check_general_info
 # ["Missed columns in Data"] указать какие именно
 # добавить проверку  Название должности
@@ -56,7 +54,6 @@ print(f'\n')
 # сделать тесткейсы для юнит-тестов
 
 # ### Функции для проверок
-# %%
 def man_emp_normalization(text: str, index) -> str:
     global errors
 
@@ -85,7 +82,6 @@ def man_emp_normalization(text: str, index) -> str:
     return text
 
 
-# %%
 def expectation_normalization(text: str, index: int) -> str:
     global errors
     valid = ["Соответствует ожиданиям", "Ниже ожиданий", "Выше ожиданий"]
@@ -111,7 +107,6 @@ def expectation_normalization(text: str, index: int) -> str:
         return text
 
 
-# %%
 def level_normalization(value, index) -> str:
     """
     Преобразует значение в формат 'N-X' (где X от 1 до 20)
@@ -130,7 +125,6 @@ def level_normalization(value, index) -> str:
     return value
 
 
-# %%
 def number_monthly_salaries_normalization(num, index):
     global errors
 
@@ -140,7 +134,7 @@ def number_monthly_salaries_normalization(num, index):
         errors['data_errors'] += [(number_monthly_salaries, index)]
     return num
 
-# %%
+
 def gender_normalization(text: str, index: int) -> str:
     global errors
 
@@ -168,8 +162,6 @@ def gender_normalization(text: str, index: int) -> str:
     return text
             
 
-
-# %%
 def region_normalization(text: str, index: int) -> str:
     global errors
 
@@ -180,9 +172,8 @@ def region_normalization(text: str, index: int) -> str:
         errors['data_errors'] += [(region, index)]
 
     return text
-    
 
-# %%
+
 def convert_some_columns_to_numeric(df):
     # Defining columns where ',' will be replaced with '.' so that it is recognized as a number
     columns_to_numeric = [monthly_salary, salary_rate, number_monthly_salaries, fact_sti, fact_lti, target_lti_per, additional_pay]
@@ -193,14 +184,12 @@ def convert_some_columns_to_numeric(df):
         df[column] = df[column].replace('nan', np.nan)
     return df
 
-# %%
 def convert_some_columns_to_str(df):
     columns_to_str = [gender_id, sti_eligibility, lti_eligibility, expat, performance]
     for column in columns_to_str:
         df[column] = df[column].astype(str)
     return df
 
-# %%
 # Function to assign values based on a mapping
 def translate_values(df, columns, translation_map):
     """
@@ -262,8 +251,6 @@ def map_column_values(df, check_column, amend_column, mapping_dict):
     return df_copy
 
 
-
-# %%
 def eng_to_rus(df):
     # Apply translations using the tranlsation function | Converting English version to Russian
     df = translate_values(df, [expat, sti_eligibility, lti_eligibility], yes_no_map)
@@ -279,8 +266,6 @@ def eng_to_rus(df):
 
     return df
 
-
-# %%
 def salary_rate_normalization(num: int, index: int) -> str:
     global errors
 
@@ -290,7 +275,6 @@ def salary_rate_normalization(num: int, index: int) -> str:
             errors['data_errors'] += [(salary_rate, index)]
     return num
 
-# %%
 def additional_pay_normalization(value, index):
     global errors
 
@@ -303,7 +287,6 @@ def additional_pay_normalization(value, index):
     return value
 
 
-# %%
 def eligibility_normalization(fact, target, value, index):
     if not pd.isna(value):
         value = value.strip().lower()
@@ -319,7 +302,6 @@ def eligibility_normalization(fact, target, value, index):
         else:
             return "Нет"
 
-# %%
 def fact_sti_normalization(eligibility, value, index):
     global errors
     if eligibility == 'Нет' and not pd.isna(value):
@@ -327,7 +309,6 @@ def fact_sti_normalization(eligibility, value, index):
         errors['data_errors'] += [(fact_sti, index)]
     return value
 
-# %%
 # Проверка листа "Общая информация"
 def check_general_info(df_company, lang, df):
     global errors
@@ -359,21 +340,18 @@ def check_general_info(df_company, lang, df):
     df['SDF Language'] = lang
     return df 
 
-# %%
 def target_sti_normalization(text: str, index: int) -> str:
     global errors
     # Оставлять ли проценты
     return text
     
 
-# %%
 def lti_checks(main_lti, lti_1, lti_2, lti_3, index, type_lti):
     global errors
     if not ((main_lti == (lti_1 + lti_2 + lti_3)) | np.isnan(main_lti)):
         errors['data_errors'] += [(type_lti, index)]
     return main_lti
 
-# %%
 def add_errors_to_excel(errors, input_path, output_path):
     """Добавляет лист 'Ошибки' и подсвечивает ячейки с ошибками на листе 'Данные'."""
     # --- Формирование таблицы ошибок ---
@@ -440,10 +418,7 @@ def add_errors_to_excel(errors, input_path, output_path):
     print(f"Лист 'Ошибки' добавлен, ячейки подсвечены. Файл: {output_path}")
 
 
-# %% [markdown]
 # ### Проверка 
-
-# %%
 def check_and_process_data(df):
 
     df = convert_some_columns_to_numeric(df)
@@ -490,20 +465,11 @@ def check_and_process_data(df):
     
     return df
 
-# %%
 # Проверка каждого файла на наличие всех нужных колонок. При любой ошибке файл попадает в unprocessed.
-
-def main(input_folder='companies/rus', output_folder='output'):
-    global errors
-    # Creating a list for files with issues
-    unprocessed_files = {}
-
-    # Initialize ultimate df
-    ultimate_df = pd.DataFrame()
-
+def module_1(input_folder='companies/rus', output_folder='output', params=None):
 
     fact_sti_threshold = 0.05
-
+    save_db_only_without_errors = params['save_db_only_without_errors']
     # Additional columns from General Info sheet from the SDFs
     additional_cols = [gi_sector, gi_origin, gi_headcount_cat, gi_revenue_cat, gi_contact_name, 
                     gi_title, gi_tel, gi_email, 'SDF Language']
@@ -514,11 +480,64 @@ def main(input_folder='companies/rus', output_folder='output'):
     final_cols = expected_columns + additional_cols
 
     # Creating the final df
-    ultimate_df = pd.DataFrame(columns=final_cols)
-    counter = 0
     # Iterate through all the files in the input folder
     process_start = time.time()
     print("Current working directory:", os.getcwd())
+    unprocessed_files, ultimate_df = file_processing(input_folder, final_cols, save_db_only_without_errors)
+    proces_end = time.time()
+    print(f'Files processed in: {proces_end - process_start}')
+
+    if len(unprocessed_files) == 0:
+        print(f"\nAll files were processed and concated")
+    else:
+        for file, issue in unprocessed_files.items():
+            data_err = [col for col, _ in issue.get('data_errors', [])]
+            unique_data_err = list(dict.fromkeys(data_err))
+            # error_df = pd.DataFrame(data=issue)
+            print(f'\n')
+            print("=" * 20 + " WARNING! " + "=" * 20)
+            print(f"List of unprocessed files:")
+            print(f"File: {file}, Info errors: {issue['info_errors']}\nData errors: {unique_data_err}")
+            
+            
+    # Create unprocessed folder if it doesn't exist
+    unprocessed_folder = os.path.join(input_folder, 'unprocessed')
+    os.makedirs(unprocessed_folder, exist_ok=True)
+
+    # Copy unprocessed files to the unprocessed folder (overwrite if exists)
+    if unprocessed_files:
+        print(f"\nCopying {len(unprocessed_files)} unprocessed files to 'unprocessed' folder...")
+
+        for file_name, issue in unprocessed_files.items():
+            source_path = os.path.join(input_folder, file_name)
+            destination_path = os.path.join(unprocessed_folder, file_name)
+            try:
+                if os.path.exists(source_path):
+                    # Если файл уже есть в папке unprocessed — удалим его
+                    if os.path.exists(destination_path):
+                        os.remove(destination_path)
+                    add_errors_to_excel(issue, source_path, destination_path)
+                    # shutil.copy2(source_path, destination_path)
+                    # print(f"Copied: {file_name}")
+            except Exception as e:
+                print(f"Failed to copy {file_name}: {str(e)}")
+    
+    try:
+        output_path = os.path.join(output_folder, 'Database.xlsx')
+        with pd.ExcelWriter(output_path) as writer:
+            ultimate_df.to_excel(writer, index=False, sheet_name='Total Data')
+        print(f"Successfully saved Excel file to: {output_path}")
+    except Exception as e:
+        print(f"Failed to save Excel file: {e}")
+
+
+def file_processing(input_folder, columns, save_db_only_without_errors):
+    global errors
+    # Creating a list for files with issues
+    unprocessed_files = {}
+    ultimate_df = pd.DataFrame(columns=columns)
+    counter = 0
+
     for file in os.listdir(input_folder):
         # Check if the file is an Excel file
         if file.endswith('.xlsx') or file.endswith('.xls') or file.endswith('.xlsm'):
@@ -555,10 +574,7 @@ def main(input_folder='companies/rus', output_folder='output'):
             missing_columns_rem_data = [col for col in expected_columns if col not in df.columns]
 
             if missing_columns_rem_data:
-                # If any columns are missing, skip this file
-                # unprocessed_files[os.path.basename(file_path)] = missing_columns_rem_data
-                errors['info_errors'] += [f"Missed columns in Data: {missing_columns_rem_data}"] # указать какие именно
-                # continue
+                errors['info_errors'] += [f"Missed columns in Data: {missing_columns_rem_data}"]
             
             # leaving only required columns
             df = df[expected_columns]
@@ -577,67 +593,12 @@ def main(input_folder='companies/rus', output_folder='output'):
 
             # Taking the data from the General Info sheet
             df = check_general_info(df_company, lang, df)
-            # print(df[man_emp])
             df = check_and_process_data(df)
             
-            if errors['data_errors'] == [] and errors['info_errors'] == []:
+            if (errors['data_errors'] == [] and errors['info_errors'] == []) or save_db_only_without_errors==False:
                 # Save the processed DataFrame to the output folder
                 ultimate_df = pd.concat([ultimate_df, df])
             else:
                 unprocessed_files[os.path.basename(file_path)] = errors
-            
-            # except Exception as e:
-                # unprocessed_files[os.path.basename(file_path)] = [str(e)]
 
-
-    proces_end = time.time()
-    print(f'Files processed in: {proces_end - process_start}')
-
-    if len(unprocessed_files) == 0:
-        print(f"\nAll files were processed and concated")
-    else:
-        for file, issue in unprocessed_files.items():
-            data_err = [col for col, _ in issue.get('data_errors', [])]
-            unique_data_err = list(dict.fromkeys(data_err))
-            # error_df = pd.DataFrame(data=issue)
-            print(f'\n')
-            print("=" * 20 + " WARNING! " + "=" * 20)
-            print(f"List of unprocessed files:")
-            print(f"File: {file}, Info errors: {issue['info_errors']}\nData errors: {unique_data_err}")
-            
-            # print(df_errors)
-            
-    # Create unprocessed folder if it doesn't exist
-    unprocessed_folder = os.path.join(input_folder, 'unprocessed')
-    os.makedirs(unprocessed_folder, exist_ok=True)
-
-    # Copy unprocessed files to the unprocessed folder (overwrite if exists)
-    if unprocessed_files:
-        print(f"\nCopying {len(unprocessed_files)} unprocessed files to 'unprocessed' folder...")
-
-        for file_name, issue in unprocessed_files.items():
-            source_path = os.path.join(input_folder, file_name)
-            destination_path = os.path.join(unprocessed_folder, file_name)
-            try:
-                if os.path.exists(source_path):
-                    # Если файл уже есть в папке unprocessed — удалим его
-                    if os.path.exists(destination_path):
-                        os.remove(destination_path)
-                    add_errors_to_excel(issue, source_path, destination_path)
-                    # shutil.copy2(source_path, destination_path)
-                    # print(f"Copied: {file_name}")
-            except Exception as e:
-                print(f"Failed to copy {file_name}: {str(e)}")
-    
-    try:
-        output_path = os.path.join(output_folder, 'Database.xlsx')
-        with pd.ExcelWriter(output_path) as writer:
-            ultimate_df.to_excel(writer, index=False, sheet_name='Total Data')
-        print(f"Successfully saved Excel file to: {output_path}")
-    except Exception as e:
-        print(f"Failed to save Excel file: {e}")
-
-# %%
-
-
-
+    return unprocessed_files, ultimate_df
