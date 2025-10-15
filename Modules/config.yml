@@ -1,6 +1,7 @@
-input_folder: src/demo/module_2/input
-output_folder: src/demo/module_2/output
+input_folder: src/module_4/input
+output_folder: src/module_4/output
 ############## modules ##############
-module: 2
+module: 4
 save_db_only_without_errors: False # База данных создается только если ни в одной анкете нет ошибок
 folder_past_year: src/demo/module_2/past_year
+save_to_parquet: True

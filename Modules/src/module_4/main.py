@@ -23,7 +23,7 @@ sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 from ..LP import *
 
 def module_4(input_folder, output_folder, params=None):
-    # folder_py = params['folder_past_year']
+    save_to_parquet = params['save_to_parquet']
     lang = ''
     counter = 0
     for file in os.listdir(input_folder):
@@ -160,9 +160,69 @@ def module_4(input_folder, output_folder, params=None):
             except Exception as e:
                 print(f"Failed to save Excel file: {e}")
 
+        if save_to_parquet:
+            save_db_to_parquet(ultimate_df, output_folder)
         print("-------------------------")        
         # if company_files:
         #     process_with_past_year(company_files, df)
+
+def save_db_to_parquet(ultimate_df, output_folder):
+    # сохранение в паркет для дозагрузки 
+    final_df = ultimate_df.copy()
+    final_df = final_df[expected_columns_market_df]
+    final_df.info()
+
+    # Setting the datatype for sting columns
+    string_columns = [company_name, dep_level_1, dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6,
+                    job_title, employee_code, manager_code, man_emp, performance, n_level, expat, gender_id, bod,
+                    hired_date, tenure, region_client_fill, region, internal_grade, grade, function_code, subfunction_code,
+                    specialization_code, function, subfunction, specialization, lti_eligibility, lti_prog_1, 
+                    lti_pay_freq_1, lti_prog_2, lti_pay_freq_2, lti_prog_3, lti_pay_freq_3, comments, macroregion, 
+                    gi_sector, gi_origin, gi_headcount_cat, gi_revenue_cat, sti_eligibility]
+
+    # Setting sting types
+    for col in string_columns:
+        final_df[col] = final_df[col].astype(str)
+        final_df[col] = final_df[col].str.strip()
+
+    # Removing nan after thew data was stringged
+    for col in string_columns:
+        final_df[col] = final_df[col].replace('nan', np.nan)
+
+    # Replacing np.nan in specialization with '-'
+    final_df[specialization] = final_df[specialization].replace(np.nan, '-')
+
+        # Setting the datatype for float columns
+    float_columns = [salary_rate, monthly_salary, number_monthly_salaries, additional_pay, 
+                    fact_sti, target_sti, fact_lti, target_lti_per, target_lti_1, 
+                    target_lti_2, target_lti_3, fact_lti_1,fact_lti_2, fact_lti_3, annual_salary, base_pay, 
+                    fact_sti_out, target_sti_out, tc_pay, ttc_pay, ltip_pay, tltip_pay, tdc_pay, ttdc_pay]
+
+    for col in float_columns:
+        # Remove non-numeric values by coercing errors
+        final_df[col] = pd.to_numeric(final_df[col], errors='coerce')
+        final_df[col] = final_df[col].astype(float)
+
+    # Setting the datatype for int columns
+    int_columns = [grade]
+
+    for col in int_columns:
+        # Remove non-numeric values by coercing errors
+        final_df[col] = pd.to_numeric(final_df[col], errors='coerce')
+
+        # Find all non-finite values (NaN, inf, -inf)
+        non_finite_values = final_df[col][~np.isfinite(final_df[col])]  # ~np.isfinite() selects non-finite values
+        # non_finite_values.to_excel("NON-finite.xlsx")
+        print("Non-finite values causing issues:")
+        # print(non_finite_values)
+
+        final_df[col] = final_df[col].astype('Int64')   # лучше чем int, потому что поддерживает NaN
+        output_file = os.path.join(output_folder, "Rawdata_2025_before_reload.parquet.gzip")
+        final_df.to_parquet(output_file, compression='gzip')
+
+        print(f"Файл сохранен в {output_file}")
+
+
 
 # Function to compare how realistic is the certain compensation element
 def validate_compensation_ranges(df, comp_column, grade_col, output_col, comp_type='BP'):
