@@ -46,9 +46,6 @@ def get_valid_path(prompt):
 # print(f'\n')
 
 # ## Модуль 1. Техническая проверка
-# добавить проверку на выпадающий список в check_general_info
-# ["Missed columns in Data"] указать какие именно
-# добавить проверку  Название должности
 # в expectation_normalization при невозможности нормализовать - удалить
 # upd: general info уже есть на платформе
 # сделать тесткейсы для юнит-тестов
@@ -426,8 +423,7 @@ def check_and_process_data(df):
     df = eng_to_rus(df)
     
     # Название должности
-    count_job_title = 0
-    
+    df[job_title] = df.apply(lambda x: '-' if (not x[job_title]) or (x[job_title]=='nan') or (x[job_title]=='') else x[job_title], axis=1)
     # Руководитель/специалист
     df[man_emp] = df.apply(lambda x: man_emp_normalization(x[man_emp], x.name), axis=1)
     # Оценка эффективности работы сотрудника
@@ -461,7 +457,7 @@ def check_and_process_data(df):
     df[fact_lti] = df.apply(lambda x: lti_checks(x[fact_lti], x[fact_lti_1], x[fact_lti_2], x[fact_lti_3], x.name, fact_lti), axis=1)
     # Целевая стоимость всех предоставленных типов LTI в % от базового оклада за 1 год
     df[target_lti_per] = df.apply(lambda x: lti_checks(x[target_lti_per], x[target_lti_1], x[target_lti_2], x[target_lti_3], x.name, target_lti_per), axis=1)
-    # Целевая стоимость вознаграждения  как % от базового оклада [Данные] AO, AS, AW
+    # Целевая стоимость вознаграждения как % от базового оклада [Данные] AO, AS, AW
     
     return df
 
