@@ -56,11 +56,6 @@ def module_2(input_folder, output_folder, params):
             # Apply cleaning to column names
             df.columns = [re.sub(r'\s+', ' ', str(col).replace('\n', ' ').replace('\r', ' ')).strip() 
                             for col in df.columns]
-            
-            # leaving only required columns
-            # df_old = df
-            # df = pd.concat([df.iloc[:,:8], df.iloc[:, 22:25]])
-            # print(df.columns)
 
             col_name = 'Название компании (заполняется автоматически)'
 
@@ -96,14 +91,13 @@ def module_2(input_folder, output_folder, params):
                              job_title]
                     cols_to_copy = [function_code, subfunction_code, specialization_code, function, subfunction, specialization]
                     df = copy_columns_from_py_preserve_excel(df, df_py, cols, cols_to_copy, output_file)
-                    # подтянуть коды с прошлого года
                 else:
                     print("Коды не проставлены, компания не участвовала в обзоре до этого")
                     # проставить коды нейронкой
+                print("\n########################")
 
-        print("-------------------------")        
-        # if company_files:
-        #     process_with_past_year(company_files, df)
+        print("-------------------------")
+        
 
 def _normalize_val(v):
     """Нормализация для сравнения: на str, strip и lower (None/NaN -> '')"""
@@ -223,7 +217,6 @@ def process_with_past_year(company, company_files, df, file, folder):
                              job_title, function_code, subfunction_code, specialization_code]]
     df = df.loc[df[company_name] == company]
     file_to_cmp = os.path.join(folder, company_files[0])
-    print("FILE: ", file_to_cmp)
 
     df_py = pd.read_excel(file_to_cmp, sheet_name=rem_data, header=6)
     df_py = df_py.loc[:, [company_name, dep_level_1, dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6,
@@ -243,7 +236,7 @@ def process_with_past_year(company, company_files, df, file, folder):
         if tup not in set_py:
             missing_indices.append(idx)
 
-    print(f"Компания: {company}")
+    # print(f"Компания: {company}")
     print(f"Новых строк: {len(missing_indices)}")
 
     wb = load_workbook(file)
@@ -279,5 +272,5 @@ def check_if_past_year_exist(company, folder_py):
         # print(f"Компания: {company_str}")
         for f in found_files:
             print(f"Найден файл: {f}")
-        print()
+        # print()
     return found_files

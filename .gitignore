@@ -3,4 +3,5 @@ Modules/src/module_*/output/*
 Modules/src/module_*/input/*
 Modules/src/module_*/__pycache__/
 Modules/src/__pycache__/
+Modules/src/demo/
 src.lnk
