@@ -20,8 +20,8 @@ parent_dir = os.path.dirname(os.getcwd())
 sys.path.insert(0, parent_dir)
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
-from ..LP import *
-from function_model.inference import predict_codes
+from LP import *
+from inference import predict_codes
 
 def module_2(input_folder, output_folder, params):
     '''- codes & past_year_exist -> выделяем строки, в которых коды не совпадают
@@ -52,6 +52,7 @@ def module_2(input_folder, output_folder, params):
             # For SDFs
             sheet_name = "Total Data"
             df = pd.read_excel(file_path, sheet_name=sheet_name)
+            df =df.iloc[:500, :]
             # print(df.keys())
 
             # Apply cleaning to column names
@@ -104,6 +105,7 @@ def module_2(input_folder, output_folder, params):
 def predict_codes_by_model(df, output_file, company):
     df = df.loc[df[company_name] == company]
     preds = predict_codes(df)
+    preds.to_parquet("preds.parquet")
     
 
 def _normalize_val(v):

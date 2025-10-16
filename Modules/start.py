@@ -17,7 +17,7 @@ if __name__ == "__main__":
         # module_2
         ['folder_past_year'],
         # module_3
-        ['folder_past_year'], 
+        ['folder_past_year'],
         # module_4
         ['save_to_parquet']
     ]
