@@ -21,7 +21,7 @@ sys.path.insert(0, parent_dir)
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 from ..LP import *
-from function_model.inference import predict
+from function_model.inference import predict_codes
 
 def module_2(input_folder, output_folder, params):
     '''- codes & past_year_exist -> выделяем строки, в которых коды не совпадают
@@ -94,16 +94,16 @@ def module_2(input_folder, output_folder, params):
                     copy_columns_from_py_preserve_excel(df, df_py, cols, cols_to_copy, excel_path=output_file)
                 else:
                     print("Коды не проставлены, компания не участвовала в обзоре до этого")
-                    predict_codes(df)
+                    predict_codes_by_model(df, output_file, company)
                     # проставить коды нейронкой
                 print("\n########################")
 
         print("-------------------------")
         
 
-def predict_codes(df, output_file, company):
+def predict_codes_by_model(df, output_file, company):
     df = df.loc[df[company_name] == company]
-    preds = predict(df)
+    preds = predict_codes(df)
     
 
 def _normalize_val(v):
