@@ -70,9 +70,37 @@ def predict_codes(df, test=False):
         )
         
         print("\nAll models and encoders loaded successfully!")
-        
+
+        models = [model_function, model_subfunction, model_specialization]
+        encoders = [function_encoders, subfunction_encoders, specialization_encoders]
         # Create combined industry mapping
         industry_mapping = {}
+        
+        industry = df['Сектор']
+        print(f"Industry for this file: {industry}")
+
+        if industry in function_encoders['industry'].classes_:
+            matched_industry = industry
+        else:
+            # Try case-insensitive match
+            industry_lower = industry.lower()
+            for ind in function_encoders['industry'].classes_:
+                if ind.lower() == industry_lower:
+                    matched_industry = ind
+                    break
+                    
+            # If still not found, try partial match
+            if not matched_industry:
+                for ind in function_encoders['industry'].classes_:
+                    if industry_lower in ind.lower() or ind.lower() in industry_lower:
+                        matched_industry = ind
+                        break
+        
+        if not matched_industry:
+            print(f"Warning: Industry '{industry}' not found in encoders")
+            print(f"Available industries: {function_encoders['industry'].classes_}")
+            return
+
         # Use industry encoder from Function model as the base
         for industry in function_encoders['industry'].classes_:
             # Create multiple entries with different formats for the same industry
@@ -88,15 +116,13 @@ def predict_codes(df, test=False):
             spacified = re.sub(r'[^a-zA-Zа-яА-ЯёЁ0-9]', ' ', industry).strip()
             industry_mapping[spacified] = industry
             industry_mapping[spacified.lower()] = industry
-        
-        process_files_and_predict(df, test, models, encoder)
 
     except Exception as e:
         print(f"Error in model loading process: {e}")
         raise
 
     # 2. Process all files in the directory
-    
+    process_files_and_predict(df, models, encoders, matched_industry, test)
 
 
 
@@ -375,7 +401,7 @@ def predict(df, matched_industry):
 
 #--------------------- Predict -------------------------
 # Single function to process all files
-def process_files_and_predict(df, test=False):
+def process_files_and_predict(df, models, encoders, matched_industry, test=False):
     """
     Function that loops through files in files_dir, 
     makes predictions, and saves results to results_dir.
@@ -385,6 +411,9 @@ def process_files_and_predict(df, test=False):
     - Results are mapped back to all occurrences
     - Now includes confidence scores for each prediction
     """
+    
+    model_function, model_subfunction, model_specialization = models
+    function_encoders, subfunction_encoders, specialization_encoders = encoders
 
     # Load df
     df= df.iloc[:500, :]
@@ -397,38 +426,7 @@ def process_files_and_predict(df, test=False):
     if job_title not in df.columns:
         print(f"Required column 'job_title' not found in df. ")
         return
-        
-    # Find matching industry from encoders
-    matched_industry = None
-    
-    # Try exact match first
-    if industry in function_encoders['industry'].classes_:
-        matched_industry = industry
-    else:
-        # Try case-insensitive match
-        industry_lower = industry.lower()
-        for ind in function_encoders['industry'].classes_:
-            if ind.lower() == industry_lower:
-                matched_industry = ind
-                break
-                
-        # If still not found, try partial match
-        if not matched_industry:
-            for ind in function_encoders['industry'].classes_:
-                if industry_lower in ind.lower() or ind.lower() in industry_lower:
-                    matched_industry = ind
-                    break
-    
-    if not matched_industry:
-        print(f"Warning: Industry '{industry}' not found in encoders")
-        print(f"Available industries: {function_encoders['industry'].classes_}")
-        print(f"Skipping file {filename} as industry cannot be matched")
-        continue
-        
-    print(f"Matched industry: '{industry}' → '{matched_industry}'")
 
-    
-    
     # df = df.reset_index(drop=True) 
     if 'add_info' in df.columns:
         df.drop(columns='add_info', inplace=True)
@@ -446,7 +444,7 @@ def process_files_and_predict(df, test=False):
     df = df.reset_index(drop=True) 
 
     df["text_input"] = (
-        df["job_title"].astype(str) +
+        df[job_title].astype(str) +
         " [SEP] " + df["add_info"].astype(str)
     )
 
@@ -459,10 +457,10 @@ def process_files_and_predict(df, test=False):
     # Initialize new columns
     df['function_pred'] = None
     df['function_confidence'] = None
-    # df['subfunction'] = None
-    # df['subfunction_confidence'] = None
-    # df['specialization'] = None
-    # df['specialization_confidence'] = None
+    df['subfunction'] = None
+    df['subfunction_confidence'] = None
+    df['specialization'] = None
+    df['specialization_confidence'] = None
     
     # Map the predictions back to all rows
     for job_title, predictions in tqdm(job_predictions.items()):
@@ -481,33 +479,6 @@ def process_files_and_predict(df, test=False):
     # Save results
     output_path = os.path.join(results_dir, f"{company_naming}_FunPreds_NoDeps_mymodel.xlsx")
     company_naming +=1
-    df.to_excel(output_path, index=False)
-    print(f"Saved results to {output_path}")
-    
     print(f"\nAll files processed!")
-
-
-result2 = pd.read_excel("results_test/0_FunPreds_NoDeps_mymodel.xlsx")
-result2
-
-
-df = pd.read_parquet('data/dozagruzka/Rawdata_2025_before_reload.parquet.gzip')
-
-df = df.iloc[:, :-35]
-df.rename(columns={'Подразделение 1 уровня': 'p1', 'Подразделение 2 уровня': 'p2','Подразделение 3 уровня': 'p3','Подразделение 4 уровня': 'p4','Подразделение 5 уровня': 'p5','Подразделение 6 уровня': 'p6', 'Код функции': 'function', 'Сектор': 'industry', 'Название должности':'job_title', 'Название функции (заполняется автоматически)': 'function_name'}, inplace=True)
-df.drop(columns=['function_name'], inplace=True)
-df
-
-
-errors = result2.loc[result2['function']!=result2['function_pred']]
-errors
-
-
-
-errors = result2.loc[result2['function']!=result2['function_pred']]
-errors
-
-
-
-
-
+    return df
+    
