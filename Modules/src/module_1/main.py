@@ -54,12 +54,11 @@ def get_valid_path(prompt):
 def man_emp_normalization(text: str, index) -> str:
     global errors
 
-    # print("index: ", index)
-    if not text or text == 'nan':
+    text = text.lower().strip()
+
+    if not text or text == 'nan' or text == '':
         errors['data_errors'] += [(man_emp, index)]
         return text
-
-    text = text.lower().strip()
 
     managers = ["руководитель", "руководители", "менеджер", "менеджеры", "manager", "managers"]
     specialists = ["рабочий", "рабочие", "служащий", "служащие", "специалист", "специалисты", "specialist", "specialists"]
@@ -182,7 +181,7 @@ def convert_some_columns_to_numeric(df):
     return df
 
 def convert_some_columns_to_str(df):
-    columns_to_str = [gender_id, sti_eligibility, lti_eligibility, expat, performance]
+    columns_to_str = [man_emp, gender_id, sti_eligibility, lti_eligibility, expat, performance]
     for column in columns_to_str:
         df[column] = df[column].astype(str)
     return df
@@ -594,7 +593,6 @@ def file_processing(input_folder, columns, save_db_only_without_errors):
             if (errors['data_errors'] == [] and errors['info_errors'] == []) or save_db_only_without_errors==False:
                 # Save the processed DataFrame to the output folder
                 ultimate_df = pd.concat([ultimate_df, df])
-            else:
-                unprocessed_files[os.path.basename(file_path)] = errors
+            unprocessed_files[os.path.basename(file_path)] = errors
 
     return unprocessed_files, ultimate_df

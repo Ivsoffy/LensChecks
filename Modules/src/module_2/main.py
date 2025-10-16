@@ -21,6 +21,7 @@ sys.path.insert(0, parent_dir)
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 from ..LP import *
+from function_model.inference import predict
 
 def module_2(input_folder, output_folder, params):
     '''- codes & past_year_exist -> выделяем строки, в которых коды не совпадают
@@ -90,14 +91,20 @@ def module_2(input_folder, output_folder, params):
                     cols = [company_name, dep_level_1, dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6,
                              job_title]
                     cols_to_copy = [function_code, subfunction_code, specialization_code, function, subfunction, specialization]
-                    df = copy_columns_from_py_preserve_excel(df, df_py, cols, cols_to_copy, output_file)
+                    copy_columns_from_py_preserve_excel(df, df_py, cols, cols_to_copy, excel_path=output_file)
                 else:
                     print("Коды не проставлены, компания не участвовала в обзоре до этого")
+                    predict_codes(df)
                     # проставить коды нейронкой
                 print("\n########################")
 
         print("-------------------------")
         
+
+def predict_codes(df, output_file, company):
+    df = df.loc[df[company_name] == company]
+    preds = predict(df)
+    
 
 def _normalize_val(v):
     """Нормализация для сравнения: на str, strip и lower (None/NaN -> '')"""
@@ -107,7 +114,7 @@ def _normalize_val(v):
     return s.lower()
 
 def copy_columns_from_py_preserve_excel(df, df_py, cols, cols_to_copy,
-                                       excel_path="data_highlighted.xlsx",
+                                       excel_path,
                                        sheet_name="Total Data",
                                        overwrite_nonempty=False,
                                        normalize=True):
@@ -190,8 +197,6 @@ def copy_columns_from_py_preserve_excel(df, df_py, cols, cols_to_copy,
 
     wb.save(excel_path)
     print(f"Scanned {rows_scanned} rows on sheet '{ws.title}'. Updated {rows_updated} rows in '{excel_path}'.")
-
-    return rows_updated
 
 
 def fill_null_columns(file, df, company):
