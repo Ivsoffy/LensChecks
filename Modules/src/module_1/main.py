@@ -40,16 +40,6 @@ def get_valid_path(prompt):
             print("Invalid path. Please try again.")
 
 
-# input_folder = get_valid_path("Please enter the path to the input folder: ")
-# output_folder = get_valid_path("Please enter the path to the output folder: ")
-
-# print(f'\n')
-
-# ## Модуль 1. Техническая проверка
-# в expectation_normalization при невозможности нормализовать - удалить
-# upd: general info уже есть на платформе
-# сделать тесткейсы для юнит-тестов
-
 # ### Функции для проверок
 def man_emp_normalization(text: str, index) -> str:
     global errors
@@ -181,7 +171,7 @@ def convert_some_columns_to_numeric(df):
     return df
 
 def convert_some_columns_to_str(df):
-    columns_to_str = [man_emp, gender_id, sti_eligibility, lti_eligibility, expat, performance]
+    columns_to_str = [man_emp, gender_id, sti_eligibility, lti_eligibility, expat, performance, function_code, subfunction_code, specialization_code]
     for column in columns_to_str:
         df[column] = df[column].astype(str)
     return df
@@ -478,7 +468,7 @@ def module_1(input_folder='companies/rus', output_folder='output', params=None):
     # Iterate through all the files in the input folder
     process_start = time.time()
     print("Current working directory:", os.getcwd())
-    unprocessed_files, ultimate_df = file_processing(input_folder, final_cols, save_db_only_without_errors)
+    unprocessed_files = file_processing(input_folder, output_folder, final_cols, save_db_only_without_errors)
     proces_end = time.time()
     print(f'Files processed in: {proces_end - process_start}')
 
@@ -517,20 +507,20 @@ def module_1(input_folder='companies/rus', output_folder='output', params=None):
             except Exception as e:
                 print(f"Failed to copy {file_name}: {str(e)}")
     
-    try:
-        output_path = os.path.join(output_folder, 'Database.xlsx')
-        with pd.ExcelWriter(output_path) as writer:
-            ultimate_df.to_excel(writer, index=False, sheet_name='Total Data')
-        print(f"Successfully saved Excel file to: {output_path}")
-    except Exception as e:
-        print(f"Failed to save Excel file: {e}")
+    # try:
+    #     output_path = os.path.join(output_folder, 'Database.xlsx')
+    #     with pd.ExcelWriter(output_path) as writer:
+    #         ultimate_df.to_excel(writer, index=False, sheet_name='Total Data')
+    #     print(f"Successfully saved Excel file to: {output_path}")
+    # except Exception as e:
+    #     print(f"Failed to save Excel file: {e}")
 
 
-def file_processing(input_folder, columns, save_db_only_without_errors):
+def file_processing(input_folder, output_folder, columns, save_db_only_without_errors):
     global errors
     # Creating a list for files with issues
     unprocessed_files = {}
-    ultimate_df = pd.DataFrame(columns=columns)
+    # ultimate_df = pd.DataFrame(columns=columns)
     counter = 0
 
     for file in os.listdir(input_folder):
@@ -592,7 +582,8 @@ def file_processing(input_folder, columns, save_db_only_without_errors):
             
             if (errors['data_errors'] == [] and errors['info_errors'] == []) or save_db_only_without_errors==False:
                 # Save the processed DataFrame to the output folder
-                ultimate_df = pd.concat([ultimate_df, df])
+                file_output_path = os.path.join(output_folder, file)
+                df.to_excel(file_output_path)
             unprocessed_files[os.path.basename(file_path)] = errors
 
-    return unprocessed_files, ultimate_df
+    return unprocessed_files

@@ -15,9 +15,9 @@ if __name__ == "__main__":
         # module_1
         ['save_db_only_without_errors'],
         # module_2
-        ['folder_past_year'],
+        ['folder_past_year', 'after_fix'],
         # module_3
-        ['folder_past_year'],
+        ['folder_past_year', 'after_fix'],
         # module_4
         ['save_to_parquet']
     ]
