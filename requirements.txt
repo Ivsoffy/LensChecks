@@ -8,3 +8,5 @@ spacy==3.8.7
 openpyxl
 fastparquet
 sentencepiece
+torch
+IPython

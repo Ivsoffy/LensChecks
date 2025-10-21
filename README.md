@@ -5,8 +5,10 @@
 Перед самым первым запуском необходимо:
 1. Установить git, если не установлен (https://git-scm.com/install/windows)
 2. Склонировать репозиторий LensCheck. Для этого открыть рабочую папку и в ней ПКМ открыть терминал PowerShell, далее набрать команду ```git clone https://github.com/Ivsoffy/LensChecks.git```
-3. Проверить наличие и версию python командой ```python --version``` (в идеале версия должна быть близка к 3.13.5). Установить requirements.txt, для этого набрать в терминале вашего IDE (например, jupyter): \
+3. Проверить наличие и версию python командой ```python --version``` (в идеале 3.13.5). Установить requirements.txt, для этого набрать в терминале вашего IDE (например, jupyter): \
 ```pip install -r requirements.txt```
+4. В том же терминале написать ```python -m spacy download ru_core_news_lg```
+5. Скачать модели для выставления кодов (https://disk.360.yandex.ru/d/LCNN_Y88KYkxrQ) и поместить их в папку LensChecks\Modules\src\module_2\function_model\final_models
 
 ### Инструкция по использованию
 Запуск проверки состоит из двух шагов:
