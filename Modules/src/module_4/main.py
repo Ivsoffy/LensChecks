@@ -26,6 +26,10 @@ def module_4(input_folder, output_folder, params=None):
     save_to_parquet = params['save_to_parquet']
     lang = ''
     counter = 0
+    res_df = pd.DataFrame()
+    res_lower_mrot_df = pd.DataFrame()
+    res_high_ti = pd.DataFrame()
+
     for file in os.listdir(input_folder):
         # Check if the file is an Excel file
         if file.endswith('.xlsx') or file.endswith('.xls') or file.endswith('.xlsm'):
@@ -150,12 +154,16 @@ def module_4(input_folder, output_folder, params=None):
                 ultimate_df[gi_origin].astype(str).str.strip()
             )
 
+            res_df = pd.concat([res_df, ultimate_df])
+            res_lower_mrot_df = pd.concat([res_lower_mrot_df, lower_mrot_df])
+            res_high_ti = pd.concat([res_high_ti, high_ti])
+
             try:
                 output_path = os.path.join(output_folder, 'Database.xlsx')
                 with pd.ExcelWriter(output_path) as writer:
-                    ultimate_df.to_excel(writer, index=False, sheet_name='Total Data')
-                    lower_mrot_df.to_excel(writer, index=True, sheet_name='Lower than MROT')
-                    high_ti.to_excel(writer, index=True, sheet_name='High TI')
+                    res_df.to_excel(writer, index=False, sheet_name='Total Data')
+                    res_lower_mrot_df.to_excel(writer, index=True, sheet_name='Lower than MROT')
+                    res_high_ti.to_excel(writer, index=True, sheet_name='High TI')
                 print(f"Successfully saved Excel file to: {output_path}")
             except Exception as e:
                 print(f"Failed to save Excel file: {e}")
