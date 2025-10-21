@@ -44,7 +44,7 @@ def module_4(input_folder, output_folder, params=None):
 
             # Exporting the dataframe from an excel file
             # For SDFs
-            sheet_name = "Total Data"
+            sheet_name = "Sheet1"
             df = pd.read_excel(file_path, sheet_name=sheet_name)
             # print(df.keys())
 
