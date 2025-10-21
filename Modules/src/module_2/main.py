@@ -166,30 +166,38 @@ def process_output_file(df1, df2, cols, output_file, sheet1_name='Prefill', shee
     df1 = df1.drop_duplicates(subset=cols)
     df2 = df2.drop_duplicates(subset=cols)
 
+    # df1 = df1.loc[:, [company_name, function_code, subfunction_code, specialization_code]]
+    # print("OK")
     # cols_df1 = [company_name, function_code, subfunction_code, specialization_code,
     #            'past_year_check', dep_level_1, dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6,
     #                             job_title]
     # print(all(c in df1.columns for c in cols_df1))
     # # print(df2.columns)
 
-    # if 'func_old' in df1.columns:
-    #     df1 = df1[company_name, function_code, subfunction_code, specialization_code,
-    #            'past_year_check', dep_level_1, dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6,
-    #                             job_title, 'func_old', 'subfunc_old', 'spec_old']
-    # else:
-    #     df1 = df1[[company_name, function_code, subfunction_code, specialization_code,
-    #            'past_year_check', dep_level_1, dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6,
-    #                             job_title]]
-        
-    # if  'function_confidence' in df2.columns:
-    #     df2 = df2[company_name, function_code, subfunction_code, specialization_code,
-    #            'function_confidence', 'subfunction_confidence', 'specialization_confidence',
-    #             dep_level_1, dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6,
-    #                             job_title]
-    # else:
-    #     df2 = df2[company_name, function_code, subfunction_code, specialization_code,
-    #             dep_level_1, dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6,
-    #                             job_title]
+    if 'func_old' in df1.columns:
+        # print(1)
+        df1 = df1.loc[:, [company_name, function_code, subfunction_code, specialization_code,
+               'past_year_check', dep_level_1, dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6,
+                                job_title, 'func_old', 'subfunc_old', 'spec_old']]
+    else:
+        # print(2)
+        df1 = df1.loc[:, [company_name, function_code, subfunction_code, specialization_code,
+                        dep_level_1,
+        dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6,
+                        job_title]]
+    
+    if len(df2.columns)>1:
+        if 'function_confidence' in df2.columns:
+            # print(3)
+            df2 = df2.loc[:, [company_name, function_code, subfunction_code, specialization_code,
+                'function_confidence', 'subfunction_confidence', 'specialization_confidence',
+                    dep_level_1, dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6,
+                                    job_title]]
+        else:
+            # print(4)
+            df2 = df2.loc[:, [company_name, function_code, subfunction_code, specialization_code,
+                    dep_level_1, dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6,
+                                    job_title]]
 
     book = load_workbook(output_file)
     red_fill = PatternFill(start_color='FFC7CE', end_color='FFC7CE', fill_type='solid')
