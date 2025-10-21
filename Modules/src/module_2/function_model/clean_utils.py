@@ -10,6 +10,9 @@ import spacy
 #     df.drop(columns=['function_name'], inplace=True)
 
 def clean_add_info(text: str) -> str:
+    text = str(text)
+    if text == 'nan':
+        text = ''
     text = remove_company_names(text)
     text = remove_named_entities(text)
     text = text.lower()
@@ -50,6 +53,7 @@ def remove_company_names(text: str) -> str:
 
 # Job title
 def sanitize_text(text):
+    text = str(text)
     text = text.strip()
     text = text.lower()
     # Ensure only one space between words
@@ -191,6 +195,7 @@ def remove_seniority_from_string(text):
     Returns:
     str: Job title with seniority terms removed
     """
+    text = str(text)
     # List of seniority terms in Russian and English
     seniority_terms = [
         "младший", "мл",

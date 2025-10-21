@@ -24,11 +24,6 @@ from LP import *
 from inference import predict_codes
 
 def module_2(input_folder, output_folder, params):
-    '''- codes & past_year_exist -> выделяем строки, в которых коды не совпадают
-       - codes -> выделяем строки, в которых кодов нет
-       - past_yesr_exist -> подтягиваем коды с прошлого года и выделяем пустые (либо проставляем нейронкой)
-       - nothing -> проставляем все коды нейронкой'''
-
     folder_py = params['folder_past_year']
     already_fixed = params['after_fix']
     lang = ''
@@ -43,63 +38,236 @@ def module_2(input_folder, output_folder, params):
             sheet_name = "Total Data"
             df = pd.read_excel(file_path, sheet_name='Sheet1')
             
-            wb = load_workbook(file_path)
-            output_file = os.path.join(output_folder, file + '_processed')
-            wb.save(output_file)
+            output_file = os.path.join(output_folder, file)
+            cols = [dep_level_1, dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6,
+                                job_title]
 
-            company = df[company_name][0]
-            df = df.rename(columns={function_code:'func_old', subfunction_code:'subfunc_old', specialization_code: 'spec_old'})
-            # узнаем, есть ли файл с прошлого года
-            found_files = check_if_past_year_exist(company, folder_py)
-            if found_files:
-                file_to_cmp = os.path.join(folder_py, found_files[0])
-                df_py = pd.read_excel(file_to_cmp, sheet_name=rem_data, header=6)
-                cols = [dep_level_1, dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6,
-                            job_title]
-                cols_to_copy = [function_code, subfunction_code, specialization_code, function, subfunction, specialization]
-                # заполняем данными с прошлого года
-                df = merge_by_cols(df, df_py, cols, cols_to_copy)
-                df.to_excel('test.xlsx')
+            if not already_fixed: # Первичная обработка
+                company = df[company_name][0]
+                found_files = check_if_past_year_exist(company, folder_py)
+                if found_files:
+                    file_to_cmp = os.path.join(folder_py, found_files[0])
+                    df_py = pd.read_excel(file_to_cmp, sheet_name=rem_data, header=6)
+                    cols_to_copy = [function_code, subfunction_code, specialization_code, function, subfunction, specialization]
+                    # Заполняем данными с прошлого года
+                    df = merge_by_cols(df, df_py, cols, cols_to_copy)
+                df.to_excel(output_file)
+                
 
-            # # делим данные на заполненные и незаполненные
-            # not_filled = df.loc[df[function_code].apply(lambda x: str(x).lower().strip() == 'nan') == True] #add subfunction
-            # filled = df[~df.index.isin(not_filled.index)]
-            # empty_count = not_filled.shape[0]
+                # Делим данные на заполненные и незаполненные
+                unfilled = df.loc[df[function_code].apply(lambda x: str(x).lower().strip() == 'nan') == True] #add subfunction
+                filled = df[~df.index.isin(unfilled.index)]
+                empty_count = unfilled.shape[0]
 
-            
+                print(f"filled: {len(filled)}, unfilled: {len(unfilled)}")
 
-            # filled_and_processed = process_filled(filled)
-            # unfilled_and_processed, count_past_year, count_model = process_unfilled()
+                filled_and_processed = process_filled(filled)
+                df, unfilled_and_processed, count_past_year, count_model = process_unfilled(unfilled, df)
+                df.to_excel(output_file)
 
-            # color_filled(output_file)
-            # color_unfilled(output_file)
+                process_output_file(filled_and_processed, unfilled_and_processed, cols, output_file)
 
-            # info = {
-            #     'Файл с прошлого года': 'Присутствует' if found_files else 'Отсутствует',
-            #     'Сколько кодов в файле отсутствовало':  empty_count, 
-            #     'Сколько всего строчек в файле': df.shape[0],
-            #     'Сколько кодов было подтянуто из прошлого года': count_past_year,
-            #     'Сколько кодов было проставлено нейросетью': count_model
-            # }
+                info = {
+                    'Файл с прошлого года': str(found_files[0]) if found_files else 'Отсутствует',
+                    'Отсутствующих кодов в файле':  empty_count, 
+                    'Всего строк в файле': df.shape[0],
+                    'Подтянуто из прошлого года': count_past_year,
+                    'Проставлено нейросетью': count_model
+                }
 
-            # unique_filled = df.drop_duplicates(subset=columns_subset)
-
-
-
-
-            
+                add_info(info, output_file)
+            else: # Аналитик проверил и исправил анкету
+                map_prefill_to_sheet1(output_file, sheet_prefill='Prefill')
+                map_prefill_to_sheet1(output_file, sheet_prefill='Model')
+        print("-----------------------")
+        print()
 
 
+def map_prefill_to_sheet1(
+    excel_file: str,
+    sheet_prefill,
+    match_cols=[dep_level_1, dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6, job_title],
+    code_cols=(function_code, subfunction_code, specialization_code),
+    sheet_target='Sheet1'
+):
+    """
+    Маппит значения кодов из листа Prefill на данные в листе Sheet1 по совпадению колонок.
+    
+    Параметры:
+        excel_file (str): путь к Excel-файлу
+        match_cols (list): список колонок, по которым искать совпадения
+        code_cols (tuple): коды, которые нужно обновить
+        sheet_prefill (str): имя листа с уникальными значениями
+        sheet_target (str): имя листа с основной таблицей (Sheet1)
+    
+    Возвращает:
+        pd.DataFrame: обновлённый датафрейм из Sheet1
+    """
 
-            # узнаем, есть ли файл с прошлого года
-            # делим данные на заполненные и незаполненные
-            # из заполненных извлекаем уникальные, ищем их в прошлом году, прибавляем колонку past year, если прошлого значения нет, то ставим -. выводим на лист 'prefill',
-            #                                                               красным выделяем несовпавшие с прошлым годом (кроме случаев когда прошлый год = '-', колонка 'past'
-            # из незаполненных извлекаем уникальные, проставляем из прошлого года (если есть), оставшееся проставляем нейронкой
-            # заполненные нейронкой выводим на лист 'neural', красным выделяем низкую уверенность (колонка confidence)
-            # выводим на третий лист инфу о проделанном
+    # --- читаем оба листа ---
+    df_prefill = pd.read_excel(excel_file, sheet_name=sheet_prefill)
+    df_target = pd.read_excel(excel_file, sheet_name=sheet_target)
 
-        print("-------------------------")
+    # если колонки не заданы — пытаемся угадать автоматически
+    if match_cols is None:
+        match_cols = [col for col in df_prefill.columns if col not in code_cols]
+
+    # --- делаем merge ---
+    df_merged = df_target.merge(
+        df_prefill[match_cols + list(code_cols)],
+        on=match_cols,
+        how='left',
+        suffixes=('', '_prefill')
+    )
+
+    # --- заменяем коды из Prefill, если там есть значения ---
+    for col in code_cols:
+        df_merged[col] = df_merged[f"{col}_prefill"].combine_first(df_merged[col])
+        df_merged.drop(columns=f"{col}_prefill", inplace=True)
+
+    # wb = load_workbook(excel_file)
+    # ws = wb[sheet_prefill]
+    # wb.remove(ws)
+    # print(f"Лист '{sheet_prefill}' удалён.")
+    # wb.save(excel_file)
+    with pd.ExcelWriter(excel_file, engine='openpyxl', mode='a', if_sheet_exists='replace') as writer:
+        df_merged.to_excel(writer, sheet_name=sheet_target, index=False)
+    print(f"Обновлён лист '{sheet_target}' в файле {excel_file}")
+
+    return df_merged
+
+        
+def add_info(info, output_file):
+    info = pd.DataFrame(data=[info])
+    book = load_workbook(output_file)
+
+    ws3 = book.create_sheet(title='Info')
+
+    # Записываем заголовки
+    for col_idx, col_name in enumerate(info.columns, start=1):
+        ws3.cell(row=1, column=col_idx, value=col_name)
+
+    # Записываем строки
+    for row in info.itertuples(index=False):
+        excel_row = ws3.max_row + 1
+        for col_idx, value in enumerate(row, start=1):
+            ws3.cell(row=excel_row, column=col_idx, value=value)
+    book.save(output_file)
+
+
+def process_output_file(df1, df2, cols, output_file, sheet1_name='Prefill', sheet2_name='Model'):
+    """
+    Добавляет два датафрейма в существующий Excel-файл.
+    В df1 подсвечивает красным строки, где past_year_check == False.
+    В df2 подсвечивает красным строки, где function_confidence < 70.
+    """
+
+    # Оставляем только уникальные строки
+    df1 = df1.drop_duplicates(subset=cols)
+    df2 = df2.drop_duplicates(subset=cols)
+
+    # cols_df1 = [company_name, function_code, subfunction_code, specialization_code,
+    #            'past_year_check', dep_level_1, dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6,
+    #                             job_title]
+    # print(all(c in df1.columns for c in cols_df1))
+    # # print(df2.columns)
+
+    # if 'func_old' in df1.columns:
+    #     df1 = df1[company_name, function_code, subfunction_code, specialization_code,
+    #            'past_year_check', dep_level_1, dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6,
+    #                             job_title, 'func_old', 'subfunc_old', 'spec_old']
+    # else:
+    #     df1 = df1[[company_name, function_code, subfunction_code, specialization_code,
+    #            'past_year_check', dep_level_1, dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6,
+    #                             job_title]]
+        
+    # if  'function_confidence' in df2.columns:
+    #     df2 = df2[company_name, function_code, subfunction_code, specialization_code,
+    #            'function_confidence', 'subfunction_confidence', 'specialization_confidence',
+    #             dep_level_1, dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6,
+    #                             job_title]
+    # else:
+    #     df2 = df2[company_name, function_code, subfunction_code, specialization_code,
+    #             dep_level_1, dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6,
+    #                             job_title]
+
+    book = load_workbook(output_file)
+    red_fill = PatternFill(start_color='FFC7CE', end_color='FFC7CE', fill_type='solid')
+
+    # Работа с df1
+    ws1 = book.create_sheet(title=sheet1_name)
+    for col_idx, col_name in enumerate(df1.columns, start=1):
+        ws1.cell(row=1, column=col_idx, value=col_name)
+
+    for _, row in df1.iterrows():
+        excel_row = ws1.max_row + 1
+        highlight = row.get('past_year_check') is False
+
+        for col_idx, value in enumerate(row, start=1):
+            cell = ws1.cell(row=excel_row, column=col_idx, value=value)
+            if highlight:
+                cell.fill = red_fill
+
+    # Работа с df2
+    ws2 = book.create_sheet(title=sheet2_name)
+    for col_idx, col_name in enumerate(df2.columns, start=1):
+        ws2.cell(row=1, column=col_idx, value=col_name)
+
+    for _, row in df2.iterrows():
+        excel_row = ws2.max_row + 1
+        try:
+            s = str(row.get('function_confidence'))
+            num = float(s.rstrip('%'))
+            highlight = num < 70
+        except:
+            highlight = False
+
+        for col_idx, value in enumerate(row, start=1):
+            cell = ws2.cell(row=excel_row, column=col_idx, value=value)
+            if highlight:
+                cell.fill = red_fill
+
+    book.save(output_file)
+    print(f"Листы '{sheet1_name}' и '{sheet2_name}' добавлены в файл: {output_file}")
+
+def process_unfilled(df, df_orig):
+    # Подтягиваем коды прошлых лет в оригинальный датасет
+    count_past_year = 0
+    preds = pd.DataFrame()
+
+    if 'func_old' in df_orig.columns:
+        df_orig[function_code].update(df['func_old'])
+        df_orig[subfunction_code].update(df['subfunc_old'])
+        df_orig[specialization_code].update(df['spec_old'])
+
+    df_without_py = df_orig.loc[df_orig[function_code].apply(lambda x: str(x).lower().strip() == 'nan') == True]
+    count_model = df_without_py.shape[0]
+    count_past_year = df.shape[0] - count_model
+    # Там где прошлого года нет, проставляем нейронкой
+    if count_model != 0:
+        preds = predict_codes(df_without_py)
+        preds = preds.loc[preds[company_name].apply(lambda x: str(x).lower().strip() == 'nan') == False]
+
+    return df_orig, preds, count_past_year, count_model
+    
+
+def process_filled(df):
+    """
+    Сравнивает столбцы 'function_code' и 'func_old' в датафрейме.
+    Создаёт новый столбец 'past_year_check', где:
+      - True, если значения совпадают,
+      - True, если значение func_old == NaN,
+      - False — если различаются.
+    """
+    df = df.copy()
+    df["past_year_check"] = True
+
+    if "func_old" in df.columns:
+        df["past_year_check"] = (
+            (df[function_code] == df["func_old"]) |
+            (df["func_old"].isna())
+        )
+    return df
 
 
 def merge_by_cols(df, df_py, cols, cols_to_copy):
@@ -116,12 +284,12 @@ def merge_by_cols(df, df_py, cols, cols_to_copy):
     Возвращает:
         pd.DataFrame: обновлённый df
     """
-    # Проверим, что все нужные колонки есть в df_py
+    # Проверим, что все нужные колонки есть в файле прошлого года
     missing_cols = [c for c in cols + cols_to_copy if c not in df_py.columns]
     if missing_cols:
         raise ValueError(f"Отсутствуют колонки в df_py: {missing_cols}")
 
-    # Делаем merge по ключевым колонкам
+    # Мерджим по ключевым колонкам
     df_merged = df.merge(
         df_py[cols + cols_to_copy],
         on=cols,
@@ -129,50 +297,17 @@ def merge_by_cols(df, df_py, cols, cols_to_copy):
         suffixes=("", "_py")
     )
 
-    # Копируем данные из _py колонок, если они есть
-    for c in cols_to_copy:
-        if f"{c}_py" in df_merged.columns:
-            df_merged[c] = df_merged[c].combine_first(df_merged[f"{c}_py"])
-            df_merged.drop(columns=[f"{c}_py"], inplace=True)
+    func_cols = ['func_old', 'subfunc_old', 'spec_old']
+
+    for old_col, new_col in zip(cols_to_copy, func_cols):
+        py_col = f"{old_col}_py"
+        if py_col in df_merged.columns:
+            df_merged[new_col] = df_merged[py_col]
+            df_merged.drop(columns=[py_col], inplace=True)
+        else:
+            df_merged[new_col] = np.nan
 
     return df_merged
-
-def processed_filles(df):
-    pass
-
-def first_process(folder_py, unique_companies, output_file, df):
-    for company in unique_companies:
-        print(f"Компания: {company}")
-        # Проверяем участвовала ли компания в обзоре прошлых лет
-        found_files = check_if_past_year_exist(company, folder_py)
-        # Проверяем, проставлены ли коды
-        codes = check_if_codes_exist(df, company)
-
-        if codes and found_files:
-            print("Коды проставлены, есть файл с прошлого года")
-            process_with_past_year(company, found_files, df, output_file, folder_py)
-        elif codes:
-            print("Коды проставлены, компания не участвовала в обзоре до этого")
-            fill_null_columns(output_file, df, company)
-        elif found_files:
-            print("Коды не проставлены, есть файл с прошлого года")
-            file_to_cmp = os.path.join(folder_py, found_files[0])
-            df_py = pd.read_excel(file_to_cmp, sheet_name=rem_data, header=6)
-            df_py = df_py.loc[df_py[company_name] == company]
-            cols = [company_name, dep_level_1, dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6,
-                    job_title]
-            cols_to_copy = [function_code, subfunction_code, specialization_code, function, subfunction, specialization]
-            copy_columns_from_py_preserve_excel(df, df_py, cols, cols_to_copy, excel_path=output_file)
-        else:
-            print("Коды не проставлены, компания не участвовала в обзоре до этого")
-            predict_codes_by_model(df, output_file, company)
-            # проставить коды нейронкой
-        print("\n########################")    
-
-def predict_codes_by_model(df, output_file, company):
-    df = df.loc[df[company_name] == company]
-    preds = predict_codes(df)
-    preds.to_parquet("src/module_2/output/preds.parquet")
     
 
 def _normalize_val(v):
@@ -268,23 +403,6 @@ def copy_columns_from_py_preserve_excel(df, df_py, cols, cols_to_copy,
     print(f"Scanned {rows_scanned} rows on sheet '{ws.title}'. Updated {rows_updated} rows in '{excel_path}'.")
 
 
-def fill_null_columns(file, df, company):
-    wb = load_workbook(file)
-    ws = wb['Total Data']
-
-    orange_fill = PatternFill(start_color="FFA500", end_color="FFA500", fill_type="solid")
-
-    col_idx = list(df.columns).index(function_code) + 1
-
-    for i in df.index[df[company_name] == company]:
-        if pd.isna(df.at[i, function_code]):
-            excel_row = i + 2  
-            ws.cell(row=excel_row, column=col_idx).fill = orange_fill
-
-    wb.save(file)
-    print(f"Файл сохранён: {file}")
-
-
 def process_with_past_year(company, company_files, df, file, folder):
     df_old = df
     df = df.loc[:, [company_name, dep_level_1, dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6,
@@ -297,8 +415,6 @@ def process_with_past_year(company, company_files, df, file, folder):
                              job_title, function_code, subfunction_code, specialization_code]]
     df_py = df_py.loc[df_py[company_name] == company]
 
-    # --- ---
-
     df_diff = df.merge(df_py, how='left', indicator=True)
     df_missing = df_diff.query('_merge == "left_only"').drop(columns=['_merge'])
 
@@ -310,7 +426,6 @@ def process_with_past_year(company, company_files, df, file, folder):
         if tup not in set_py:
             missing_indices.append(idx)
 
-    # print(f"Компания: {company}")
     print(f"Новых строк: {len(missing_indices)}")
 
     wb = load_workbook(file)
@@ -342,9 +457,6 @@ def check_if_past_year_exist(company, folder_py):
             found_files.append(filename)
     
     if found_files:
-        # company_files[company] = found_files
-        # print(f"Компания: {company_str}")
         for f in found_files:
             print(f"Найден файл: {f}")
-        # print()
     return found_files

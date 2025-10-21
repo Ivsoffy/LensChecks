@@ -83,8 +83,8 @@ def predict_codes(df, test=False):
         industry_mapping = {}
         
         industry = df['Сектор']
-        print(f"Industry for this file: {industry[0]}")
-        matched_industry = industry[0]
+        print(f"Industry for this file: {list(set(industry))[0]}")
+        matched_industry = list(set(industry))[0]
 
         # if industry in function_encoders['industry'].classes_:
         #     matched_industry = function_encoders['industry'].classes_
@@ -326,33 +326,35 @@ def enhanced_predict_specialization(model, tokenizer, text, industry, function, 
     
     return pred_idx, specialization_encoders['target'].inverse_transform([pred_idx])[0], confidence
 
+from tqdm import tqdm
+
 def select_p_features(df):
     p_cols = [dep_level_1, dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6]
     df_divs = df.loc[:, p_cols]
     last_two_divs = []
-    # print("ok")
-    for row, _ in tqdm(df_divs.iterrows()):
-        # print("row ", df.iloc[row, :], "col", cols)
-        # break
-        only_divisions = df_divs.iloc[row, :]
-        only_divisions.dropna(inplace=True)
+
+    for _, row in tqdm(df_divs.iterrows()):
+        # row уже pd.Series, нет нужды использовать iloc
+        only_divisions = row.dropna()  # сразу убираем NaN
         result = []
-        # print("ok")
+
         for p in only_divisions:
-            # print(p)
             p_cleaned = clean_add_info(p)
-            
-            # print("cleaned: ", p_cleaned)
-            # если все слова в p_cleaned содержатся где-то в result, то мы не должны добавлять этот p_cleaned к result
-            if (p_cleaned!=''):
-                result+=[p_cleaned]
-        if len(result)>1:
+
+            # если строка не пустая, добавляем
+            if p_cleaned != '':
+                result += [p_cleaned]
+
+        # собираем последние два элемента
+        if len(result) > 1:
             last_two_divs += [result[-2] + ' ' + result[-1]]
-        elif len(result)==1:
+        elif len(result) == 1:
             last_two_divs += [result[-1]]
         else:
             last_two_divs += ['']
+
     return last_two_divs
+
         # print(only_divisions)
 
 def predict(df, matched_industry, models, encoders):
@@ -400,11 +402,11 @@ def predict(df, matched_industry, models, encoders):
         
         # Store predictions and confidence scores for this job title
         job_predictions[job_title] = {
-            'function_pred': function_name,
+            function_code: function_name,
             'function_confidence': function_confidence,
-            'subfunction_pred': subfunction_name,
+            subfunction_code: subfunction_name,
             'subfunction_confidence': subfunction_confidence,
-            'specialization_pred': specialization_name if specialization_name != '-' else None,
+            specialization_code: specialization_name if specialization_name != '-' else None,
             'specialization_confidence': specialization_confidence if specialization_name != '-' else None
         }
             
@@ -474,14 +476,14 @@ def process_files_and_predict(df, models, encoders, matched_industry, test=False
     # Initialize new columns
     df['function_pred'] = None
     df['function_confidence'] = None
-    df['subfunction'] = None
+    df['subfunction_pred'] = None
     df['subfunction_confidence'] = None
-    df['specialization'] = None
+    df['specialization_pred'] = None
     df['specialization_confidence'] = None
     
     # Map the predictions back to all rows
     for job_title, predictions in tqdm(job_predictions.items()):
-        print(f"job title: {job_title}, preds: {predictions}")
+        # print(f"job title: {job_title}, preds: {predictions}")
         # Find all rows with this job title
         mask = df['text_input'] == job_title
         # Apply predictions and confidence scores
@@ -497,7 +499,7 @@ def process_files_and_predict(df, models, encoders, matched_industry, test=False
             df.loc[mask, col] = df.loc[mask, col].apply(lambda x: f"{x:.2%}")
     
     
-    print(df.loc[:20, 'function_pred'])
+    # print(df.loc[:20, 'function_pred'])
     # Save results
     # output_path = os.path.join(results_dir, f"{company_naming}_FunPreds_NoDeps_mymodel.xlsx")
     # company_naming +=1
