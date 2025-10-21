@@ -412,7 +412,7 @@ def check_and_process_data(df):
     df = eng_to_rus(df)
     
     # Название должности
-    df[job_title] = df.apply(lambda x: '-' if (not x[job_title]) or (x[job_title]=='nan') or (x[job_title]=='') else x[job_title], axis=1)
+    df[job_title] = df.apply(lambda x: '-' if (not x[job_title]) or (str(x[job_title]).strip() == 'nan') or (str(x[job_title]).strip() == '') else x[job_title], axis=1)
     # Руководитель/специалист
     df[man_emp] = df.apply(lambda x: man_emp_normalization(x[man_emp], x.name), axis=1)
     # Оценка эффективности работы сотрудника

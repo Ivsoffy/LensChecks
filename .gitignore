@@ -1,7 +1,8 @@
 Modules/src/module_1/companies/*
 Modules/src/module_*/output/*
 Modules/src/module_*/input/*
-Modules/src/module_*/__pycache__/
-Modules/src/__pycache__/
+__pycache__/
 Modules/src/demo/
 src.lnk
+*.pth
+Modules/src/module_2/function_model/__pycache__/*
