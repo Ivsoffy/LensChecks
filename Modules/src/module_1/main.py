@@ -403,20 +403,31 @@ def add_errors_to_excel(errors, input_path, output_path):
     wb.save(output_path)
     print(f"Лист 'Ошибки' добавлен, ячейки подсвечены. Файл: {output_path}")
 
+def month_salary_norm(row, index):
+    if pd.isna(row):
+        errors['data_errors'] += [(monthly_salary, index)]
+    return row
+
 
 # ### Проверка 
 def check_and_process_data(df):
 
     df = convert_some_columns_to_numeric(df)
+    print(df.shape[0])
     df = convert_some_columns_to_str(df)
+    print(df.shape[0])
     df = eng_to_rus(df)
+    print(df.shape[0])
     
     # Название должности
     df[job_title] = df.apply(lambda x: '-' if (not x[job_title]) or (str(x[job_title]).strip() == 'nan') or (str(x[job_title]).strip() == '') else x[job_title], axis=1)
+    # print(df.shape[0])
     # Руководитель/специалист
     df[man_emp] = df.apply(lambda x: man_emp_normalization(x[man_emp], x.name), axis=1)
+    # print(df.shape[0])
     # Оценка эффективности работы сотрудника
     df[performance] = df.apply(lambda x: expectation_normalization(x[performance], x.name), axis=1)
+    # print("эффективность",  df.shape[0])
     # Уровень подчинения по отношению к Первому лицу компании
     df[n_level] = df.apply(lambda x: level_normalization(x[n_level], x.name), axis=1)
     # Пол
@@ -427,14 +438,18 @@ def check_and_process_data(df):
     df[macroregion] = np.nan
     df = map_column_values(df, region, macroregion, region_to_macroregion_map)
     df[region] = df.apply(lambda x: region_normalization(x[region], x.name), axis=1)
+    # print("reg",df.shape[0])
     # Размер ставки
     df[salary_rate] = df.apply(lambda x: salary_rate_normalization(x[salary_rate], x.name), axis=1)
+    # print("sal",df.shape[0])
     # Ежемесячный оклад
-    df[monthly_salary] = df.dropna(subset=[monthly_salary], inplace=True)
+    df[monthly_salary] = df.apply(lambda x: month_salary_norm(x[monthly_salary], x.name), axis=1)
+    # print("month",df.shape[0])
     # Число окладов в году
     df[number_monthly_salaries] = df.apply(lambda x: number_monthly_salaries_normalization(x[number_monthly_salaries], x.name), axis=1)
     # Постоянные надбавки и доплаты (общая сумма за год)
     df[additional_pay] = df.apply(lambda x: additional_pay_normalization(x[additional_pay], x.name), axis=1)
+    # print(df.shape[0])
     # Право на получение переменного вознаграждения
     df[sti_eligibility] = df.apply(lambda x: eligibility_normalization(x[fact_sti], x[target_sti], x[sti_eligibility], x.name), axis=1)
     # Фактическая премия
@@ -442,7 +457,7 @@ def check_and_process_data(df):
     # Целевая премия (%)
     df[target_sti] = df.apply(lambda x: target_sti_normalization(x[target_sti], x.name), axis=1)
     # Фактическая стоимость всех предоставленных типов LTI за 1 год (AK)
-    print( fact_lti in df.columns)
+    # print( fact_lti in df.columns)
     df[fact_lti] = df.apply(lambda x: lti_checks(x[fact_lti], x[fact_lti_1], x[fact_lti_2], x[fact_lti_3], x.name, fact_lti), axis=1)
     # Целевая стоимость всех предоставленных типов LTI в % от базового оклада за 1 год
     df[target_lti_per] = df.apply(lambda x: lti_checks(x[target_lti_per], x[target_lti_1], x[target_lti_2], x[target_lti_3], x.name, target_lti_per), axis=1)
@@ -576,9 +591,11 @@ def file_processing(input_folder, output_folder, columns, save_db_only_without_e
             df_company = pd.read_excel(file_path, sheet_name=cmp_data, header=1)
             df_company = df_company.iloc[:, 2:]
 
+
             # Taking the data from the General Info sheet
             df = check_general_info(df_company, lang, df)
             df = check_and_process_data(df)
+            print(df.shape[0])
             
             if (errors['data_errors'] == [] and errors['info_errors'] == []) or save_db_only_without_errors==False:
                 # Save the processed DataFrame to the output folder
