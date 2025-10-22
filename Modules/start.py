@@ -13,7 +13,7 @@ if __name__ == "__main__":
 
     params_for_each_module = [
         # module_1
-        ['save_db_only_without_errors'],
+        ['save_db_only_without_errors', 'drop_empty_month_salary'],
         # module_2
         ['folder_past_year', 'after_fix'],
         # module_3

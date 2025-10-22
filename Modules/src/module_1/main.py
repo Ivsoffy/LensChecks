@@ -403,31 +403,27 @@ def add_errors_to_excel(errors, input_path, output_path):
     wb.save(output_path)
     print(f"Лист 'Ошибки' добавлен, ячейки подсвечены. Файл: {output_path}")
 
-def month_salary_norm(row, index):
+def monthly_salary_normalization(row, index):
     if pd.isna(row):
         errors['data_errors'] += [(monthly_salary, index)]
     return row
 
 
 # ### Проверка 
-def check_and_process_data(df):
+def check_and_process_data(df, params):
 
     df = convert_some_columns_to_numeric(df)
-    print(df.shape[0])
     df = convert_some_columns_to_str(df)
-    print(df.shape[0])
     df = eng_to_rus(df)
-    print(df.shape[0])
+
+    drop_empty_month_salary = params['drop_empty_month_salary']
     
     # Название должности
     df[job_title] = df.apply(lambda x: '-' if (not x[job_title]) or (str(x[job_title]).strip() == 'nan') or (str(x[job_title]).strip() == '') else x[job_title], axis=1)
-    # print(df.shape[0])
     # Руководитель/специалист
     df[man_emp] = df.apply(lambda x: man_emp_normalization(x[man_emp], x.name), axis=1)
-    # print(df.shape[0])
     # Оценка эффективности работы сотрудника
     df[performance] = df.apply(lambda x: expectation_normalization(x[performance], x.name), axis=1)
-    # print("эффективность",  df.shape[0])
     # Уровень подчинения по отношению к Первому лицу компании
     df[n_level] = df.apply(lambda x: level_normalization(x[n_level], x.name), axis=1)
     # Пол
@@ -438,18 +434,17 @@ def check_and_process_data(df):
     df[macroregion] = np.nan
     df = map_column_values(df, region, macroregion, region_to_macroregion_map)
     df[region] = df.apply(lambda x: region_normalization(x[region], x.name), axis=1)
-    # print("reg",df.shape[0])
     # Размер ставки
     df[salary_rate] = df.apply(lambda x: salary_rate_normalization(x[salary_rate], x.name), axis=1)
-    # print("sal",df.shape[0])
     # Ежемесячный оклад
-    df[monthly_salary] = df.apply(lambda x: month_salary_norm(x[monthly_salary], x.name), axis=1)
-    # print("month",df.shape[0])
+    if drop_empty_month_salary:
+        df[monthly_salary] = df.dropna(subset=[monthly_salary], inplace=True)
+    else:
+        df[monthly_salary] = df.apply(lambda x: monthly_salary_normalization(x[monthly_salary], x.name), axis=1)
     # Число окладов в году
     df[number_monthly_salaries] = df.apply(lambda x: number_monthly_salaries_normalization(x[number_monthly_salaries], x.name), axis=1)
     # Постоянные надбавки и доплаты (общая сумма за год)
     df[additional_pay] = df.apply(lambda x: additional_pay_normalization(x[additional_pay], x.name), axis=1)
-    # print(df.shape[0])
     # Право на получение переменного вознаграждения
     df[sti_eligibility] = df.apply(lambda x: eligibility_normalization(x[fact_sti], x[target_sti], x[sti_eligibility], x.name), axis=1)
     # Фактическая премия
@@ -457,7 +452,6 @@ def check_and_process_data(df):
     # Целевая премия (%)
     df[target_sti] = df.apply(lambda x: target_sti_normalization(x[target_sti], x.name), axis=1)
     # Фактическая стоимость всех предоставленных типов LTI за 1 год (AK)
-    # print( fact_lti in df.columns)
     df[fact_lti] = df.apply(lambda x: lti_checks(x[fact_lti], x[fact_lti_1], x[fact_lti_2], x[fact_lti_3], x.name, fact_lti), axis=1)
     # Целевая стоимость всех предоставленных типов LTI в % от базового оклада за 1 год
     df[target_lti_per] = df.apply(lambda x: lti_checks(x[target_lti_per], x[target_lti_1], x[target_lti_2], x[target_lti_3], x.name, target_lti_per), axis=1)
@@ -468,8 +462,6 @@ def check_and_process_data(df):
 # Проверка каждого файла на наличие всех нужных колонок. При любой ошибке файл попадает в unprocessed.
 def module_1(input_folder='companies/rus', output_folder='output', params=None):
 
-    fact_sti_threshold = 0.05
-    save_db_only_without_errors = params['save_db_only_without_errors']
     # Additional columns from General Info sheet from the SDFs
     additional_cols = [gi_sector, gi_origin, gi_headcount_cat, gi_revenue_cat, gi_contact_name, 
                     gi_title, gi_tel, gi_email, 'SDF Language']
@@ -483,7 +475,7 @@ def module_1(input_folder='companies/rus', output_folder='output', params=None):
     # Iterate through all the files in the input folder
     process_start = time.time()
     print("Current working directory:", os.getcwd())
-    unprocessed_files = file_processing(input_folder, output_folder, final_cols, save_db_only_without_errors)
+    unprocessed_files = file_processing(input_folder, output_folder, final_cols, params)
     proces_end = time.time()
     print(f'Files processed in: {proces_end - process_start}')
 
@@ -531,12 +523,13 @@ def module_1(input_folder='companies/rus', output_folder='output', params=None):
     #     print(f"Failed to save Excel file: {e}")
 
 
-def file_processing(input_folder, output_folder, columns, save_db_only_without_errors):
+def file_processing(input_folder, output_folder, columns, params):
     global errors
     # Creating a list for files with issues
     unprocessed_files = {}
     # ultimate_df = pd.DataFrame(columns=columns)
     counter = 0
+    save_db_only_without_errors = params['save_db_only_without_errors']
 
     for file in os.listdir(input_folder):
         # Check if the file is an Excel file
@@ -594,7 +587,7 @@ def file_processing(input_folder, output_folder, columns, save_db_only_without_e
 
             # Taking the data from the General Info sheet
             df = check_general_info(df_company, lang, df)
-            df = check_and_process_data(df)
+            df = check_and_process_data(df, params)
             print(df.shape[0])
             
             if (errors['data_errors'] == [] and errors['info_errors'] == []) or save_db_only_without_errors==False:
