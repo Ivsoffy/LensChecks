@@ -155,6 +155,7 @@ def region_normalization(text: str, index: int, lang) -> str:
     not_missing = not pd.isna(text)
     if lang == 'RUS':
         in_dict_values = text in (set(final_region.values()))
+        # print("rus", in_dict_values, " ", text)
     else:
         in_dict_values = text in (set(final_region_eng.values()))
     
@@ -474,7 +475,8 @@ def check_and_process_data(df, lang, params):
     # Целевая стоимость всех предоставленных типов LTI в % от базового оклада за 1 год
     df[target_lti_per] = df.apply(lambda x: lti_checks(x[target_lti_per], x[target_lti_1], x[target_lti_2], x[target_lti_3], x.name, target_lti_per), axis=1)
     # Целевая стоимость вознаграждения как % от базового оклада [Данные] AO, AS, AW
-    errors = errors_rus_to_eng(errors)
+    if lang == 'ENG':
+        errors = errors_rus_to_eng(errors)
     return df
 
 # Проверка каждого файла на наличие всех нужных колонок. При любой ошибке файл попадает в unprocessed.
@@ -492,13 +494,13 @@ def module_1(input_folder='companies/rus', output_folder='output', params=None):
     # Creating the final df
     # Iterate through all the files in the input folder
     process_start = time.time()
-    print("Current working directory:", os.getcwd())
+    # print("Current working directory:", os.getcwd())
     unprocessed_files = file_processing(input_folder, output_folder, final_cols, params)
     proces_end = time.time()
-    print(f'Files processed in: {proces_end - process_start}')
+    print(f'Обработка файлов заняла: {proces_end - process_start}')
 
     if len(unprocessed_files) == 0:
-        print(f"\nAll files were processed and concated")
+        print(f"\nВсе файлы проверены!")
     else:
         for file, issue in unprocessed_files.items():
             data_err = [col for col, _ in issue.get('data_errors', [])]
@@ -516,7 +518,7 @@ def module_1(input_folder='companies/rus', output_folder='output', params=None):
 
     # Copy unprocessed files to the unprocessed folder (overwrite if exists)
     if unprocessed_files:
-        print(f"\nCopying {len(unprocessed_files)} unprocessed files to 'unprocessed' folder...")
+        print(f"\nСохраняем {len(unprocessed_files)} файлов в 'unprocessed'...")
 
         for file_name, issue in unprocessed_files.items():
             source_path = os.path.join(input_folder, file_name)
@@ -530,7 +532,7 @@ def module_1(input_folder='companies/rus', output_folder='output', params=None):
                     # shutil.copy2(source_path, destination_path)
                     # print(f"Copied: {file_name}")
             except Exception as e:
-                print(f"Failed to copy {file_name}: {str(e)}")
+                print(f"Не удалось сохранить файл {file_name} в unprocessed: {str(e)}")
     
     # try:
     #     output_path = os.path.join(output_folder, 'Database.xlsx')
@@ -558,7 +560,7 @@ def file_processing(input_folder, output_folder, columns, params):
                 'data_errors': [] # Cписок (row, col)
             }
             
-            print(f"Processing file {counter}: {file}")
+            print(f"Проверяем файл {counter}: {file}")
             # Process the Excel file
             file_path = os.path.join(input_folder, file)
 
@@ -587,7 +589,7 @@ def file_processing(input_folder, output_folder, columns, params):
             missing_columns_rem_data = [col for col in expected_columns if col not in df.columns]
 
             if missing_columns_rem_data:
-                errors['info_errors'] += [f"Missed columns in Data: {missing_columns_rem_data}"]
+                errors['info_errors'] += [f"Не хватает следующих колонок в Данных: {missing_columns_rem_data}"]
             
             # leaving only required columns
             df = df[expected_columns]
@@ -612,6 +614,10 @@ def file_processing(input_folder, output_folder, columns, params):
                 # Save the processed DataFrame to the output folder
                 file_output_path = os.path.join(output_folder, file)
                 df.to_excel(file_output_path)
-            unprocessed_files[os.path.basename(file_path)] = errors
+                print(f"Анкета {file} сохранена в {output_folder}!")
+            if errors['data_errors'] != [] or errors['info_errors'] != []:
+                unprocessed_files[os.path.basename(file_path)] = errors
+            else:
+                print("В файле не обнаружено ошибок, мои поздравления!")
 
     return unprocessed_files
