@@ -149,11 +149,14 @@ def gender_normalization(text: str, index: int) -> str:
     return '-'
             
 
-def region_normalization(text: str, index: int) -> str:
+def region_normalization(text: str, index: int, lang) -> str:
     global errors
 
     not_missing = not pd.isna(text)
-    in_dict_values = text in (set(final_region.values()))
+    if lang == 'RUS':
+        in_dict_values = text in (set(final_region.values()))
+    else:
+        in_dict_values = text in (set(final_region_eng.values()))
     
     if not(not_missing and in_dict_values):
         errors['data_errors'] += [(region, index)]
@@ -442,10 +445,13 @@ def check_and_process_data(df, lang, params):
     df[gender_id] = df.apply(lambda x: gender_normalization(x[gender_id], x.name), axis=1)
     # Регион/область (заполняется автоматически)
     df[region] = df[region].astype(str).str.lower()
-    df = translate_values(df, region, final_region)
+    if lang == 'RUS':
+        df = translate_values(df, region, final_region)
+    else:
+        df = translate_values(df, region, final_region_eng)
     df[macroregion] = np.nan
     df = map_column_values(df, region, macroregion, region_to_macroregion_map)
-    df[region] = df.apply(lambda x: region_normalization(x[region], x.name), axis=1)
+    df[region] = df.apply(lambda x: region_normalization(x[region], x.name, lang), axis=1)
     # Размер ставки
     df[salary_rate] = df.apply(lambda x: salary_rate_normalization(x[salary_rate], x.name), axis=1)
     # Ежемесячный оклад
