@@ -1,5 +1,5 @@
 ############### all modules ##############
-input_folder: src/module_1/input
+input_folder: src/module_1/input/eng
 output_folder: src/module_1/output
 module: 1
 

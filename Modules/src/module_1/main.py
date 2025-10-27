@@ -47,7 +47,7 @@ def man_emp_normalization(text: str, index) -> str:
     text = text.lower().strip()
 
     if not text or text == 'nan' or text == '':
-        errors['data_errors'] += [(man_emp, index)]
+        # errors['data_errors'] += [(man_emp, index)]
         return text
 
     managers = ["руководитель", "руководители", "менеджер", "менеджеры", "manager", "managers"]
@@ -89,8 +89,9 @@ def expectation_normalization(text: str, index: int) -> str:
             if valid_eng[ind].lower() == match_eng[0]:
                 return valid[ind]
     else:
-        errors['data_errors'] += [(performance, index)]
-        return text
+        # errors['data_errors'] += [(performance, index)]
+        # return text
+        return '-'
 
 
 def level_normalization(value, index) -> str:
@@ -107,8 +108,8 @@ def level_normalization(value, index) -> str:
             if 1 <= num <= 20:
                 return f"N-{num}"
     
-    errors['data_errors'] += [(n_level, index)]
-    return value
+    # errors['data_errors'] += [(n_level, index)]
+    return '-'
 
 
 def number_monthly_salaries_normalization(num, index):
@@ -125,8 +126,8 @@ def gender_normalization(text: str, index: int) -> str:
     global errors
 
     if text == '' or text == 'nan':
-        errors['data_errors'] += [(gender_id, index)]
-        return text
+        # errors['data_errors'] += [(gender_id, index)]
+        return '-'
 
     text = text.lower().strip()
 
@@ -144,8 +145,8 @@ def gender_normalization(text: str, index: int) -> str:
             elif match[0] in man:
                 return "М"
 
-    errors['data_errors'] += [(gender_id, index)]
-    return text
+    # errors['data_errors'] += [(gender_id, index)]
+    return '-'
             
 
 def region_normalization(text: str, index: int) -> str:
@@ -351,7 +352,7 @@ def add_errors_to_excel(errors, input_path, output_path):
     })
 
     wb = load_workbook(input_path, data_only=True)
-    ws_err = wb.create_sheet("Ошибки", 0)
+    ws_err = wb.create_sheet("Errors", 0)
 
     # --- Запись и оформление листа "Ошибки" ---
     for r, row in enumerate(dataframe_to_rows(df_errors, index=False, header=True), 1):
@@ -372,7 +373,7 @@ def add_errors_to_excel(errors, input_path, output_path):
         ws_err.column_dimensions[col[0].column_letter].width = max(len(str(c.value) or "") for c in col) + 2
 
     # --- Определение структуры листа "Данные" ---
-    data_sheet = next((s for s in wb.sheetnames if s.strip().lower() == "данные"), None)
+    data_sheet = next((s for s in wb.sheetnames if (s.strip().lower() == "данные") or s.strip().lower() == "salary data"), None)
     if not data_sheet:
         raise ValueError("Не найден лист 'Данные'.")
     ws_data = wb[data_sheet]
@@ -404,17 +405,28 @@ def add_errors_to_excel(errors, input_path, output_path):
     print(f"Лист 'Ошибки' добавлен, ячейки подсвечены. Файл: {output_path}")
 
 def monthly_salary_normalization(row, index):
+    global errors
     if pd.isna(row):
         errors['data_errors'] += [(monthly_salary, index)]
     return row
 
+def errors_rus_to_eng(errors):
+    for ind, error in enumerate(errors['data_errors']):
+        new_error_ind = expected_columns_rus.index(error[0])
+        new_error = (expected_columns_eng[new_error_ind], error[1])
+        errors['data_errors'][ind] = new_error
+    return errors
+    # находим индекс ошибки в expected_columns_rus, меняем на колонку-ошибку из expected_columns_eng
+
 
 # ### Проверка 
-def check_and_process_data(df, params):
+def check_and_process_data(df, lang, params):
+    global errors
 
     df = convert_some_columns_to_numeric(df)
     df = convert_some_columns_to_str(df)
-    df = eng_to_rus(df)
+    if lang == 'ENG':
+        df = eng_to_rus(df)
 
     drop_empty_month_salary = params['drop_empty_month_salary']
     
@@ -456,7 +468,7 @@ def check_and_process_data(df, params):
     # Целевая стоимость всех предоставленных типов LTI в % от базового оклада за 1 год
     df[target_lti_per] = df.apply(lambda x: lti_checks(x[target_lti_per], x[target_lti_1], x[target_lti_2], x[target_lti_3], x.name, target_lti_per), axis=1)
     # Целевая стоимость вознаграждения как % от базового оклада [Данные] AO, AS, AW
-    
+    errors = errors_rus_to_eng(errors)
     return df
 
 # Проверка каждого файла на наличие всех нужных колонок. При любой ошибке файл попадает в unprocessed.
@@ -549,10 +561,12 @@ def file_processing(input_folder, output_folder, columns, params):
                 lang = 'ENG'
                 rm_data = rem_data_eng 
                 cmp_data = company_data_eng
+                rows_to_drop = [company_name_eng, job_title_eng]
             else:
                 lang = 'RUS'
                 rm_data = rem_data
                 cmp_data = company_data
+                rows_to_drop = [company_name, job_title]
             expected_columns = set_expected_columns(lang)
 
             # Exporting the dataframe from an excel file
@@ -571,15 +585,13 @@ def file_processing(input_folder, output_folder, columns, params):
             
             # leaving only required columns
             df = df[expected_columns]
-
-            rows_to_drop = [company_name, job_title]
         
             # Cleaning all the blanks from the columns
             for column in rows_to_drop:
                 df[column] = df[column].replace('', np.nan)
 
             # Dropping rows where company name and title are empty at the same time
-            df.dropna(subset=[company_name, job_title], how = 'all', inplace=True)
+            df.dropna(subset=rows_to_drop, how = 'all', inplace=True)
 
             df_company = pd.read_excel(file_path, sheet_name=cmp_data, header=1)
             df_company = df_company.iloc[:, 2:]
@@ -587,8 +599,8 @@ def file_processing(input_folder, output_folder, columns, params):
 
             # Taking the data from the General Info sheet
             df = check_general_info(df_company, lang, df)
-            df = check_and_process_data(df, params)
-            print(df.shape[0])
+            df = check_and_process_data(df, lang, params)
+            # print(df.shape[0])
             
             if (errors['data_errors'] == [] and errors['info_errors'] == []) or save_db_only_without_errors==False:
                 # Save the processed DataFrame to the output folder
