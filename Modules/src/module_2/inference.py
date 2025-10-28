@@ -44,7 +44,7 @@ pd.set_option('display.max_columns', None)
 
 # Define directories
 results_dir = 'results_test'
-os.makedirs(results_dir, exist_ok=True)
+# os.makedirs(results_dir, exist_ok=True)
 # files_dir = 'data/dozagruzka/'
 MODEL_DIR = "src/module_2/function_model/final_models"  # Directory where model files are stored
 
@@ -82,9 +82,21 @@ def predict_codes(df, test=False):
         # Create combined industry mapping
         industry_mapping = {}
         
-        industry = df['Сектор']
-        print(f"Industry for this file: {list(set(industry))[0]}")
-        matched_industry = list(set(industry))[0]
+        
+        companies = df[company_name].unique()
+        print(f"Компании с пропусками кодов: {companies}")
+        df_final = pd.DataFrame()
+        for company in companies:
+            df_comp = df.loc[df[company_name]==company]
+            # print("----")
+            # print(df_comp['Сектор'])
+            industry = list(df_comp['Сектор'])[0]
+            # 2. Process all files in the directory
+            df_res = process_files_and_predict(df_comp, models, encoders, industry, test)
+            df_final = pd.concat([df_final, df_res])
+        return df_final
+        # print(f"Industry for this file: {list(set(industry))}")
+        # matched_industry = list(set(industry))[0]
 
         # if industry in function_encoders['industry'].classes_:
         #     matched_industry = function_encoders['industry'].classes_
@@ -109,27 +121,24 @@ def predict_codes(df, test=False):
         #     return
 
         # Use industry encoder from Function model as the base
-        for industry in function_encoders['industry'].classes_:
-            # Create multiple entries with different formats for the same industry
-            cleaned = sanitize_text(industry)
-            industry_mapping[cleaned] = industry
-            # Add the original version too
-            industry_mapping[industry] = industry
-            # Add a version with capitalization but no special chars
-            simplified = re.sub(r'[^a-zA-Zа-яА-ЯёЁ0-9\s]', '', industry)
-            industry_mapping[simplified] = industry
-            industry_mapping[simplified.lower()] = industry
-            # Add version with special chars converted to spaces
-            spacified = re.sub(r'[^a-zA-Zа-яА-ЯёЁ0-9]', ' ', industry).strip()
-            industry_mapping[spacified] = industry
-            industry_mapping[spacified.lower()] = industry
+        # for industry in function_encoders['industry'].classes_:
+        #     # Create multiple entries with different formats for the same industry
+        #     cleaned = sanitize_text(industry)
+        #     industry_mapping[cleaned] = industry
+        #     # Add the original version too
+        #     industry_mapping[industry] = industry
+        #     # Add a version with capitalization but no special chars
+        #     simplified = re.sub(r'[^a-zA-Zа-яА-ЯёЁ0-9\s]', '', industry)
+        #     industry_mapping[simplified] = industry
+        #     industry_mapping[simplified.lower()] = industry
+        #     # Add version with special chars converted to spaces
+        #     spacified = re.sub(r'[^a-zA-Zа-яА-ЯёЁ0-9]', ' ', industry).strip()
+        #     industry_mapping[spacified] = industry
+        #     industry_mapping[spacified.lower()] = industry
 
     except Exception as e:
         print(f"Error in model loading process: {e}")
         raise
-
-    # 2. Process all files in the directory
-    df = process_files_and_predict(df, models, encoders, matched_industry, test)
     return df
 
 
@@ -198,7 +207,7 @@ def load_model_with_encoders(model_name, categorical_features, model_class=Class
     Returns:
     tuple: (model, encoders_dict) - The loaded model and a dictionary of its encoders
     """
-    print(f"\nLoading {model_name} model and its encoders...")
+    # print(f"\nLoading {model_name} model and its encoders...")
     model_path = os.path.join(MODEL_DIR, f"{model_name}_final.pth")
     encoders_dict = {}
     
@@ -219,26 +228,26 @@ def load_model_with_encoders(model_name, categorical_features, model_class=Class
             # Try to load model-specific encoder, fall back to generic if needed
             if os.path.exists(encoder_path):
                 encoders_dict[feature] = joblib.load(encoder_path)
-                print(f"  - Loaded {feature} encoder for {model_name} model")
+                # print(f"  - Loaded {feature} encoder for {model_name} model")
             else:
                 # Look for generic encoder
                 generic_path = os.path.join(MODEL_DIR, f"Function_le_{feature}.pkl")
                 if os.path.exists(generic_path):
                     encoders_dict[feature] = joblib.load(generic_path)
-                    print(f"  - Used generic {feature} encoder for {model_name} model")
+                    # print(f"  - Used generic {feature} encoder for {model_name} model")
                 else:
                     raise FileNotFoundError(f"Could not find encoder for {feature}")
         
         # Load output encoder (always model-specific)
         target_path = os.path.join(MODEL_DIR, f"{model_name}_le_target.pkl")
         encoders_dict['target'] = joblib.load(target_path)
-        print(f"  - Loaded target encoder for {model_name} model")
+        # print(f"  - Loaded target encoder for {model_name} model")
         
         # Get number of output classes
         num_classes = len(encoders_dict['target'].classes_)
         
         # Create and load model with correct dimensions
-        print(f"  - Creating {model_name} model with {num_cat_features} categorical features and {num_classes} output classes")
+        # print(f"  - Creating {model_name} model with {num_cat_features} categorical features and {num_classes} output classes")
         model = model_class(num_cat_features, num_classes, categorical_features).to(device)
         model.load_state_dict(state_dict)
         model.eval()
@@ -359,15 +368,15 @@ def select_p_features(df):
 
 def predict(df, matched_industry, models, encoders):
 
-    print("Loading tokenizer...")
+    # print("Loading tokenizer...")
     tokenizer = XLMRobertaTokenizer.from_pretrained('xlm-roberta-base')
-    print("Tokenizer loaded successfully.")
+    # print("Tokenizer loaded successfully.")
 
     model_function, model_subfunction, model_specialization = models
     function_encoders, subfunction_encoders, specialization_encoders = encoders
 
     unique_job_titles = df['text_input'].drop_duplicates().tolist()
-    print(f"Found {len(unique_job_titles)} unique job titles to process")
+    # print(f"Found {len(unique_job_titles)} unique job titles to process")
 
     # Dictionary to store predictions for unique job titles
     job_predictions = {}

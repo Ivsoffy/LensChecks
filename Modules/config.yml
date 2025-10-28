@@ -1,15 +1,16 @@
 ############### all modules ##############
-input_folder: src/module_1/input/eng
-output_folder: src/module_1/output
-module: 1
+input_folder: src/module_2/output/output_after_fix
+output_folder: src/module_2/output
+module: 2
+single_db: False
 
 ############### module 1 #################
 save_db_only_without_errors: False # База данных создается только если ни в одной анкете нет ошибок
 drop_empty_month_salary: False
 
 ############### module 2,3 ###############
-folder_past_year: src/module_2/past_year
-after_fix: False
+folder_past_year: src/module_2/input_past_year
+after_fix: True
 
 ############### module 4 #################
 save_to_parquet: True

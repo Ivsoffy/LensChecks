@@ -13,13 +13,13 @@ if __name__ == "__main__":
 
     params_for_each_module = [
         # module_1
-        ['save_db_only_without_errors', 'drop_empty_month_salary'],
+        ['save_db_only_without_errors', 'drop_empty_month_salary', 'single_db'],
         # module_2
-        ['folder_past_year', 'after_fix'],
+        ['folder_past_year', 'after_fix', 'single_db'],
         # module_3
-        ['folder_past_year', 'after_fix'],
+        ['folder_past_year', 'after_fix', 'single_db'],
         # module_4
-        ['save_to_parquet']
+        ['save_to_parquet', 'single_db']
     ]
 
     with open('config.yml', 'r') as f:

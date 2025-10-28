@@ -175,6 +175,7 @@ def convert_some_columns_to_numeric(df):
         df[column] = df[column].replace('nan', np.nan)
     return df
 
+
 def convert_some_columns_to_str(df):
     columns_to_str = [man_emp, gender_id, sti_eligibility, lti_eligibility, expat, performance, function_code, subfunction_code, specialization_code]
     for column in columns_to_str:
@@ -533,20 +534,14 @@ def module_1(input_folder='companies/rus', output_folder='output', params=None):
                     # print(f"Copied: {file_name}")
             except Exception as e:
                 print(f"Не удалось сохранить файл {file_name} в unprocessed: {str(e)}")
-    
-    # try:
-    #     output_path = os.path.join(output_folder, 'Database.xlsx')
-    #     with pd.ExcelWriter(output_path) as writer:
-    #         ultimate_df.to_excel(writer, index=False, sheet_name='Total Data')
-    #     print(f"Successfully saved Excel file to: {output_path}")
-    # except Exception as e:
-    #     print(f"Failed to save Excel file: {e}")
 
 
 def file_processing(input_folder, output_folder, columns, params):
     global errors
     # Creating a list for files with issues
     unprocessed_files = {}
+    single_db = params['single_db']
+    result_df = pd.DataFrame()
     # ultimate_df = pd.DataFrame(columns=columns)
     counter = 0
     save_db_only_without_errors = params['save_db_only_without_errors']
@@ -608,16 +603,23 @@ def file_processing(input_folder, output_folder, columns, params):
             # Taking the data from the General Info sheet
             df = check_general_info(df_company, lang, df)
             df = check_and_process_data(df, lang, params)
+
+            if single_db:
+                result_df = pd.concat([result_df, df])
             # print(df.shape[0])
             
-            if (errors['data_errors'] == [] and errors['info_errors'] == []) or save_db_only_without_errors==False:
+            if not single_db and ((errors['data_errors'] == [] and errors['info_errors'] == []) or not save_db_only_without_errors):
                 # Save the processed DataFrame to the output folder
                 file_output_path = os.path.join(output_folder, file)
-                df.to_excel(file_output_path)
+                df.to_excel(file_output_path, sheet_name='Total Data')
                 print(f"Анкета {file} сохранена в {output_folder}!")
             if errors['data_errors'] != [] or errors['info_errors'] != []:
                 unprocessed_files[os.path.basename(file_path)] = errors
             else:
                 print("В файле не обнаружено ошибок, мои поздравления!")
+    if single_db and not save_db_only_without_errors:
+        file_output_path = os.path.join(output_folder, 'result_db.xlsx')
+        result_df.to_excel(file_output_path, sheet_name='Total Data')
+        print(f"Все анкеты объединены в {output_folder}!")
 
     return unprocessed_files

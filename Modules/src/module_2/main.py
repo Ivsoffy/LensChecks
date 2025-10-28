@@ -15,6 +15,8 @@ import warnings
 warnings.simplefilter("ignore", category=UserWarning, lineno=329, append=False)
 warnings.filterwarnings('ignore', message='The behavior of DataFrame concatenation with empty or all-NA entries is deprecated.*',
                        category=FutureWarning)
+warnings.simplefilter(action='ignore', category=FutureWarning)
+
 pd.set_option('future.no_silent_downcasting', True)
 parent_dir = os.path.dirname(os.getcwd())
 sys.path.insert(0, parent_dir)
@@ -32,28 +34,27 @@ def module_2(input_folder, output_folder, params):
         # Check if the file is an Excel file
         if file.endswith('.xlsx') or file.endswith('.xls') or file.endswith('.xlsm'):
             counter+=1
-            
-            print(f"Processing file {counter}: {file}")
-            file_path = os.path.join(input_folder, file)
-            sheet_name = "Total Data"
-            df = pd.read_excel(file_path, sheet_name='Sheet1')
-            
             output_file = os.path.join(output_folder, file)
-            cols = [dep_level_1, dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6,
+            file_path = os.path.join(input_folder, file)
+
+            print(f"Processing file {counter}: {file}")
+            df = pd.read_excel(file_path, sheet_name='Total Data')
+            # df.to_excel(output_file)
+            cols = [company_name, dep_level_1, dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6,
                                 job_title]
+            companies = df[company_name].unique()
 
             if not already_fixed: # Первичная обработка
-                company = df[company_name][0]
-                found_files = check_if_past_year_exist(company, folder_py)
-                if found_files:
-                    file_to_cmp = os.path.join(folder_py, found_files[0])
-                    df_py = pd.read_excel(file_to_cmp, sheet_name=rem_data, header=6)
-                    cols_to_copy = [function_code, subfunction_code, specialization_code, function, subfunction, specialization]
-                    # Заполняем данными с прошлого года
-                    df = merge_by_cols(df, df_py, cols, cols_to_copy)
-                df.to_excel(output_file)
+                for company in companies:
+                    found_files = check_if_past_year_exist(company, folder_py)
+                    if found_files:
+                        file_to_cmp = os.path.join(folder_py, found_files[0])
+                        df_py = pd.read_excel(file_to_cmp, sheet_name=rem_data, header=6)
+                        cols_to_copy = [function_code, subfunction_code, specialization_code, function, subfunction, specialization]
+                        # Заполняем данными с прошлого года
+                        df = merge_by_cols(df, df_py, cols, cols_to_copy)
+            
                 
-
                 # Делим данные на заполненные и незаполненные
                 unfilled = df.loc[df[function_code].apply(lambda x: str(x).lower().strip() == 'nan') == True] #add subfunction
                 filled = df[~df.index.isin(unfilled.index)]
@@ -63,12 +64,13 @@ def module_2(input_folder, output_folder, params):
 
                 filled_and_processed = process_filled(filled)
                 df, unfilled_and_processed, count_past_year, count_model = process_unfilled(unfilled, df)
-                df.to_excel(output_file)
+                df.to_excel(output_file, sheet_name='Total Data')
+
 
                 process_output_file(filled_and_processed, unfilled_and_processed, cols, output_file)
 
                 info = {
-                    'Файл с прошлого года': str(found_files[0]) if found_files else 'Отсутствует',
+                    'Файлы с прошлого года': str(found_files) if found_files else 'Отсутствуют',
                     'Отсутствующих кодов в файле':  empty_count, 
                     'Всего строк в файле': df.shape[0],
                     'Подтянуто из прошлого года': count_past_year,
@@ -77,18 +79,20 @@ def module_2(input_folder, output_folder, params):
 
                 add_info(info, output_file)
             else: # Аналитик проверил и исправил анкету
-                map_prefill_to_sheet1(output_file, sheet_prefill='Prefill')
-                map_prefill_to_sheet1(output_file, sheet_prefill='Model')
+                
+                map_prefill_to_sheet1(file_path, output_file, sheet_prefill='Prefill')
+                map_prefill_to_sheet1(file_path, output_file, sheet_prefill='Model')
         print("-----------------------")
         print()
 
 
 def map_prefill_to_sheet1(
     excel_file: str,
+    output_path,
     sheet_prefill,
-    match_cols=[dep_level_1, dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6, job_title],
+    match_cols=[company_name, dep_level_1, dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6, job_title],
     code_cols=(function_code, subfunction_code, specialization_code),
-    sheet_target='Sheet1'
+    sheet_target='Total Data'
 ):
     """
     Маппит значения кодов из листа Prefill на данные в листе Sheet1 по совпадению колонок.
@@ -98,7 +102,7 @@ def map_prefill_to_sheet1(
         match_cols (list): список колонок, по которым искать совпадения
         code_cols (tuple): коды, которые нужно обновить
         sheet_prefill (str): имя листа с уникальными значениями
-        sheet_target (str): имя листа с основной таблицей (Sheet1)
+        sheet_target (str): имя листа с основной таблицей (Total Data)
     
     Возвращает:
         pd.DataFrame: обновлённый датафрейм из Sheet1
@@ -112,29 +116,37 @@ def map_prefill_to_sheet1(
     if match_cols is None:
         match_cols = [col for col in df_prefill.columns if col not in code_cols]
 
-    # --- делаем merge ---
-    df_merged = df_target.merge(
-        df_prefill[match_cols + list(code_cols)],
-        on=match_cols,
-        how='left',
-        suffixes=('', '_prefill')
-    )
+    if set(match_cols).issubset(df_prefill):
 
-    # --- заменяем коды из Prefill, если там есть значения ---
-    for col in code_cols:
-        df_merged[col] = df_merged[f"{col}_prefill"].combine_first(df_merged[col])
-        df_merged.drop(columns=f"{col}_prefill", inplace=True)
+    # --- делаем merge ---
+        df_merged = df_target.merge(
+            df_prefill[match_cols + list(code_cols)],
+            on=match_cols,
+            how='left',
+            suffixes=('', '_prefill')
+        )
+
+        # --- заменяем коды из Prefill, если там есть значения ---
+        for col in code_cols:
+            df_merged[col] = df_merged[f"{col}_prefill"].combine_first(df_merged[col])
+            df_merged.drop(columns=f"{col}_prefill", inplace=True)
 
     # wb = load_workbook(excel_file)
     # ws = wb[sheet_prefill]
     # wb.remove(ws)
     # print(f"Лист '{sheet_prefill}' удалён.")
     # wb.save(excel_file)
-    with pd.ExcelWriter(excel_file, engine='openpyxl', mode='a', if_sheet_exists='replace') as writer:
-        df_merged.to_excel(writer, sheet_name=sheet_target, index=False)
-    print(f"Обновлён лист '{sheet_target}' в файле {excel_file}")
+        if not os.path.exists(output_path):
+            # Если файла нет — создаём новый
+            with pd.ExcelWriter(output_path, engine="openpyxl", mode="w") as writer:
+                df_merged.to_excel(writer, sheet_name=sheet_target, index=False)
+        else:
+            # Если файл есть — добавляем или заменяем лист
+            with pd.ExcelWriter(output_path, engine="openpyxl", mode="a", if_sheet_exists="replace") as writer:
+                df_merged.to_excel(writer, sheet_name=sheet_target, index=False)
+        print(f"На лист '{sheet_target}' подтянуты значения из листа {sheet_prefill} в файле {excel_file}")
 
-    return df_merged
+        # return df_merged
 
         
 def add_info(info, output_file):
@@ -189,13 +201,13 @@ def process_output_file(df1, df2, cols, output_file, sheet1_name='Prefill', shee
     if len(df2.columns)>1:
         if 'function_confidence' in df2.columns:
             # print(3)
-            df2 = df2.loc[:, [company_name, function_code, subfunction_code, specialization_code,
+            df2 = df2.loc[:, [company_name, 'Сектор', function_code, subfunction_code, specialization_code,
                 'function_confidence', 'subfunction_confidence', 'specialization_confidence',
                     dep_level_1, dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6,
                                     job_title]]
         else:
             # print(4)
-            df2 = df2.loc[:, [company_name, function_code, subfunction_code, specialization_code,
+            df2 = df2.loc[:, [company_name, 'Сектор', function_code, subfunction_code, specialization_code,
                     dep_level_1, dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6,
                                     job_title]]
 
@@ -292,14 +304,18 @@ def merge_by_cols(df, df_py, cols, cols_to_copy):
     Возвращает:
         pd.DataFrame: обновлённый df
     """
-    # Проверим, что все нужные колонки есть в файле прошлого года
+
+    print(f"Shape до merge: {df.shape[0]}")
+
     missing_cols = [c for c in cols + cols_to_copy if c not in df_py.columns]
     if missing_cols:
         raise ValueError(f"Отсутствуют колонки в df_py: {missing_cols}")
 
-    # Мерджим по ключевым колонкам
+    # Уберём дубликаты по ключевым колонкам в df_py
+    df_py_unique = df_py.drop_duplicates(subset=cols, keep="first")
+
     df_merged = df.merge(
-        df_py[cols + cols_to_copy],
+        df_py_unique[cols + cols_to_copy],
         on=cols,
         how="left",
         suffixes=("", "_py")
@@ -315,6 +331,7 @@ def merge_by_cols(df, df_py, cols, cols_to_copy):
         else:
             df_merged[new_col] = np.nan
 
+    print(f"Shape после merge: {df_merged.shape[0]}")
     return df_merged
     
 
@@ -451,10 +468,10 @@ def process_with_past_year(company, company_files, df, file, folder):
     print(f"Файл сохранён с выделенными строками: {file}")
 
 
-def check_if_codes_exist(df, company):
-    empty_count = df.loc[df[company_name]==company][function_code].isna().sum()
-    non_empty_count = df.loc[df[company_name]==company][function_code].notna().sum()
-    return empty_count <= non_empty_count
+def check_if_codes_exist(df):
+    empty_count = df[function_code].isna().sum()
+    # non_empty_count = df.loc[df[company_name]==company][function_code].notna().sum()
+    return empty_count == 0
 
 def check_if_past_year_exist(company, folder_py):
     company_str = str(company).strip()

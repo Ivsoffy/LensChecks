@@ -7,3 +7,4 @@ Modules/src/demo/
 src.lnk
 *.pth
 Modules/src/module_2/function_model/__pycache__/*
+result_test/
