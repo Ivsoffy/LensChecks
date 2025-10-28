@@ -28,8 +28,12 @@ from inference import predict_codes
 def module_2(input_folder, output_folder, params):
     folder_py = params['folder_past_year']
     already_fixed = params['after_fix']
-    lang = ''
+    
+    if not os.path.exists(folder_py):
+        print(f"Папка {folder_py} с анкетами прошлого года не найдена")
+    
     counter = 0
+    found_files=[]
     for file in os.listdir(input_folder):
         # Check if the file is an Excel file
         if file.endswith('.xlsx') or file.endswith('.xls') or file.endswith('.xlsm'):
@@ -45,14 +49,16 @@ def module_2(input_folder, output_folder, params):
             companies = df[company_name].unique()
 
             if not already_fixed: # Первичная обработка
-                for company in companies:
-                    found_files = check_if_past_year_exist(company, folder_py)
-                    if found_files:
-                        file_to_cmp = os.path.join(folder_py, found_files[0])
-                        df_py = pd.read_excel(file_to_cmp, sheet_name=rem_data, header=6)
-                        cols_to_copy = [function_code, subfunction_code, specialization_code, function, subfunction, specialization]
-                        # Заполняем данными с прошлого года
-                        df = merge_by_cols(df, df_py, cols, cols_to_copy)
+                if os.path.exists(folder_py):
+                    for company in companies:
+                        print(f"Ищем анкету с прошлого года для компании {company}")
+                        found_files = check_if_past_year_exist(company, folder_py)
+                        if found_files:
+                            file_to_cmp = os.path.join(folder_py, found_files[0])
+                            df_py = pd.read_excel(file_to_cmp, sheet_name=rem_data, header=6)
+                            cols_to_copy = [function_code, subfunction_code, specialization_code, function, subfunction, specialization]
+                            # Заполняем данными с прошлого года
+                            df = merge_by_cols(df, df_py, cols, cols_to_copy)
             
                 
                 # Делим данные на заполненные и незаполненные
@@ -60,7 +66,7 @@ def module_2(input_folder, output_folder, params):
                 filled = df[~df.index.isin(unfilled.index)]
                 empty_count = unfilled.shape[0]
 
-                print(f"filled: {len(filled)}, unfilled: {len(unfilled)}")
+                print(f"Проставлено кодов: {len(filled)}, отсутствует кодов: {len(unfilled)}")
 
                 filled_and_processed = process_filled(filled)
                 df, unfilled_and_processed, count_past_year, count_model = process_unfilled(unfilled, df)
@@ -305,7 +311,6 @@ def merge_by_cols(df, df_py, cols, cols_to_copy):
         pd.DataFrame: обновлённый df
     """
 
-    print(f"Shape до merge: {df.shape[0]}")
 
     missing_cols = [c for c in cols + cols_to_copy if c not in df_py.columns]
     if missing_cols:
@@ -330,8 +335,6 @@ def merge_by_cols(df, df_py, cols, cols_to_copy):
             df_merged.drop(columns=[py_col], inplace=True)
         else:
             df_merged[new_col] = np.nan
-
-    print(f"Shape после merge: {df_merged.shape[0]}")
     return df_merged
     
 
@@ -476,12 +479,14 @@ def check_if_codes_exist(df):
 def check_if_past_year_exist(company, folder_py):
     company_str = str(company).strip()
     found_files = []
-    
+
     for filename in os.listdir(folder_py):
         if company_str.lower() in filename.lower():
             found_files.append(filename)
     
     if found_files:
         for f in found_files:
-            print(f"Найден файл: {f}")
+            print(f"Найдена анкета прошлого года: {f}")
+    else:
+        print("Не найдено анкет прошлого года.")
     return found_files
