@@ -81,6 +81,8 @@ def predict_codes(df, test=False):
         encoders = [function_encoders, subfunction_encoders, specialization_encoders]
         # Create combined industry mapping
         industry_mapping = {}
+
+        
         
         
         companies = df[company_name].unique()
@@ -91,34 +93,34 @@ def predict_codes(df, test=False):
             # print("----")
             # print(df_comp['Сектор'])
             industry = list(df_comp['Сектор'])[0]
+            if industry in function_encoders['industry'].classes_:
+                matched_industry = industry
+            else:
+                # Try case-insensitive match
+                industry_lower = industry.lower()
+                for ind in function_encoders['industry'].classes_:
+                    if ind.lower() == industry_lower:
+                        matched_industry = ind
+                        break
+                        
+                # If still not found, try partial match
+                if not matched_industry:
+                    for ind in function_encoders['industry'].classes_:
+                        if industry_lower in ind.lower() or ind.lower() in industry_lower:
+                            matched_industry = ind
+                            break
+            
+            if not matched_industry:
+                print(f"Warning: Industry '{industry}' not found in encoders")
+                print(f"Available industries: {function_encoders['industry'].classes_}")
+                return
             # 2. Process all files in the directory
-            df_res = process_files_and_predict(df_comp, models, encoders, industry, test)
+            df_res = process_files_and_predict(df_comp, models, encoders, matched_industry, test)
             df_final = pd.concat([df_final, df_res])
         return df_final
         # print(f"Industry for this file: {list(set(industry))}")
         # matched_industry = list(set(industry))[0]
 
-        # if industry in function_encoders['industry'].classes_:
-        #     matched_industry = function_encoders['industry'].classes_
-        # else:
-        #     # Try case-insensitive match
-        #     industry_lower = industry.lower()
-        #     for ind in function_encoders['industry'].classes_:
-        #         if ind.lower() == industry_lower:
-        #             matched_industry = ind
-        #             break
-                    
-        #     # If still not found, try partial match
-        #     if not matched_industry:
-        #         for ind in function_encoders['industry'].classes_:
-        #             if industry_lower in ind.lower() or ind.lower() in industry_lower:
-        #                 matched_industry = ind
-        #                 break
-        
-        # if not matched_industry:
-        #     print(f"Warning: Industry '{industry}' not found in encoders")
-        #     print(f"Available industries: {function_encoders['industry'].classes_}")
-        #     return
 
         # Use industry encoder from Function model as the base
         # for industry in function_encoders['industry'].classes_:
@@ -139,7 +141,6 @@ def predict_codes(df, test=False):
     except Exception as e:
         print(f"Error in model loading process: {e}")
         raise
-    return df
 
 
 
@@ -348,7 +349,7 @@ def select_p_features(df):
         df[p_cols]
         .astype(str)
         .replace(['nan', 'None', 'NaN'], '')
-        .agg('_'.join, axis=1)
+        .agg(' _ '.join, axis=1)
     )
     # print('combined[0]: ', combined[3])
     # 2. Берем только уникальные комбинации
@@ -360,8 +361,10 @@ def select_p_features(df):
         cleaned = clean(text)
         parts = [x.strip() for x in cleaned.split('_') if x.strip()]
         if len(parts) > 1:
+            # print(len(parts))
             mapping[text] = parts[-2] + ' ' + parts[-1]
         elif len(parts) == 1:
+            # print("yes")
             mapping[text] = parts[-1]
         else:
             mapping[text] = ''
