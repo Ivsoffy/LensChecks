@@ -344,39 +344,28 @@ def select_p_features(df):
 
     clean = clean_add_info  # локальная ссылка для скорости
 
-    # 1. Склеиваем 6 колонок в одну строку с разделителем "_"
     combined = (
         df[p_cols]
         .astype(str)
         .replace(['nan', 'None', 'NaN'], '')
         .agg(' _ '.join, axis=1)
     )
-    # print('combined[0]: ', combined[3])
-    # 2. Берем только уникальные комбинации
     unique_texts = combined.drop_duplicates()
 
-    # 3. Обрабатываем только уникальные строки
     mapping = {}
     for text in unique_texts:
         cleaned = clean(text)
         parts = [x.strip() for x in cleaned.split('_') if x.strip()]
         if len(parts) > 1:
-            # print(len(parts))
             mapping[text] = parts[-2] + ' ' + parts[-1]
         elif len(parts) == 1:
-            # print("yes")
             mapping[text] = parts[-1]
         else:
             mapping[text] = ''
 
-    # 4. Маппим результаты обратно на весь df
+    # Маппим результаты обратно на весь df
     results = combined.map(mapping)
-    # print('res: ', results[3])
     return results
-
-
-
-        # print(only_divisions)
 
 def predict(df, matched_industry, models, encoders):
 

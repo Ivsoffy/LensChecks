@@ -535,7 +535,6 @@ def module_1(input_folder='companies/rus', output_folder='output', params=None):
             except Exception as e:
                 print(f"Не удалось сохранить файл {file_name} в unprocessed: {str(e)}")
 
-
 def file_processing(input_folder, output_folder, columns, params):
     global errors
     # Creating a list for files with issues
