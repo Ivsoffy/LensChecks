@@ -31,7 +31,7 @@ def clean_add_info(text: str) -> str:
     pattern = r'\b(?:по|в|и)\b'
     text = re.sub(pattern,'', text)
     # Удаляем лишние символы (кроме &, -)
-    text = re.sub(r'[^a-zа-яё0-9\s&-]', '', text)
+    text = re.sub(r'[^a-zа-яё0-9\s&_-]', '', text)
     # Убираем дефисы в начале и конце
     text = re.sub(r'^-+|-+$', '', text)
     # Нормализуем пробелы

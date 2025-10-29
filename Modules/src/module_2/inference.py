@@ -259,7 +259,6 @@ def load_model_with_encoders(model_name, categorical_features, model_class=Class
         raise
 
 
-
 # Enhanced prediction functions for each level with their specific encoders and confidence scores
 def enhanced_predict_function(model, tokenizer, text, industry, function_encoders):
     """Predict function category for a job title with confidence score"""
@@ -335,34 +334,44 @@ def enhanced_predict_specialization(model, tokenizer, text, industry, function, 
     
     return pred_idx, specialization_encoders['target'].inverse_transform([pred_idx])[0], confidence
 
-from tqdm import tqdm
 
 def select_p_features(df):
-    p_cols = [dep_level_1, dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6]
-    df_divs = df.loc[:, p_cols]
-    last_two_divs = []
+    p_cols = [
+        dep_level_1, dep_level_2, dep_level_3,
+        dep_level_4, dep_level_5, dep_level_6
+    ]
 
-    for _, row in tqdm(df_divs.iterrows()):
-        # row уже pd.Series, нет нужды использовать iloc
-        only_divisions = row.dropna()  # сразу убираем NaN
-        result = []
+    clean = clean_add_info  # локальная ссылка для скорости
 
-        for p in only_divisions:
-            p_cleaned = clean_add_info(p)
+    # 1. Склеиваем 6 колонок в одну строку с разделителем "_"
+    combined = (
+        df[p_cols]
+        .astype(str)
+        .replace(['nan', 'None', 'NaN'], '')
+        .agg('_'.join, axis=1)
+    )
+    # print('combined[0]: ', combined[3])
+    # 2. Берем только уникальные комбинации
+    unique_texts = combined.drop_duplicates()
 
-            # если строка не пустая, добавляем
-            if p_cleaned != '':
-                result += [p_cleaned]
-
-        # собираем последние два элемента
-        if len(result) > 1:
-            last_two_divs += [result[-2] + ' ' + result[-1]]
-        elif len(result) == 1:
-            last_two_divs += [result[-1]]
+    # 3. Обрабатываем только уникальные строки
+    mapping = {}
+    for text in unique_texts:
+        cleaned = clean(text)
+        parts = [x.strip() for x in cleaned.split('_') if x.strip()]
+        if len(parts) > 1:
+            mapping[text] = parts[-2] + ' ' + parts[-1]
+        elif len(parts) == 1:
+            mapping[text] = parts[-1]
         else:
-            last_two_divs += ['']
+            mapping[text] = ''
 
-    return last_two_divs
+    # 4. Маппим результаты обратно на весь df
+    results = combined.map(mapping)
+    # print('res: ', results[3])
+    return results
+
+
 
         # print(only_divisions)
 
@@ -460,7 +469,12 @@ def process_files_and_predict(df, models, encoders, matched_industry, test=False
     if test and ('text_input' in df.columns):
         df.drop(columns='text_input',inplace=True)
     
+    start = time.time()
     lst = select_p_features(df)
+    finish = time.time()
+    res_time = finish - start
+    print(f"time: {res_time}")
+
     res_col = pd.Series(lst, name='add_info')
     df = pd.concat([df, res_col], axis=1)
     # print(df.columns)
