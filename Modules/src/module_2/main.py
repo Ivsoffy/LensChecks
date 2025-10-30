@@ -85,12 +85,14 @@ def module_2(input_folder, output_folder, params):
 
                 add_info(info, output_file)
             else: # Аналитик проверил и исправил анкету
-                
                 map_prefill_to_sheet1(file_path, output_file, sheet_prefill='Prefill')
                 map_prefill_to_sheet1(file_path, output_file, sheet_prefill='Model')
         print("-----------------------")
         print()
 
+
+import os
+import pandas as pd
 
 def map_prefill_to_sheet1(
     excel_file: str,
@@ -102,29 +104,23 @@ def map_prefill_to_sheet1(
 ):
     """
     Маппит значения кодов из листа Prefill на данные в листе Sheet1 по совпадению колонок.
-    
-    Параметры:
-        excel_file (str): путь к Excel-файлу
-        match_cols (list): список колонок, по которым искать совпадения
-        code_cols (tuple): коды, которые нужно обновить
-        sheet_prefill (str): имя листа с уникальными значениями
-        sheet_target (str): имя листа с основной таблицей (Total Data)
-    
-    Возвращает:
-        pd.DataFrame: обновлённый датафрейм из Sheet1
     """
 
     # --- читаем оба листа ---
     df_prefill = pd.read_excel(excel_file, sheet_name=sheet_prefill)
     df_target = pd.read_excel(excel_file, sheet_name=sheet_target)
 
-    # если колонки не заданы — пытаемся угадать автоматически
     if match_cols is None:
         match_cols = [col for col in df_prefill.columns if col not in code_cols]
 
-    if set(match_cols).issubset(df_prefill):
+    # приведение типов к строке для колонок совпадений
+    for col in match_cols:
+        if col in df_prefill.columns:
+            df_prefill[col] = df_prefill[col].astype(str).fillna('')
+        if col in df_target.columns:
+            df_target[col] = df_target[col].astype(str).fillna('')
 
-    # --- делаем merge ---
+    if set(match_cols).issubset(df_prefill.columns) and set(match_cols).issubset(df_target.columns):
         df_merged = df_target.merge(
             df_prefill[match_cols + list(code_cols)],
             on=match_cols,
@@ -137,22 +133,18 @@ def map_prefill_to_sheet1(
             df_merged[col] = df_merged[f"{col}_prefill"].combine_first(df_merged[col])
             df_merged.drop(columns=f"{col}_prefill", inplace=True)
 
-    # wb = load_workbook(excel_file)
-    # ws = wb[sheet_prefill]
-    # wb.remove(ws)
-    # print(f"Лист '{sheet_prefill}' удалён.")
-    # wb.save(excel_file)
+        # сохраняем результат
         if not os.path.exists(output_path):
-            # Если файла нет — создаём новый
             with pd.ExcelWriter(output_path, engine="openpyxl", mode="w") as writer:
                 df_merged.to_excel(writer, sheet_name=sheet_target, index=False)
         else:
-            # Если файл есть — добавляем или заменяем лист
             with pd.ExcelWriter(output_path, engine="openpyxl", mode="a", if_sheet_exists="replace") as writer:
                 df_merged.to_excel(writer, sheet_name=sheet_target, index=False)
-        print(f"На лист '{sheet_target}' подтянуты значения из листа {sheet_prefill} в файле {excel_file}")
 
-        # return df_merged
+        print(f"На лист '{sheet_target}' подтянуты значения из листа '{sheet_prefill}' в файле {excel_file}")
+    else:
+        print("Не все колонки из match_cols найдены в обоих листах.")
+
 
         
 def add_info(info, output_file):

@@ -9,4 +9,5 @@ openpyxl
 fastparquet
 sentencepiece
 torch
-IPython
+ipython
+sentencepiece

@@ -19,10 +19,6 @@ import random
 import time
 import spacy
 
-# parent_dir = os.path.dirname(os.getcwd())
-# sys.path.insert(0, parent_dir)
-# sys.path.append(os.path.abspath(os.path.dirname(__file__)))
-
 warnings.simplefilter("ignore", category=UserWarning, lineno=329, append=False)
 warnings.filterwarnings('ignore', message='The behavior of DataFrame concatenation with empty or all-NA entries is deprecated.*',
                        category=FutureWarning)
@@ -81,8 +77,6 @@ def predict_codes(df, test=False):
         encoders = [function_encoders, subfunction_encoders, specialization_encoders]
         # Create combined industry mapping
         industry_mapping = {}
-
-        
         
         
         companies = df[company_name].unique()
@@ -384,14 +378,10 @@ def predict(df, matched_industry, models, encoders):
 
     # Process each unique job title
     for job_title in tqdm(unique_job_titles, desc="Predicting unique job titles"):
-        # try:
-        # print("ok")
         # Clean job title
-        # job_title_clean = sanitize_text(job_title)
+        job_title_clean = sanitize_text(job_title)
         job_title_clean = remove_seniority_from_string(job_title)
 
-        # print("OK!!!!!!!!!!!!!!!!!!!!")
-        # print(job_title_clean)
         
         # Predict function with confidence
         _, function_name, function_confidence = enhanced_predict_function(
