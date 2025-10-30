@@ -17,9 +17,9 @@ if __name__ == "__main__":
         # module_2
         ['folder_past_year', 'after_fix'],
         # module_3
-        ['folder_past_year', 'after_fix'],
+        ['save_to_parquet'],
         # module_4
-        ['save_to_parquet']
+        ['folder_past_year', 'after_fix']
     ]
 
     with open('config.yml', 'r') as f:

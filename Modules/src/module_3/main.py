@@ -29,6 +29,7 @@ def module_3(input_folder, output_folder, params=None):
     res_df = pd.DataFrame()
     res_lower_mrot_df = pd.DataFrame()
     res_high_ti = pd.DataFrame()
+    print("Модуль 3: Компенсационные элементы.")
 
     for file in os.listdir(input_folder):
         # Check if the file is an Excel file
@@ -48,7 +49,7 @@ def module_3(input_folder, output_folder, params=None):
 
             # Exporting the dataframe from an excel file
             # For SDFs
-            sheet_name = "Sheet1"
+            sheet_name = "Total Data"
             df = pd.read_excel(file_path, sheet_name=sheet_name)
             # print(df.keys())
 
