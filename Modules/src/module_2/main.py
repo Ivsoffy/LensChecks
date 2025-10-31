@@ -29,7 +29,7 @@ def module_2(input_folder, output_folder, params):
     folder_py = params['folder_past_year']
     already_fixed = params['after_fix']
     
-    if not os.path.exists(folder_py):
+    if not isinstance(folder_py,str) or not os.path.exists(folder_py):
         print(f"Папка {folder_py} с анкетами прошлого года не найдена")
     
     counter = 0
@@ -49,7 +49,7 @@ def module_2(input_folder, output_folder, params):
             companies = df[company_name].unique()
 
             if not already_fixed: # Первичная обработка
-                if os.path.exists(folder_py):
+                if isinstance(folder_py, str) and os.path.exists(folder_py):
                     for company in companies:
                         print(f"Ищем анкету с прошлого года для компании {company}")
                         found_files = check_if_past_year_exist(company, folder_py)

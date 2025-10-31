@@ -232,9 +232,11 @@ def map_prefill_to_sheet1(
     os.makedirs(os.path.dirname(output_path) or '.', exist_ok=True)
     if not os.path.exists(output_path):
         write_mode = "w"
+        if_sheet_exists=None
     else:
         write_mode = "a"
-    with pd.ExcelWriter(output_path, engine="openpyxl", mode=write_mode, if_sheet_exists="replace") as writer:
+        if_sheet_exists="replace"
+    with pd.ExcelWriter(output_path, engine="openpyxl", mode=write_mode, if_sheet_exists=if_sheet_exists) as writer:
         df_final.to_excel(writer, sheet_name=sheet_target, index=False)
 
     print(f"\nРезультат сохранён в {output_path} (лист {sheet_target}).")

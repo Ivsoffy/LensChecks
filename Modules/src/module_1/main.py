@@ -458,7 +458,7 @@ def check_and_process_data(df, lang, params):
     df[salary_rate] = df.apply(lambda x: salary_rate_normalization(x[salary_rate], x.name), axis=1)
     # Ежемесячный оклад
     if drop_empty_month_salary:
-        df[monthly_salary] = df.dropna(subset=[monthly_salary], inplace=True)
+        df.dropna(subset=[monthly_salary], inplace=True)
     else:
         df[monthly_salary] = df.apply(lambda x: monthly_salary_normalization(x[monthly_salary], x.name), axis=1)
     # Число окладов в году
