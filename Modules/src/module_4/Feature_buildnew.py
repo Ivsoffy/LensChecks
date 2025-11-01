@@ -476,7 +476,7 @@ def calculate_f(df):
     df['region'] = df['region'].apply(sanitize_text)
     df['headcount_cat'] = df['headcount_cat'].apply(sanitize_text)
     df['revenue_cat'] = df['revenue_cat'].apply(sanitize_text)
-    df['function'] = df['function'].str.strip().str.upper()
+    df['function'] = str(df['function']).strip().upper()
     df['subfunction'] = df['subfunction'].str.strip().str.upper()
     df['spec'] = df['spec'].str.strip().str.upper()
 

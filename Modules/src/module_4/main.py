@@ -11,6 +11,7 @@ import warnings
 import re
 from openpyxl import utils
 import warnings
+import uuid
 # warnings.filterwarnings("ignore", category=UserWarning)
 warnings.simplefilter("ignore", category=UserWarning, lineno=329, append=False)
 warnings.filterwarnings('ignore', message='The behavior of DataFrame concatenation with empty or all-NA entries is deprecated.*',
@@ -59,6 +60,7 @@ def module_4(input_folder, output_folder, params):
                             cols_to_copy = [grade]
                             # Заполняем данными с прошлого года
                             df = merge_by_cols(df, df_py, cols, cols_to_copy)
+                            df.to_excel('debug.xlsx')
             
                 
                 # Делим данные на заполненные и незаполненные
@@ -377,26 +379,35 @@ def process_filled(df):
 def merge_by_cols(df, df_py, cols, cols_to_copy):
     """
     Сравнивает строки df и df_py по списку колонок cols.
-    Если значения совпадают — копирует значения колонок cols_to_copy из df_py в df.
+    Если значения совпадают — копирует значения колонок cols_to_copy из df_py в df в колонку grade_old.
 
     Параметры:
         df (pd.DataFrame): основной датафрейм, в который копируем данные
         df_py (pd.DataFrame): источник данных
         cols (list): список колонок для сравнения
-        cols_to_copy (list): список колонок, которые нужно скопировать из df_py в df
+        cols_to_copy (list): список колонок, которые нужно скопировать из df_py в df (ожидается одна колонка: ['grade'])
 
     Возвращает:
         pd.DataFrame: обновлённый df
     """
 
-
+    # Проверим наличие нужных колонок
     missing_cols = [c for c in cols + cols_to_copy if c not in df_py.columns]
     if missing_cols:
         raise ValueError(f"Отсутствуют колонки в df_py: {missing_cols}")
 
+    df = df.copy()
+    df_py = df_py.copy()
+
+    # Приведение типов к строке (чтобы избежать ValueError при merge)
+    for c in cols:
+        df[c] = df[c].astype(str).replace('nan', np.nan)
+        df_py[c] = df_py[c].astype(str).replace('nan', np.nan)
+
     # Уберём дубликаты по ключевым колонкам в df_py
     df_py_unique = df_py.drop_duplicates(subset=cols, keep="first")
 
+    # Выполним объединение
     df_merged = df.merge(
         df_py_unique[cols + cols_to_copy],
         on=cols,
@@ -404,23 +415,25 @@ def merge_by_cols(df, df_py, cols, cols_to_copy):
         suffixes=("", "_py")
     )
 
-    func_cols = ['grade_old']
+    # Теперь переносим данные из df_py в grade_old
+    old_col = cols_to_copy[0]  # например, "grade"
+    py_col = f"{old_col}_py"
 
-    for old_col, new_col in zip(cols_to_copy, func_cols):
-        py_col = f"{old_col}_py"
-        if py_col in df_merged.columns:
-            df_merged[new_col] = df_merged[py_col]
-            df_merged.drop(columns=[py_col], inplace=True)
-        else:
-            df_merged[new_col] = np.nan
+    if py_col in df_merged.columns:
+        df_merged["grade_old"] = df_merged[py_col]
+        df_merged.drop(columns=[py_col], inplace=True)
+    else:
+        df_merged["grade_old"] = np.nan
+
     return df_merged
-    
-def _normalize_val(v):
-    """Нормализация для сравнения: на str, strip и lower (None/NaN -> '')"""
-    if pd.isna(v):
-        return ""
-    s = str(v).strip()
-    return s.lower()
+
+
+# def _normalize_val(v):
+#     """Нормализация для сравнения: на str, strip и lower (None/NaN -> '')"""
+#     if pd.isna(v):
+#         return ""
+#     s = str(v).strip()
+#     return s.lower()
 
 def check_if_past_year_exist(company, folder_py):
     company_str = str(company).strip()
