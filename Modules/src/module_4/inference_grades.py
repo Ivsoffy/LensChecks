@@ -120,7 +120,7 @@ def run_inference(df, model, tokenizer, encoders, le_grade, device, batch_size=1
     
     # Encode categorical features
     X_categorical = []
-    print(df.loc[3, 'function'])
+    # print(df.loc[3, 'function'])
     for feature in categorical_features:
         encoder = encoders[feature]
         # Handle potential new categories not seen in training

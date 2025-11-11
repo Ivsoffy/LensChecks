@@ -11,11 +11,13 @@ import warnings
 import re
 from openpyxl import utils
 import warnings
+
 # warnings.filterwarnings("ignore", category=UserWarning)
 warnings.simplefilter("ignore", category=UserWarning, lineno=329, append=False)
 warnings.filterwarnings('ignore', message='The behavior of DataFrame concatenation with empty or all-NA entries is deprecated.*',
                        category=FutureWarning)
 warnings.simplefilter(action='ignore', category=FutureWarning)
+warnings.simplefilter(action='ignore', category=pd.errors.SettingWithCopyWarning)
 
 pd.set_option('future.no_silent_downcasting', True)
 parent_dir = os.path.dirname(os.getcwd())
@@ -25,12 +27,32 @@ sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 from LP import *
 from inference import predict_codes
 
+cols = [company_name, dep_level_1, dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6,
+                                job_title]
+
+def process_past_year(folder_py, df):
+    companies = df[company_name].unique()
+
+    if not isinstance(folder_py,str) or not os.path.exists(folder_py):
+        print(f"Папка {folder_py} с анкетами прошлого года не найдена")
+    else:
+        for company in companies:
+            print(f"Ищем анкету с прошлого года для компании {company}")
+            try:
+                found_files = check_if_past_year_exist(company, folder_py)
+                if found_files:
+                    file_to_cmp = os.path.join(folder_py, found_files[0])
+                    df_py = pd.read_excel(file_to_cmp, sheet_name=rem_data, header=6, index_col=0)
+                    cols_to_copy = [function_code, subfunction_code, specialization_code, function, subfunction, specialization]
+                    # Заполняем данными с прошлого года
+                    df = merge_by_cols(df, df_py, cols, cols_to_copy)
+            except:
+                print(f"Не удалось прочитатать файл {found_files[0]}")
+    return df
+
 def module_2(input_folder, output_folder, params):
     folder_py = params['folder_past_year']
     already_fixed = params['after_fix']
-    
-    if not isinstance(folder_py,str) or not os.path.exists(folder_py):
-        print(f"Папка {folder_py} с анкетами прошлого года не найдена")
     
     counter = 0
     found_files=[]
@@ -41,28 +63,21 @@ def module_2(input_folder, output_folder, params):
             output_file = os.path.join(output_folder, file)
             file_path = os.path.join(input_folder, file)
 
-            print(f"Processing file {counter}: {file}")
-            df = pd.read_excel(file_path, sheet_name='Total Data')
-            # df.to_excel(output_file)
-            cols = [company_name, dep_level_1, dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6,
-                                job_title]
-            companies = df[company_name].unique()
+            print(f"Проверяем файл {counter}: {file}")
+            df = pd.read_excel(file_path, sheet_name='Total Data', index_col=0)
 
             if not already_fixed: # Первичная обработка
-                if isinstance(folder_py, str) and os.path.exists(folder_py):
-                    for company in companies:
-                        print(f"Ищем анкету с прошлого года для компании {company}")
-                        found_files = check_if_past_year_exist(company, folder_py)
-                        if found_files:
-                            file_to_cmp = os.path.join(folder_py, found_files[0])
-                            df_py = pd.read_excel(file_to_cmp, sheet_name=rem_data, header=6)
-                            cols_to_copy = [function_code, subfunction_code, specialization_code, function, subfunction, specialization]
-                            # Заполняем данными с прошлого года
-                            df = merge_by_cols(df, df_py, cols, cols_to_copy)
-            
+                # Подтягиваем коды с прошлого года
+                df = process_past_year(folder_py,df)
                 
                 # Делим данные на заполненные и незаполненные
-                unfilled = df.loc[df[function_code].apply(lambda x: str(x).lower().strip() == 'nan') == True] #add subfunction
+                unfilled = df.loc[
+                    df[function_code]
+                    .astype(str)
+                    .str.lower()
+                    .str.strip()
+                    .isin(['nan', 'none', 'null', ''])
+                ]
                 filled = df[~df.index.isin(unfilled.index)]
                 empty_count = unfilled.shape[0]
 
@@ -103,45 +118,74 @@ def map_prefill_to_sheet1(
     Маппит значения кодов из листа Prefill на данные в листе Sheet1 по совпадению колонок.
     """
 
-    # --- читаем оба листа ---
-    df_prefill = pd.read_excel(excel_file, sheet_name=sheet_prefill)
-    df_target = pd.read_excel(excel_file, sheet_name=sheet_target)
+    try:
+        # --- читаем оба листа ---
+        try:
+            df_prefill = pd.read_excel(excel_file, sheet_name=sheet_prefill)
+            df_target = pd.read_excel(excel_file, sheet_name=sheet_target)
+        except FileNotFoundError:
+            print(f"Ошибка: файл '{excel_file}' не найден.")
+            return
+        except ValueError as e:
+            print(f"Ошибка при чтении листов: {e}")
+            return
+        except Exception as e:
+            print(f"Не удалось прочитать Excel-файл: {e}")
+            return
 
-    if match_cols is None:
-        match_cols = [col for col in df_prefill.columns if col not in code_cols]
+        if match_cols is None:
+            match_cols = [col for col in df_prefill.columns if col not in code_cols]
 
-    # приведение типов к строке для колонок совпадений
-    for col in match_cols:
-        if col in df_prefill.columns:
-            df_prefill[col] = df_prefill[col].astype(str).fillna('')
-        if col in df_target.columns:
-            df_target[col] = df_target[col].astype(str).fillna('')
+        # приведение типов к строке для колонок совпадений
+        for col in match_cols:
+            if col in df_prefill.columns:
+                df_prefill[col] = df_prefill[col].astype(str).fillna('')
+            if col in df_target.columns:
+                df_target[col] = df_target[col].astype(str).fillna('')
 
-    if set(match_cols).issubset(df_prefill.columns) and set(match_cols).issubset(df_target.columns):
-        df_merged = df_target.merge(
-            df_prefill[match_cols + list(code_cols)],
-            on=match_cols,
-            how='left',
-            suffixes=('', '_prefill')
-        )
+        if set(match_cols).issubset(df_prefill.columns) and set(match_cols).issubset(df_target.columns):
+            try:
+                df_merged = df_target.merge(
+                    df_prefill[match_cols + list(code_cols)],
+                    on=match_cols,
+                    how='left',
+                    suffixes=('', '_prefill')
+                )
+            except KeyError as e:
+                print(f"Ошибка при объединении таблиц: отсутствует колонка {e}")
+                return
+            except Exception as e:
+                print(f"Ошибка при объединении данных: {e}")
+                return
 
-        # --- заменяем коды из Prefill, если там есть значения ---
-        for col in code_cols:
-            df_merged[col] = df_merged[f"{col}_prefill"].combine_first(df_merged[col])
-            df_merged.drop(columns=f"{col}_prefill", inplace=True)
+            # --- заменяем коды из Prefill, если там есть значения ---
+            for col in code_cols:
+                try:
+                    df_merged[col] = df_merged[f"{col}_prefill"].combine_first(df_merged[col])
+                    df_merged.drop(columns=f"{col}_prefill", inplace=True)
+                except KeyError:
+                    print(f"Предупреждение: колонка '{col}' отсутствует в данных для замены.")
+                except Exception as e:
+                    print(f"Ошибка при обработке колонки '{col}': {e}")
 
-        # сохраняем результат
-        if not os.path.exists(output_path):
-            with pd.ExcelWriter(output_path, engine="openpyxl", mode="w") as writer:
-                df_merged.to_excel(writer, sheet_name=sheet_target, index=False)
+            # сохраняем результат
+            try:
+                if not os.path.exists(output_path):
+                    with pd.ExcelWriter(output_path, engine="openpyxl", mode="w") as writer:
+                        df_merged.to_excel(writer, sheet_name=sheet_target, index=False)
+                else:
+                    with pd.ExcelWriter(output_path, engine="openpyxl", mode="a", if_sheet_exists="replace") as writer:
+                        df_merged.to_excel(writer, sheet_name=sheet_target, index=False)
+
+                print(f"На лист '{sheet_target}' подтянуты значения из листа '{sheet_prefill}' в файле {excel_file}")
+            except PermissionError:
+                print(f"Ошибка: нет доступа для записи в файл '{output_path}'. Возможно, он открыт.")
+            except Exception as e:
+                print(f"Ошибка при сохранении файла: {e}")
         else:
-            with pd.ExcelWriter(output_path, engine="openpyxl", mode="a", if_sheet_exists="replace") as writer:
-                df_merged.to_excel(writer, sheet_name=sheet_target, index=False)
-
-        print(f"На лист '{sheet_target}' подтянуты значения из листа '{sheet_prefill}' в файле {excel_file}")
-    else:
-        print("Не все колонки из match_cols найдены в обоих листах.")
-
+            print("Не все колонки из match_cols найдены в обоих листах.")
+    except Exception as e:
+        print(f"Непредвиденная ошибка при выполнении функции: {e}")
 
         
 def add_info(info, output_file):
@@ -173,40 +217,31 @@ def process_output_file(df1, df2, cols, output_file, sheet1_name='Prefill', shee
     df1 = df1.drop_duplicates(subset=cols)
     df2 = df2.drop_duplicates(subset=cols)
 
-    # df1 = df1.loc[:, [company_name, function_code, subfunction_code, specialization_code]]
-    # print("OK")
-    # cols_df1 = [company_name, function_code, subfunction_code, specialization_code,
-    #            'past_year_check', dep_level_1, dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6,
-    #                             job_title]
-    # print(all(c in df1.columns for c in cols_df1))
-    # # print(df2.columns)
+    # --- Обработка df1 ---
+    base_cols_1 = [
+        company_name, 'Сектор', function_code, subfunction_code, specialization_code,
+        dep_level_1, dep_level_2, dep_level_3, dep_level_4,
+        dep_level_5, dep_level_6, job_title
+    ]
+    extra_cols_1 = ['past_year_check', 'func_old', 'subfunc_old', 'spec_old']
+    df1_cols = base_cols_1 + extra_cols_1 if 'func_old' in df1.columns else base_cols_1
+    df1 = df1[[c for c in df1_cols if c in df1.columns]]
 
-    if 'func_old' in df1.columns:
-        # print(1)
-        df1 = df1.loc[:, [company_name, function_code, subfunction_code, specialization_code,
-               'past_year_check', dep_level_1, dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6,
-                                job_title, 'func_old', 'subfunc_old', 'spec_old']]
-    else:
-        # print(2)
-        df1 = df1.loc[:, [company_name, function_code, subfunction_code, specialization_code,
-                        dep_level_1,
-        dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6,
-                        job_title]]
-    
-    if len(df2.columns)>1:
-        if 'function_confidence' in df2.columns:
-            # print(3)
-            df2 = df2.loc[:, [company_name, 'Сектор', function_code, subfunction_code, specialization_code,
-                'function_confidence', 'subfunction_confidence', 'specialization_confidence',
-                    dep_level_1, dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6,
-                                    job_title]]
-        else:
-            # print(4)
-            df2 = df2.loc[:, [company_name, 'Сектор', function_code, subfunction_code, specialization_code,
-                    dep_level_1, dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6,
-                                    job_title]]
+    # --- Обработка df2 ---
+    base_cols_2 = [
+        company_name, 'Сектор', function_code, subfunction_code, specialization_code,
+        dep_level_1, dep_level_2, dep_level_3, dep_level_4,
+        dep_level_5, dep_level_6, job_title
+    ]
+    conf_cols = ['function_confidence', 'subfunction_confidence', 'specialization_confidence']
+    df2_cols = base_cols_2[:5] + conf_cols + base_cols_2[5:] if 'function_confidence' in df2.columns else base_cols_2
+    df2 = df2[[c for c in df2_cols if c in df2.columns]]
 
-    book = load_workbook(output_file)
+    try:
+        book = load_workbook(output_file)
+    except FileNotFoundError:
+        print(f"Ошибка: файл '{output_file}' не найден.")
+        return
     red_fill = PatternFill(start_color='FFC7CE', end_color='FFC7CE', fill_type='solid')
 
     # Работа с df1
@@ -325,19 +360,7 @@ def merge_by_cols(df, df_py, cols, cols_to_copy):
         else:
             df_merged[new_col] = np.nan
     return df_merged
-    
 
-def _normalize_val(v):
-    """Нормализация для сравнения: на str, strip и lower (None/NaN -> '')"""
-    if pd.isna(v):
-        return ""
-    s = str(v).strip()
-    return s.lower()
-
-def check_if_codes_exist(df):
-    empty_count = df[function_code].isna().sum()
-    # non_empty_count = df.loc[df[company_name]==company][function_code].notna().sum()
-    return empty_count == 0
 
 def check_if_past_year_exist(company, folder_py):
     company_str = str(company).strip()

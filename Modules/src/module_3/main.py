@@ -41,16 +41,10 @@ def module_3(input_folder, output_folder, params=None):
             # Process the Excel file
             file_path = os.path.join(input_folder, file)
 
-            # Language detection
-            if 'Salary Data' in pd.ExcelFile(file_path).sheet_names:
-                lang = 'ENG'
-            else:
-                lang = 'RUS'
-
             # Exporting the dataframe from an excel file
             # For SDFs
             sheet_name = "Total Data"
-            df = pd.read_excel(file_path, sheet_name=sheet_name)
+            df = pd.read_excel(file_path, sheet_name=sheet_name, index_col=0)
             # print(df.keys())
 
             # Apply cleaning to column names
@@ -160,7 +154,7 @@ def module_3(input_folder, output_folder, params=None):
             res_high_ti = pd.concat([res_high_ti, high_ti])
 
             try:
-                output_path = os.path.join(output_folder, 'Database.xlsx')
+                output_path = os.path.join(output_folder, file)
                 with pd.ExcelWriter(output_path) as writer:
                     res_df.to_excel(writer, index=False, sheet_name='Total Data')
                     res_lower_mrot_df.to_excel(writer, index=True, sheet_name='Lower than MROT')

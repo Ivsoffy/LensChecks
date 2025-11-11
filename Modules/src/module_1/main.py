@@ -483,6 +483,8 @@ def check_and_process_data(df, lang, params):
 # Проверка каждого файла на наличие всех нужных колонок. При любой ошибке файл попадает в unprocessed.
 def module_1(input_folder='companies/rus', output_folder='output', params=None):
 
+    print("Модуль 1: Техническая проверка.")
+
     # Additional columns from General Info sheet from the SDFs
     additional_cols = [gi_sector, gi_origin, gi_headcount_cat, gi_revenue_cat, gi_contact_name, 
                     gi_title, gi_tel, gi_email, 'SDF Language']
@@ -610,6 +612,7 @@ def file_processing(input_folder, output_folder, columns, params):
             if not single_db and ((errors['data_errors'] == [] and errors['info_errors'] == []) or not save_db_only_without_errors):
                 # Save the processed DataFrame to the output folder
                 file_output_path = os.path.join(output_folder, file)
+                df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
                 df.to_excel(file_output_path, sheet_name='Total Data')
                 print(f"Анкета {file} сохранена в {output_folder}!")
             if errors['data_errors'] != [] or errors['info_errors'] != []:
@@ -618,6 +621,7 @@ def file_processing(input_folder, output_folder, columns, params):
                 print("В файле не обнаружено ошибок, мои поздравления!")
     if single_db and not save_db_only_without_errors:
         file_output_path = os.path.join(output_folder, 'result_db.xlsx')
+        result_df = result_df.loc[:, ~df.columns.str.contains('^Unnamed')]
         result_df.to_excel(file_output_path, sheet_name='Total Data')
         print(f"Все анкеты объединены в {output_folder}!")
 
