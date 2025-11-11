@@ -51,6 +51,8 @@ def process_past_year(folder_py, df):
     return df
 
 def module_2(input_folder, output_folder, params):
+    print("Модуль 2: Выставление кодов функций.")
+    
     folder_py = params['folder_past_year']
     already_fixed = params['after_fix']
     
@@ -68,7 +70,7 @@ def module_2(input_folder, output_folder, params):
 
             if not already_fixed: # Первичная обработка
                 # Подтягиваем коды с прошлого года
-                df = process_past_year(folder_py,df)
+                df = process_past_year(folder_py, df)
                 
                 # Делим данные на заполненные и незаполненные
                 unfilled = df.loc[
@@ -100,6 +102,8 @@ def module_2(input_folder, output_folder, params):
 
                 add_info(info, output_file)
             else: # Аналитик проверил и исправил анкету
+                file_path = os.path.join(output_folder, file)
+
                 map_prefill_to_sheet1(file_path, output_file, sheet_prefill='Prefill')
                 map_prefill_to_sheet1(file_path, output_file, sheet_prefill='Model')
         print("-----------------------")

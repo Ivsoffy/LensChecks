@@ -28,6 +28,8 @@ from LP import *
 from inference_grades import predict_grades
 
 def module_4(input_folder, output_folder, params):
+    print("Модуль 4: Выставление грейдов.")
+
     folder_py = params['folder_past_year']
     already_fixed = params['after_fix']
     
@@ -73,14 +75,9 @@ def module_4(input_folder, output_folder, params):
 
                 filled_and_processed = process_filled(filled)
 
-                # print(f"DEBUG: {unfilled.loc[5, job_title]}")
-                # print(f"shape: {unfilled.shape[0]}")
                 df, unfilled_and_processed, count_past_year, count_model = process_unfilled(unfilled, df)
-                # print(f"DEBUG: {unfilled_and_processed.loc[5, job_title]}")
-                # print(f"shape: {unfilled_and_processed.shape[0]}")
                 df.to_excel(output_file, sheet_name='Total Data')
                 
-
                 process_output_file(filled_and_processed, unfilled_and_processed, cols, output_file)
 
                 info = {
@@ -93,6 +90,7 @@ def module_4(input_folder, output_folder, params):
 
                 add_info(info, output_file)
             else: # Аналитик проверил и исправил анкету
+                file_path = os.path.join(output_folder, file)
                 map_prefill_to_sheet1(file_path, output_file, sheet_prefill='Prefill')
                 df_final = map_prefill_to_sheet1(file_path, output_file, sheet_prefill='Model')
 
@@ -156,8 +154,6 @@ def map_prefill_to_sheet1(
     
     return df_merged
     
-
-
         
 def add_info(info, output_file):
     info = pd.DataFrame(data=[info])
