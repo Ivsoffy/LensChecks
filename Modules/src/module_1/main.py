@@ -325,7 +325,7 @@ def check_general_info(df_company, lang, df):
         errors['info_errors'] += ["Incorrect General Info"]
     else:
         comp_name = df[company_name][0]
-        if not re.fullmatch(r"[A-Za-z_]+", str(comp_name)):
+        if not re.fullmatch(r"[A-Za-z0-9_]+", str(comp_name)):
             errors['info_errors'] += [f"Incorrect company name format: {comp_name}"]
             # print(df[gi_company_name
 

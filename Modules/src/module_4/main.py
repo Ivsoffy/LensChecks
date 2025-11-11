@@ -30,9 +30,6 @@ def module_4(input_folder, output_folder, params):
     folder_py = params['folder_past_year']
     already_fixed = params['after_fix']
     
-    if not isinstance(folder_py, str) or not os.path.exists(folder_py):
-        print(f"Папка {folder_py} с анкетами прошлого года не найдена")
-    
     counter = 0
     found_files=[]
     for file in os.listdir(input_folder):
@@ -50,7 +47,9 @@ def module_4(input_folder, output_folder, params):
             companies = df[company_name].unique()
 
             if not already_fixed: # Первичная обработка
-                if isinstance(folder_py, str) and os.path.exists(folder_py):
+                if not isinstance(folder_py, str) or not os.path.exists(folder_py):
+                    print(f"Папка {folder_py} с анкетами прошлого года не найдена")
+                elif os.path.exists(folder_py):
                     for company in companies:
                         print(f"Ищем анкету с прошлого года для компании {company}")
                         found_files = check_if_past_year_exist(company, folder_py)
@@ -112,120 +111,123 @@ def map_prefill_to_sheet1(
 
     code_col_name = str(code_col)
 
-    # --- читаем оба листа ---
-    df_prefill = pd.read_excel(excel_file, sheet_name=sheet_prefill)
-    df_target = pd.read_excel(excel_file, sheet_name=sheet_target)
+    wb = load_workbook(excel_file, read_only=True)
+    if sheet_prefill in wb.sheetnames:
 
-    if sheet_prefill=='Model':
-        df_prefill = df_prefill.drop(columns=grade)
-        df_prefill = df_prefill.rename(columns={'predicted_grade': grade})
+        # --- читаем оба листа ---
+        df_prefill = pd.read_excel(excel_file, sheet_name=sheet_prefill)
+        df_target = pd.read_excel(excel_file, sheet_name=sheet_target)
 
-    print(f"Прочитаны листы: prefill '{sheet_prefill}' ({df_prefill.shape[0]} строк, {df_prefill.shape[1]} колонки),"
-          f" target '{sheet_target}' ({df_target.shape[0]} строк, {df_target.shape[1]} колонки)")
-    if df_prefill.shape[0] != 0:
-    # вычислим match_cols по умолчанию: все колонки prefill кроме code_col_name
-        if match_cols is None:
-            match_cols = [col for col in df_prefill.columns if col != code_col_name]
-            print(f"match_cols не переданы — использую все колонки prefill, кроме '{code_col_name}': {match_cols}")
-        else:
-            print(f"Используем переданные match_cols: {match_cols}")
+        if sheet_prefill=='Model':
+            df_prefill = df_prefill.drop(columns=grade)
+            df_prefill = df_prefill.rename(columns={'predicted_grade': grade})
 
-        # Быстрые проверки наличия колонок
-        missing_in_prefill = [c for c in match_cols if c not in df_prefill.columns]
-        missing_in_target = [c for c in match_cols if c not in df_target.columns]
-        if missing_in_prefill or missing_in_target:
-            raise KeyError(
-                "Не все колонки из match_cols найдены.\n"
-                f"Отсутствуют в prefill: {missing_in_prefill}\n"
-                f"Отсутствуют в target: {missing_in_target}"
+        print(f"Прочитаны листы: prefill '{sheet_prefill}' ({df_prefill.shape[0]} строк, {df_prefill.shape[1]} колонки),"
+            f" target '{sheet_target}' ({df_target.shape[0]} строк, {df_target.shape[1]} колонки)")
+        if df_prefill.shape[0] != 0:
+        # вычислим match_cols по умолчанию: все колонки prefill кроме code_col_name
+            if match_cols is None:
+                match_cols = [col for col in df_prefill.columns if col != code_col_name]
+                print(f"match_cols не переданы — использую все колонки prefill, кроме '{code_col_name}': {match_cols}")
+            else:
+                print(f"Используем переданные match_cols: {match_cols}")
+
+            # Быстрые проверки наличия колонок
+            missing_in_prefill = [c for c in match_cols if c not in df_prefill.columns]
+            missing_in_target = [c for c in match_cols if c not in df_target.columns]
+            if missing_in_prefill or missing_in_target:
+                raise KeyError(
+                    "Не все колонки из match_cols найдены.\n"
+                    f"Отсутствуют в prefill: {missing_in_prefill}\n"
+                    f"Отсутствуют в target: {missing_in_target}"
+                )
+
+            if code_col_name not in df_prefill.columns:
+                raise KeyError(f"Колонка с кодом ({code_col_name}) не найдена в листе {sheet_prefill}.")
+
+            # Приведение: сначала fillna(''), затем str; нормализация для сравнения (strip + lower)
+            def normalize_series(s):
+                return s.fillna('').astype(str).str.strip().str.lower()
+
+            for col in match_cols:
+                df_prefill[col + "_norm"] = normalize_series(df_prefill[col])
+                df_target[col + "_norm"] = normalize_series(df_target[col])
+
+            # Также нормализуем сам code_col (но не обязательно приводить к lower)
+            # сохраняем исходные значения grade в отдельную колонку на всякий случай
+            if code_col_name not in df_target.columns:
+                df_target[code_col_name] = pd.NA
+
+            df_prefill[code_col_name] = df_prefill[code_col_name].where(pd.notna(df_prefill[code_col_name]), other=pd.NA)
+
+            # Создадим вспомогательный составной ключ для удобной диагностики
+            norm_cols = [c + "_norm" for c in match_cols]
+            df_prefill["_merge_key"] = df_prefill[norm_cols].agg("||".join, axis=1)
+            df_target["_merge_key"] = df_target[norm_cols].agg("||".join, axis=1)
+
+            # Сколько уникальных ключей в каждом наборе?
+            keys_prefill = set(df_prefill["_merge_key"].unique())
+            keys_target = set(df_target["_merge_key"].unique())
+            common_keys = keys_prefill & keys_target
+
+            print(f"Уникальных ключей (prefill): {len(keys_prefill)}")
+            print(f"Уникальных ключей (target):  {len(keys_target)}")
+            print(f"Общих ключей (пересечение):  {len(common_keys)}")
+
+            # Покажем несколько примеров несовпадений (ключи, которые есть в target но нет в prefill)
+            missing_keys_in_prefill = list(keys_target - keys_prefill)
+            missing_keys_in_target = list(keys_prefill - keys_target)
+
+            # Делаем merge по нормализованным колонкам (через _merge_key для наглядности)
+            # сначала подготовим временные DataFrame с нужными колонками
+            df_prefill_for_merge = df_prefill[["_merge_key", code_col_name]].rename(columns={code_col_name: f"{code_col_name}_prefill"})
+            df_target_for_merge = df_target.copy()
+
+            df_merged = df_target_for_merge.merge(
+                df_prefill_for_merge,
+                on="_merge_key",
+                how="left",
+                indicator=True
             )
 
-        if code_col_name not in df_prefill.columns:
-            raise KeyError(f"Колонка с кодом ({code_col_name}) не найдена в листе {sheet_prefill}.")
+            if "_merge" in df_merged.columns:
+                print(df_merged["_merge"].value_counts())
+            else:
+                print("indicator отсутствует — что-то пошло не так с merge")
 
-        # Приведение: сначала fillna(''), затем str; нормализация для сравнения (strip + lower)
-        def normalize_series(s):
-            return s.fillna('').astype(str).str.strip().str.lower()
+            # Сколько строк получили непустой grade из prefill?
+            df_merged[code_col_name + "_final"] = df_merged[f"{code_col_name}_prefill"].combine_first(df_merged.get(code_col_name))
+            n_prefill_taken = df_merged[f"{code_col_name}_prefill"].notna().sum()
+            print(f"\nСтрок, для которых нашёлся grade: {n_prefill_taken} из {len(df_merged)}")
 
-        for col in match_cols:
-            df_prefill[col + "_norm"] = normalize_series(df_prefill[col])
-            df_target[col + "_norm"] = normalize_series(df_target[col])
+            # Сохраним результат в output_path (заменим существующий лист)
+            # удалим временные столбцы с суффиксами и приведём к исходному виду
+            # перенесём final grade в имя code_col_name
+            df_final = df_merged.copy()
+            # если в исходном target была колонка code_col_name — заменим её
+            if code_col_name in df_target.columns:
+                df_final[code_col_name] = df_final[code_col_name + "_final"]
+            else:
+                df_final[code_col_name] = df_final[code_col_name + "_final"]
 
-        # Также нормализуем сам code_col (но не обязательно приводить к lower)
-        # сохраняем исходные значения grade в отдельную колонку на всякий случай
-        if code_col_name not in df_target.columns:
-            df_target[code_col_name] = pd.NA
+            # Удалим колонки, которые добавляли для диагностики, перед сохранением
+            cols_to_drop = [c for c in df_final.columns if c.endswith("_norm") or c.startswith("_merge_key") or c.endswith("_prefill") or c.endswith("_final")]
+            df_final.drop(columns=cols_to_drop, inplace=True, errors='ignore')
 
-        df_prefill[code_col_name] = df_prefill[code_col_name].where(pd.notna(df_prefill[code_col_name]), other=pd.NA)
+            # Сохраняем excel (перезаписываем лист)
+            os.makedirs(os.path.dirname(output_path) or '.', exist_ok=True)
+            if not os.path.exists(output_path):
+                write_mode = "w"
+                if_sheet_exists=None
+            else:
+                write_mode = "a"
+                if_sheet_exists="replace"
+            with pd.ExcelWriter(output_path, engine="openpyxl", mode=write_mode, if_sheet_exists=if_sheet_exists) as writer:
+                df_final.to_excel(writer, sheet_name=sheet_target, index=False)
 
-        # Создадим вспомогательный составной ключ для удобной диагностики
-        norm_cols = [c + "_norm" for c in match_cols]
-        df_prefill["_merge_key"] = df_prefill[norm_cols].agg("||".join, axis=1)
-        df_target["_merge_key"] = df_target[norm_cols].agg("||".join, axis=1)
-
-        # Сколько уникальных ключей в каждом наборе?
-        keys_prefill = set(df_prefill["_merge_key"].unique())
-        keys_target = set(df_target["_merge_key"].unique())
-        common_keys = keys_prefill & keys_target
-
-        print(f"Уникальных ключей (prefill): {len(keys_prefill)}")
-        print(f"Уникальных ключей (target):  {len(keys_target)}")
-        print(f"Общих ключей (пересечение):  {len(common_keys)}")
-
-        # Покажем несколько примеров несовпадений (ключи, которые есть в target но нет в prefill)
-        missing_keys_in_prefill = list(keys_target - keys_prefill)
-        missing_keys_in_target = list(keys_prefill - keys_target)
-
-        # Делаем merge по нормализованным колонкам (через _merge_key для наглядности)
-        # сначала подготовим временные DataFrame с нужными колонками
-        df_prefill_for_merge = df_prefill[["_merge_key", code_col_name]].rename(columns={code_col_name: f"{code_col_name}_prefill"})
-        df_target_for_merge = df_target.copy()
-
-        df_merged = df_target_for_merge.merge(
-            df_prefill_for_merge,
-            on="_merge_key",
-            how="left",
-            indicator=True
-        )
-
-        if "_merge" in df_merged.columns:
-            print(df_merged["_merge"].value_counts())
-        else:
-            print("indicator отсутствует — что-то пошло не так с merge")
-
-        # Сколько строк получили непустой grade из prefill?
-        df_merged[code_col_name + "_final"] = df_merged[f"{code_col_name}_prefill"].combine_first(df_merged.get(code_col_name))
-        n_prefill_taken = df_merged[f"{code_col_name}_prefill"].notna().sum()
-        print(f"\nСтрок, для которых нашёлся grade: {n_prefill_taken} из {len(df_merged)}")
-
-        # Сохраним результат в output_path (заменим существующий лист)
-        # удалим временные столбцы с суффиксами и приведём к исходному виду
-        # перенесём final grade в имя code_col_name
-        df_final = df_merged.copy()
-        # если в исходном target была колонка code_col_name — заменим её
-        if code_col_name in df_target.columns:
-            df_final[code_col_name] = df_final[code_col_name + "_final"]
-        else:
-            df_final[code_col_name] = df_final[code_col_name + "_final"]
-
-        # Удалим колонки, которые добавляли для диагностики, перед сохранением
-        cols_to_drop = [c for c in df_final.columns if c.endswith("_norm") or c.startswith("_merge_key") or c.endswith("_prefill") or c.endswith("_final")]
-        df_final.drop(columns=cols_to_drop, inplace=True, errors='ignore')
-
-        # Сохраняем excel (перезаписываем лист)
-        os.makedirs(os.path.dirname(output_path) or '.', exist_ok=True)
-        if not os.path.exists(output_path):
-            write_mode = "w"
-            if_sheet_exists=None
-        else:
-            write_mode = "a"
-            if_sheet_exists="replace"
-        with pd.ExcelWriter(output_path, engine="openpyxl", mode=write_mode, if_sheet_exists=if_sheet_exists) as writer:
-            df_final.to_excel(writer, sheet_name=sheet_target, index=False)
-
-        print(f"\nРезультат сохранён в {output_path} (лист {sheet_target}).")
+            print(f"\nРезультат сохранён в {output_path} (лист {sheet_target}).")
     else:
-        print("Лист пуст.")
+        print(f"Лист {sheet_prefill} пуст.")
 
 
         
