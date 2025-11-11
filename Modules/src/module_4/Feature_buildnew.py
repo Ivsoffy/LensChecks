@@ -471,13 +471,13 @@ def calculate_f(df):
         return text
     
     # Apply the sanitize function to the relevant columns
-    df['job_title'] = df['job_title'].apply(sanitize_text)
-    df['industry'] = df['industry'].apply(sanitize_text)
-    df['region'] = df['region'].apply(sanitize_text)
-    df['headcount_cat'] = df['headcount_cat'].apply(sanitize_text)
-    df['revenue_cat'] = df['revenue_cat'].apply(sanitize_text)
-    df['function'] = str(df['function']).strip().upper()
-    df['subfunction'] = df['subfunction'].str.strip().str.upper()
-    df['spec'] = df['spec'].str.strip().str.upper()
+    df['job_title_cleaned'] = df['job_title'].apply(sanitize_text)
+    df['industry_cleaned'] = df['industry'].apply(sanitize_text)
+    df['region_cleaned'] = df['region'].apply(sanitize_text)
+    df['headcount_cat_cleaned'] = df['headcount_cat'].apply(sanitize_text)
+    df['revenue_cat_cleaned'] = df['revenue_cat'].apply(sanitize_text)
+    df['function_cleaned'] = str(df['function']).strip().upper()
+    df['subfunction_cleaned'] = df['subfunction'].str.strip().str.upper()
+    df['spec_cleaned'] = df['spec'].str.strip().str.upper()
 
     return df

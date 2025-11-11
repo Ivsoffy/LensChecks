@@ -112,7 +112,7 @@ def run_inference(df, model, tokenizer, encoders, le_grade, device, batch_size=1
     all_probabilities = []
     
     # Define the features as in training
-    categorical_features = ['function', 'subfunction', 'spec', 'industry', 'region', 'headcount_cat', 'revenue_cat']
+    categorical_features = ['function_cleaned', 'subfunction_cleaned', 'spec_cleaned', 'industry_cleaned', 'region_cleaned', 'headcount_cat_cleaned', 'revenue_cat_cleaned']
     numerical_features = ['Scaled_Logged_BP','Scaled_Logged_BP_Region', 'FtC','SUtC','SPtC','SUtF','SPtSU', 'functions_num',
                           'subfunctions_num', 'spec_num','Scaled_EmpBP_Portion_C','Scaled_EmpBP_Portion_F','Scaled_EmpBP_Portion_SU',
                           'Scaled_EmpBP_Portion_SP','Scaled_emp_in_job','Scaled_emp_in_job_r','Scaled_CR_C','Scaled_CR_F','Scaled_CR_SU',
@@ -120,6 +120,7 @@ def run_inference(df, model, tokenizer, encoders, le_grade, device, batch_size=1
     
     # Encode categorical features
     X_categorical = []
+    print(df.loc[3, 'function'])
     for feature in categorical_features:
         encoder = encoders[feature]
         # Handle potential new categories not seen in training
@@ -130,7 +131,7 @@ def run_inference(df, model, tokenizer, encoders, le_grade, device, batch_size=1
             except:
                 # Assign a default value (0) for new categories not seen during training
                 encoded_value = 0
-                print(f"Warning: New category '{value}' found in '{feature}' - using default encoding")
+                # print(f"Warning: New category '{value}' found in '{feature}' - using default encoding")
             encoded_feature.append(encoded_value)
         X_categorical.append(encoded_feature)
     
@@ -141,7 +142,7 @@ def run_inference(df, model, tokenizer, encoders, le_grade, device, batch_size=1
     
     # Tokenize job titles with progress bar
     print("Tokenizing job titles...")
-    unique_job_titles = df['job_title'].unique()
+    unique_job_titles = df['job_title_cleaned'].unique()
     print(f"Number of unique job titles: {len(unique_job_titles)}")
     
     unique_input_ids, unique_attention_masks = bert_encode(unique_job_titles, tokenizer)
@@ -151,8 +152,8 @@ def run_inference(df, model, tokenizer, encoders, le_grade, device, batch_size=1
                          zip(unique_job_titles, unique_input_ids, unique_attention_masks)}
     
     # Map tokenized values back to the original DataFrame
-    X_input_ids = torch.stack([tokenized_mapping[job_title][0] for job_title in df['job_title']])
-    X_attention_masks = torch.stack([tokenized_mapping[job_title][1] for job_title in df['job_title']])
+    X_input_ids = torch.stack([tokenized_mapping[job_title][0] for job_title in df['job_title_cleaned']])
+    X_attention_masks = torch.stack([tokenized_mapping[job_title][1] for job_title in df['job_title_cleaned']])
 
     # for job_title in df['job_title']:
     #     print(job_title)
@@ -198,7 +199,7 @@ def run_inference(df, model, tokenizer, encoders, le_grade, device, batch_size=1
     
     # Add predictions to the dataframe
     df_result = df.copy()
-    df_result['predicted_grade'] = predicted_grades
+    df_result[grade] = predicted_grades
     df_result['predicted_grade_encoded'] = all_predictions
     
     # Add top-3 predicted grades and their probabilities
@@ -229,6 +230,7 @@ def run_inference(df, model, tokenizer, encoders, le_grade, device, batch_size=1
 
 # Main inference function
 def predict_grades(df):
+    orig_df = df.copy()
     # Check if CUDA is available and set the device to GPU if possible
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
@@ -252,7 +254,7 @@ def predict_grades(df):
     encoders = {}
     # print(os.getcwd())
     for feature in categorical_features:
-        encoders[feature] = joblib.load(f'{my_directory}/{tag}_le_{feature}.pkl')
+        encoders[feature+'_cleaned'] = joblib.load(f'{my_directory}/{tag}_le_{feature}.pkl')
     
     le_grade = joblib.load(f'{my_directory}/{tag}_le_grade.pkl')
     
@@ -316,6 +318,8 @@ def predict_grades(df):
         # 2. Process all files in the directory
         df_res = process_files_and_predict(df, model, tokenizer, encoders, le_grade, device)
         df_final = pd.concat([df_final, df_res])
+
+    # orig_df[grade].update(df_final['predicted_grade'])
     return df_final
     
 
@@ -330,14 +334,15 @@ def process_files_and_predict(df, model, tokenizer, encoders, le_grade, device):
     
     # Run inference
     print("Running inference...")
+    # print(f"DEBUG: {df.loc[5,'job_title']}")
     df_with_predictions = run_inference(df, model, tokenizer, encoders, le_grade, device)
-
+    # print(f"DEBUG: {df_with_predictions.loc[5,'job_title']}")
     df_with_predictions = df_with_predictions[['company', 'Подразделение 1 уровня','Подразделение 2 уровня','Подразделение 3 уровня',
                                                 'Подразделение 4 уровня','Подразделение 5 уровня','Подразделение 6 уровня','job_title',
                                                 'Код сотрудника','Код руководителя сотрудника','Руководитель / специалист',
                                                 'Оценка эффективности работы сотрудника','Уровень подчинения по отношению к Первому лицу компании',
                                                 'Экспат','Пол','Год рождения','Дата приема на работу','Сотрудники, проработавшие в компании меньше 1 года',
-                                                'Название города','region','Внутренний грейд компании','grade', 'predicted_grade', 'prediction_confidence','function','subfunction','spec',
+                                                'Название города','region','Внутренний грейд компании', grade, 'prediction_confidence','function','subfunction','spec',
                                                 'Название функции (заполняется автоматически)','Название подфункции (заполняется автоматически)',
                                                 'Название специализации (заполняется автоматически)','Размер ставки','Ежемесячный оклад',
                                                 'Число окладов в году','Постоянные надбавки и доплаты (общая сумма за год)','Право на получение переменного вознаграждения',
@@ -353,7 +358,6 @@ def process_files_and_predict(df, model, tokenizer, encoders, le_grade, device):
     df_with_predictions = df_with_predictions.rename(columns={'company': company_name,
                                                                 'job_title': job_title,
                                                                 'region': region,
-                                                                'grade': grade,
                                                                 'function': function_code,
                                                                 'subfunction': subfunction_code,
                                                                 'spec': specialization_code,
@@ -373,7 +377,7 @@ def process_files_and_predict(df, model, tokenizer, encoders, le_grade, device):
     # Print summary
     print("\nInference Summary:")
     print(f"Processed {len(df_with_predictions)} records")
-    print(f"Number of unique predicted grades: {df_with_predictions['predicted_grade'].nunique()}")
+    print(f"Number of unique predicted grades: {df_with_predictions[grade].nunique()}")
     # print(f"Grade distribution:")
     # print(df_with_predictions['predicted_grade'].value_counts().head(10))
     
