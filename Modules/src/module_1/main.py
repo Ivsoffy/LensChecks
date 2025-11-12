@@ -586,35 +586,35 @@ def file_processing(input_folder, output_folder, columns, params):
 
             if missing_columns_rem_data:
                 errors['info_errors'] += [f"Не хватает следующих колонок в Данных: {missing_columns_rem_data}"]
+            else:
+                # leaving only required columns
+                df = df[expected_columns]
             
-            # leaving only required columns
-            df = df[expected_columns]
-        
-            # Cleaning all the blanks from the columns
-            for column in rows_to_drop:
-                df[column] = df[column].replace('', np.nan)
+                # Cleaning all the blanks from the columns
+                for column in rows_to_drop:
+                    df[column] = df[column].replace('', np.nan)
 
-            # Dropping rows where company name and title are empty at the same time
-            df.dropna(subset=rows_to_drop, how = 'all', inplace=True)
+                # Dropping rows where company name and title are empty at the same time
+                df.dropna(subset=rows_to_drop, how = 'all', inplace=True)
 
-            df_company = pd.read_excel(file_path, sheet_name=cmp_data, header=1)
-            df_company = df_company.iloc[:, 2:]
+                df_company = pd.read_excel(file_path, sheet_name=cmp_data, header=1)
+                df_company = df_company.iloc[:, 2:]
 
 
-            # Taking the data from the General Info sheet
-            df = check_general_info(df_company, lang, df)
-            df = check_and_process_data(df, lang, params)
+                # Taking the data from the General Info sheet
+                df = check_general_info(df_company, lang, df)
+                df = check_and_process_data(df, lang, params)
 
-            if single_db:
-                result_df = pd.concat([result_df, df])
-            # print(df.shape[0])
-            
-            if not single_db and ((errors['data_errors'] == [] and errors['info_errors'] == []) or not save_db_only_without_errors):
-                # Save the processed DataFrame to the output folder
-                file_output_path = os.path.join(output_folder, file)
-                df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
-                df.to_excel(file_output_path, sheet_name='Total Data')
-                print(f"Анкета {file} сохранена в {output_folder}!")
+                if single_db:
+                    result_df = pd.concat([result_df, df])
+                # print(df.shape[0])
+                
+                if not single_db and ((errors['data_errors'] == [] and errors['info_errors'] == []) or not save_db_only_without_errors):
+                    # Save the processed DataFrame to the output folder
+                    file_output_path = os.path.join(output_folder, file)
+                    df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
+                    df.to_excel(file_output_path, sheet_name='Total Data')
+                    print(f"Анкета {file} сохранена в {output_folder}!")
             if errors['data_errors'] != [] or errors['info_errors'] != []:
                 unprocessed_files[os.path.basename(file_path)] = errors
             else:
