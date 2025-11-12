@@ -15,6 +15,7 @@ import time
 import shutil
 from openpyxl import utils
 import warnings
+import os, tempfile
 # warnings.filterwarnings("ignore", category=UserWarning)
 warnings.simplefilter("ignore", category=UserWarning, lineno=329, append=False)
 warnings.filterwarnings('ignore', message='The behavior of DataFrame concatenation with empty or all-NA entries is deprecated.*',
@@ -332,6 +333,21 @@ def check_general_info(df_company, lang, df):
     df['SDF Language'] = lang
     return df 
 
+
+
+def save_excel(input_path, output_path):
+
+    wb = load_workbook(input_path, data_only=False, keep_vba=False)  # для .xlsm ставь True
+    tmp_fd, tmp_path = tempfile.mkstemp(suffix=".xlsx")
+    os.close(tmp_fd)
+
+    wb.save(tmp_path)
+    wb.close()
+    os.replace(tmp_path, output_path)
+
+    print(f"✅ Копия книги сохранена как: {output_path}")
+
+
 def target_sti_normalization(text: str, index: int) -> str:
     global errors
     # Оставлять ли проценты
@@ -344,8 +360,95 @@ def lti_checks(main_lti, lti_1, lti_2, lti_3, index, type_lti):
         errors['data_errors'] += [(type_lti, index)]
     return main_lti
 
+# def add_errors_to_excel(errors, input_path, output_path):
+#     """Добавляет лист 'Ошибки' и подсвечивает ячейки с ошибками на листе 'Данные'."""
+#     # --- Формирование таблицы ошибок ---
+#     info = errors.get('info_errors', [])
+#     data = [col for col, _ in errors.get('data_errors', [])]
+#     unique_data = list(dict.fromkeys(data))
+#     n = max(len(info), len(unique_data))
+#     df_errors = pd.DataFrame({
+#         'info_errors': info + [None] * (n - len(info)),
+#         'data_errors': unique_data + [None] * (n - len(unique_data))
+#     })
+
+#     wb = load_workbook(input_path, data_only=True)
+#     ws_err = wb.create_sheet("Errors", 0)
+
+#     # --- Запись и оформление листа "Ошибки" ---
+#     for r, row in enumerate(dataframe_to_rows(df_errors, index=False, header=True), 1):
+#         for c, v in enumerate(row, 1):
+#             ws_err.cell(r, c, v)
+
+#     header_style = {"font": Font(bold=True, color="FFFFFF"),
+#                     "fill": PatternFill("solid", fgColor="4472C4")}
+#     border = Border(*[Side(style="thin", color="808080")]*4)
+#     for cell in ws_err[1]:
+#         cell.font, cell.fill = header_style["font"], header_style["fill"]
+#         cell.alignment, cell.border = Alignment(horizontal='center'), border
+#     for row in ws_err.iter_rows(min_row=2):
+#         for cell in row:
+#             cell.alignment = Alignment(wrap_text=True, vertical="top")
+#             cell.border = border
+#     for col in ws_err.columns:
+#         ws_err.column_dimensions[col[0].column_letter].width = max(len(str(c.value) or "") for c in col) + 2
+
+#     # --- Определение структуры листа "Данные" ---
+#     data_sheet = next((s for s in wb.sheetnames if (s.strip().lower() == "данные") or s.strip().lower() == "salary data"), None)
+#     if not data_sheet:
+#         raise ValueError("Не найден лист 'Данные'.")
+#     ws_data = wb[data_sheet]
+#     df_head = pd.read_excel(input_path, sheet_name=data_sheet, header=None, nrows=40)
+
+#     non_empty = df_head.notna().sum(axis=1)
+#     header_end = max((i for i, v in enumerate(non_empty) if v >= max(3, df_head.shape[1] * 0.05)), default=0)
+#     data_start = header_end + 2
+
+#     def norm(s): return str(s).strip().lower() if pd.notna(s) else ""
+#     col_map = {norm(df_head.iat[r, c]): c + 1
+#                for r in range(header_end + 1) for c in range(df_head.shape[1])
+#                if pd.notna(df_head.iat[r, c])}
+
+#     # --- Подсветка ошибок ---
+#     orange = PatternFill("solid", fgColor="FFC000")
+#     for col_name, idx in errors.get('data_errors', []):
+#         col_idx = col_map.get(norm(col_name))
+#         if not col_idx:
+#             print(f"Не найдена колонка: {col_name}")
+#             continue
+#         excel_row = 8 + idx
+#         if 1 <= excel_row <= ws_data.max_row:
+#             ws_data.cell(excel_row, col_idx).fill = orange
+#         else:
+#             print(f"Строка вне диапазона: {excel_row}")
+
+#     wb.save(output_path)
+#     print(f"Лист 'Ошибки' добавлен, ячейки подсвечены. Файл: {output_path}")
+
+
+# import win32com.client as win32
+import win32com.client
+import shutil, os
+from win32com.client import makepy
+
+#pip install pywin32 --upgrade
+
 def add_errors_to_excel(errors, input_path, output_path):
-    """Добавляет лист 'Ошибки' и подсвечивает ячейки с ошибками на листе 'Данные'."""
+    """Добавляет лист 'Errors' и подсвечивает ячейки с ошибками с использованием win32com."""
+
+    
+    try:
+        excel = win32com.client.Dispatch("Excel.Application")
+    except AttributeError:
+        # Если кэш повреждён или не создан — чистим и пробуем снова
+        gen_py = os.path.join(os.path.expanduser("~"), "AppData\\Local\\Temp\\gen_py")
+        shutil.rmtree(gen_py, ignore_errors=True)
+        makepy.main(["Microsoft Excel * Object Library"])
+        excel = win32com.client.Dispatch("Excel.Application")
+
+
+    input_path = os.path.abspath(input_path)
+    output_path = os.path.abspath(output_path)
     # --- Формирование таблицы ошибок ---
     info = errors.get('info_errors', [])
     data = [col for col, _ in errors.get('data_errors', [])]
@@ -356,58 +459,89 @@ def add_errors_to_excel(errors, input_path, output_path):
         'data_errors': unique_data + [None] * (n - len(unique_data))
     })
 
-    wb = load_workbook(input_path, data_only=True)
-    ws_err = wb.create_sheet("Errors", 0)
+    # --- Открытие Excel ---
+    # excel = win32com.client.Dispatch("Excel.Application")
+    excel.Visible = False
+    excel.DisplayAlerts = False
+    wb = excel.Workbooks.Open(input_path)
 
-    # --- Запись и оформление листа "Ошибки" ---
-    for r, row in enumerate(dataframe_to_rows(df_errors, index=False, header=True), 1):
-        for c, v in enumerate(row, 1):
-            ws_err.cell(r, c, v)
+    # --- Проверка и создание листа Errors ---
+    for sheet in wb.Sheets:
+        if sheet.Name.lower().strip() == "errors":
+            sheet.Delete()
+    ws_err = wb.Sheets.Add(Before=wb.Sheets(1))
+    ws_err.Name = "Errors"
 
-    header_style = {"font": Font(bold=True, color="FFFFFF"),
-                    "fill": PatternFill("solid", fgColor="4472C4")}
-    border = Border(*[Side(style="thin", color="808080")]*4)
-    for cell in ws_err[1]:
-        cell.font, cell.fill = header_style["font"], header_style["fill"]
-        cell.alignment, cell.border = Alignment(horizontal='center'), border
-    for row in ws_err.iter_rows(min_row=2):
-        for cell in row:
-            cell.alignment = Alignment(wrap_text=True, vertical="top")
-            cell.border = border
-    for col in ws_err.columns:
-        ws_err.column_dimensions[col[0].column_letter].width = max(len(str(c.value) or "") for c in col) + 2
+    # --- Запись таблицы ошибок ---
+    ws_err.Cells(1, 1).Value = "info_errors"
+    ws_err.Cells(1, 2).Value = "data_errors"
+    for r in range(len(df_errors)):
+        ws_err.Cells(r + 2, 1).Value = df_errors.iloc[r, 0]
+        ws_err.Cells(r + 2, 2).Value = df_errors.iloc[r, 1]
 
-    # --- Определение структуры листа "Данные" ---
-    data_sheet = next((s for s in wb.sheetnames if (s.strip().lower() == "данные") or s.strip().lower() == "salary data"), None)
+    # --- Форматирование заголовка ---
+    header_range = ws_err.Range(ws_err.Cells(1, 1), ws_err.Cells(1, 2))
+    header_range.Font.Bold = True
+    header_range.Font.Color = 0xFFFFFF      # Белый
+    header_range.Interior.Color = 0x4472C4  # Синий (BGR)
+    header_range.HorizontalAlignment = -4108  # xlCenter
+    header_range.Borders.Weight = 2
+
+    # --- Форматирование тела таблицы ---
+    used_range = ws_err.UsedRange
+    used_range.Columns.AutoFit()
+    for row in ws_err.Range(ws_err.Cells(2, 1), ws_err.Cells(df_errors.shape[0] + 1, 2)):
+        row.Borders.Weight = 2
+        row.WrapText = True
+        row.VerticalAlignment = -4160  # xlTop
+
+    # --- Определение листа "Данные" ---
+    data_sheet = None
+    for s in wb.Sheets:
+        name = s.Name.strip().lower()
+        if name in ("данные", "salary data"):
+            data_sheet = s
+            break
     if not data_sheet:
+        wb.Close(SaveChanges=False)
+        excel.Quit()
         raise ValueError("Не найден лист 'Данные'.")
-    ws_data = wb[data_sheet]
-    df_head = pd.read_excel(input_path, sheet_name=data_sheet, header=None, nrows=40)
 
+    ws_data = data_sheet
+
+    # --- Определяем начало данных ---
+    df_head = pd.read_excel(input_path, sheet_name=ws_data.Name, header=None, nrows=40)
     non_empty = df_head.notna().sum(axis=1)
     header_end = max((i for i, v in enumerate(non_empty) if v >= max(3, df_head.shape[1] * 0.05)), default=0)
-    data_start = header_end + 2
 
-    def norm(s): return str(s).strip().lower() if pd.notna(s) else ""
+    def norm(s):
+        return str(s).strip().lower() if pd.notna(s) else ""
+
     col_map = {norm(df_head.iat[r, c]): c + 1
-               for r in range(header_end + 1) for c in range(df_head.shape[1])
+               for r in range(header_end + 1)
+               for c in range(df_head.shape[1])
                if pd.notna(df_head.iat[r, c])}
 
     # --- Подсветка ошибок ---
-    orange = PatternFill("solid", fgColor="FFC000")
+    orange_color = 0x00C0FF  # BGR = (0xFF, 0xC0, 0x00) → оранжевый
     for col_name, idx in errors.get('data_errors', []):
         col_idx = col_map.get(norm(col_name))
         if not col_idx:
             print(f"Не найдена колонка: {col_name}")
             continue
         excel_row = 8 + idx
-        if 1 <= excel_row <= ws_data.max_row:
-            ws_data.cell(excel_row, col_idx).fill = orange
+        if 1 <= excel_row <= ws_data.UsedRange.Rows.Count:
+            ws_data.Cells(excel_row, col_idx).Interior.Color = orange_color
         else:
             print(f"Строка вне диапазона: {excel_row}")
 
-    wb.save(output_path)
-    print(f"Лист 'Ошибки' добавлен, ячейки подсвечены. Файл: {output_path}")
+    # --- Сохранение и закрытие ---
+    wb.SaveAs(output_path)
+    wb.Close(SaveChanges=True)
+    excel.Quit()
+
+    print(f"Лист 'Errors' добавлен, ячейки подсвечены. Файл: {output_path}")
+
 
 def monthly_salary_normalization(row, index):
     global errors
@@ -526,14 +660,16 @@ def module_1(input_folder='companies/rus', output_folder='output', params=None):
         for file_name, issue in unprocessed_files.items():
             source_path = os.path.join(input_folder, file_name)
             destination_path = os.path.join(unprocessed_folder, file_name)
+            # print(source_path)
+            # print(destination_path)
             try:
                 if os.path.exists(source_path):
                     # Если файл уже есть в папке unprocessed — удалим его
                     if os.path.exists(destination_path):
                         os.remove(destination_path)
+                    # save_excel('src/module_1/input/Carprice_Salary_data_ru_2025.xlsx', 'src/module_1/input/unprocessed/Carprice_Salary_data_ru_2025.xlsx')
+                    # return
                     add_errors_to_excel(issue, source_path, destination_path)
-                    # shutil.copy2(source_path, destination_path)
-                    # print(f"Copied: {file_name}")
             except Exception as e:
                 print(f"Не удалось сохранить файл {file_name} в unprocessed: {str(e)}")
 
@@ -619,7 +755,8 @@ def file_processing(input_folder, output_folder, columns, params):
                 unprocessed_files[os.path.basename(file_path)] = errors
             else:
                 print("В файле не обнаружено ошибок, мои поздравления!")
-    if single_db and not save_db_only_without_errors:
+    
+    if single_db and ((not save_db_only_without_errors) or (errors['data_errors'] == [] and errors['info_errors'] == [])):
         file_output_path = os.path.join(output_folder, 'result_db.xlsx')
         result_df = result_df.loc[:, ~df.columns.str.contains('^Unnamed')]
         result_df.to_excel(file_output_path, sheet_name='Total Data')
