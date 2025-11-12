@@ -418,6 +418,9 @@ def calculate_compensation_elements(df,
             np.nan
         )
     )
+
+    df[target_sti] = pd.to_numeric(df[target_sti], errors='coerce')
+
     
     # Target STI output
     df[target_sti_out] = np.where(
