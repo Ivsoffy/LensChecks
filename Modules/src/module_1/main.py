@@ -302,6 +302,22 @@ def fact_sti_normalization(eligibility, value, index):
         errors['data_errors'] += [(fact_sti, index)]
     return value
 
+
+def is_empty_value(x):
+    """Возвращает True, если значение можно считать пустым."""
+    if x is None:
+        return True
+    if isinstance(x, (float, np.floating)) and pd.isna(x):
+        return True
+    if isinstance(x, str):
+        s = x.strip().lower()
+        if s in ("", "nan", "none", "null", "n/a", "na", "-", "--"):
+            print("debug yes")
+            return True
+    if isinstance(x, (list, tuple, dict, set)) and len(x) == 0:
+        return True
+    return False
+
 # Проверка листа "Общая информация"
 def check_general_info(df_company, lang, df):
     global errors
@@ -321,13 +337,18 @@ def check_general_info(df_company, lang, df):
     except (IndexError, KeyError):
         errors['info_errors'] += ["Incorrect General Info"]
 
+    # print("debug: ", df[gi_headcount_cat])
+    # print(df_company)
     # print(x for x in df)
-    if any(x is None or str(x).strip() == "" for x in df):
-        errors['info_errors'] += ["Incorrect General Info"]
-    else:
-        comp_name = df[company_name][0]
-        if not re.fullmatch(r"[A-Za-z0-9_]+", str(comp_name)):
-            errors['info_errors'] += [f"Incorrect company name format: {comp_name}"]
+    for _, row in df_company.loc[0:3, ["Unnamed: 2", "Unnamed: 3"]].iterrows():
+        field_name = str(row["Unnamed: 2"]).strip()   # Название поля
+        value = row["Unnamed: 3"]                     # Значение
+        if is_empty_value(value):
+            errors['info_errors'].append(f"Incorrect General Info: {field_name}")
+
+    comp_name = df[company_name][0]
+    if not re.fullmatch(r"[A-Za-z0-9_]+", str(comp_name)):
+        errors['info_errors'] += [f"Incorrect company name format: {comp_name}"]
             # print(df[gi_company_name
 
     df['SDF Language'] = lang
