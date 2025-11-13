@@ -126,54 +126,60 @@ def map_prefill_to_sheet1(
     """
 
     # --- читаем оба листа ---
-    df_prefill = pd.read_excel(excel_file, sheet_name=sheet_prefill)
+    xls = pd.ExcelFile(excel_file)
     df_target = pd.read_excel(excel_file, sheet_name=sheet_target)
 
-    if match_cols is None:
-        match_cols = [col for col in df_prefill.columns if col not in code_cols]
+    if sheet_prefill in xls.sheet_names:
+        df_prefill = pd.read_excel(excel_file, sheet_name=sheet_prefill)
 
-    # приведение типов к строке для колонок совпадений
-    for col in match_cols:
-        if col in df_prefill.columns:
-            df_prefill[col] = df_prefill[col].astype(str).fillna('')
-        if col in df_target.columns:
-            df_target[col] = df_target[col].astype(str).fillna('')
+        # df_target = pd.read_excel(excel_file, sheet_name=sheet_target)
 
-    if set(match_cols).issubset(df_prefill.columns) and set(match_cols).issubset(df_target.columns):
-        df_merged = df_target.merge(
-            df_prefill[match_cols + list(code_cols)],
-            on=match_cols,
-            how='left',
-            suffixes=('', '_prefill')
-        )
+        if match_cols is None:
+            match_cols = [col for col in df_prefill.columns if col not in code_cols]
 
-        # --- заменяем коды из Prefill, если там есть значения ---
-        for col in code_cols:
-            df_merged[col] = df_merged[f"{col}_prefill"].combine_first(df_merged[col])
-            df_merged.drop(columns=f"{col}_prefill", inplace=True)
-        
-        folder, filename = os.path.split(output_path)
-        name, ext = os.path.splitext(filename)
+        # приведение типов к строке для колонок совпадений
+        for col in match_cols:
+            if col in df_prefill.columns:
+                df_prefill[col] = df_prefill[col].astype(str).fillna('')
+            if col in df_target.columns:
+                df_target[col] = df_target[col].astype(str).fillna('')
 
-        # Добавляем _processed
-        processed_filename = f"{name}_processed{ext}"
+        if set(match_cols).issubset(df_prefill.columns) and set(match_cols).issubset(df_target.columns):
+            df_merged = df_target.merge(
+                df_prefill[match_cols + list(code_cols)],
+                on=match_cols,
+                how='left',
+                suffixes=('', '_prefill')
+            )
 
-        # Собираем обратно
-        processed_path = os.path.join(folder, processed_filename)
+            # --- заменяем коды из Prefill, если там есть значения ---
+            for col in code_cols:
+                df_merged[col] = df_merged[f"{col}_prefill"].combine_first(df_merged[col])
+                df_merged.drop(columns=f"{col}_prefill", inplace=True)
+            
+            folder, filename = os.path.split(output_path)
+            name, ext = os.path.splitext(filename)
 
-        # сохраняем результат
-        if not os.path.exists(processed_path):
-            with pd.ExcelWriter(processed_path, engine="openpyxl", mode="w") as writer:
-                df_merged.to_excel(writer, sheet_name=sheet_target, index=False)
+            # Добавляем _processed
+            processed_filename = f"{name}_processed{ext}"
+
+            # Собираем обратно
+            processed_path = os.path.join(folder, processed_filename)
+
+            # сохраняем результат
+            if not os.path.exists(processed_path):
+                with pd.ExcelWriter(processed_path, engine="openpyxl", mode="w") as writer:
+                    df_merged.to_excel(writer, sheet_name=sheet_target, index=False)
+            else:
+                with pd.ExcelWriter(processed_path, engine="openpyxl", mode="a", if_sheet_exists="replace") as writer:
+                    df_merged.to_excel(writer, sheet_name=sheet_target, index=False)
+
+            print(f"На лист '{sheet_target}' подтянуты значения из листа '{sheet_prefill}' в файле {processed_path}")
         else:
-            with pd.ExcelWriter(processed_path, engine="openpyxl", mode="a", if_sheet_exists="replace") as writer:
-                df_merged.to_excel(writer, sheet_name=sheet_target, index=False)
-
-        print(f"На лист '{sheet_target}' подтянуты значения из листа '{sheet_prefill}' в файле {processed_path}")
-    else:
-        print("Не все колонки из match_cols найдены в обоих листах.")
+            print("Не все колонки из match_cols найдены в обоих листах.")
     
-    return df_merged
+        return df_merged
+    return df_target
     
         
 def add_info(info, output_file):
