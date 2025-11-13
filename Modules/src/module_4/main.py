@@ -35,22 +35,24 @@ def module_4(input_folder, output_folder, params):
     
     counter = 0
     found_files=[]
-    for file in os.listdir(input_folder):
-        # Check if the file is an Excel file
-        if file.endswith('.xlsx') or file.endswith('.xls') or file.endswith('.xlsm'):
-            counter+=1
-            output_file = os.path.join(output_folder, file)
-            file_path = os.path.join(input_folder, file)
-            filename, _ = os.path.splitext(file)
+    if not already_fixed: # Первичная обработка
+        for file in os.listdir(input_folder):
+            # Check if the file is an Excel file
+            if file.endswith('.xlsx') or file.endswith('.xls') or file.endswith('.xlsm'):
+                counter+=1
+                output_file = os.path.join(output_folder, file)
+                file_path = os.path.join(input_folder, file)
+                filename, _ = os.path.splitext(file)
 
-            print(f"Processing file {counter}: {file}")
-            df = pd.read_excel(file_path, sheet_name='Total Data')
-            # df.to_excel(output_file)
-            cols = [company_name, dep_level_1, dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6,
-                                job_title]
-            companies = df[company_name].unique()
+                print(f"Processing file {counter}: {file}")
+                # df = pd.read_excel(file_path, sheet_name='Total Data')
+                # df.to_excel(output_file)
+                cols = [company_name, dep_level_1, dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6,
+                                    job_title]
+                
+                df = pd.read_excel(file_path, sheet_name='Total Data')
+                companies = df[company_name].unique()
 
-            if not already_fixed: # Первичная обработка
                 if not isinstance(folder_py, str) or not os.path.exists(folder_py):
                     print(f"Папка {folder_py} с анкетами прошлого года не найдена")
                 elif os.path.exists(folder_py):
@@ -89,16 +91,26 @@ def module_4(input_folder, output_folder, params):
                 }
 
                 add_info(info, output_file)
-            else: # Аналитик проверил и исправил анкету
+                print("-----------------------")
+                print()
+    else: # Аналитик проверил и исправил анкету
+        for file in os.listdir(output_folder):
+            if file.endswith('.xlsx') or file.endswith('.xls') or file.endswith('.xlsm'):
+                counter+=1
+                output_file = os.path.join(output_folder, file)
                 file_path = os.path.join(output_folder, file)
+                filename, _ = os.path.splitext(file)
+
+                print(f"Processing file {counter}: {file}")
+
                 map_prefill_to_sheet1(file_path, output_file, sheet_prefill='Prefill')
                 df_final = map_prefill_to_sheet1(file_path, output_file, sheet_prefill='Model')
 
                 output_file = os.path.join(output_folder, filename+'_final.parquet')
                 df_final.to_parquet(output_file)
                 print(f"Файл {output_file} сохранен.")
-        print("-----------------------")
-        print()
+                print("-----------------------")
+                print()
 
 
 def map_prefill_to_sheet1(
@@ -139,16 +151,25 @@ def map_prefill_to_sheet1(
         for col in code_cols:
             df_merged[col] = df_merged[f"{col}_prefill"].combine_first(df_merged[col])
             df_merged.drop(columns=f"{col}_prefill", inplace=True)
+        
+        folder, filename = os.path.split(output_path)
+        name, ext = os.path.splitext(filename)
+
+        # Добавляем _processed
+        processed_filename = f"{name}_processed{ext}"
+
+        # Собираем обратно
+        processed_path = os.path.join(folder, processed_filename)
 
         # сохраняем результат
-        if not os.path.exists(output_path):
-            with pd.ExcelWriter(output_path, engine="openpyxl", mode="w") as writer:
+        if not os.path.exists(processed_path):
+            with pd.ExcelWriter(processed_path, engine="openpyxl", mode="w") as writer:
                 df_merged.to_excel(writer, sheet_name=sheet_target, index=False)
         else:
-            with pd.ExcelWriter(output_path, engine="openpyxl", mode="a", if_sheet_exists="replace") as writer:
+            with pd.ExcelWriter(processed_path, engine="openpyxl", mode="a", if_sheet_exists="replace") as writer:
                 df_merged.to_excel(writer, sheet_name=sheet_target, index=False)
 
-        print(f"На лист '{sheet_target}' подтянуты значения из листа '{sheet_prefill}' в файле {excel_file}")
+        print(f"На лист '{sheet_target}' подтянуты значения из листа '{sheet_prefill}' в файле {processed_path}")
     else:
         print("Не все колонки из match_cols найдены в обоих листах.")
     
