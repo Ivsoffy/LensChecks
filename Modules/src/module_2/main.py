@@ -42,12 +42,13 @@ def process_past_year(folder_py, df):
                 found_files = check_if_past_year_exist(company, folder_py)
                 if found_files:
                     file_to_cmp = os.path.join(folder_py, found_files[0])
-                    df_py = pd.read_excel(file_to_cmp, sheet_name=rem_data, header=6, index_col=0)
+                    df_py = pd.read_excel(file_to_cmp, sheet_name=rem_data, header=6, index_col=None)
+                    # df_py = df.reset_index()
                     cols_to_copy = [function_code, subfunction_code, specialization_code, function, subfunction, specialization]
                     # Заполняем данными с прошлого года
                     df = merge_by_cols(df, df_py, cols, cols_to_copy)
-            except:
-                print(f"Не удалось прочитатать файл {found_files[0]}")
+            except Exception as e:
+                print(f"Не удалось прочитатать файл {found_files[0]}. {e}")
     return df
 
 def module_2(input_folder, output_folder, params):
@@ -173,17 +174,26 @@ def map_prefill_to_sheet1(
                     print(f"Ошибка при обработке колонки '{col}': {e}")
 
             # сохраняем результат
+            folder, filename = os.path.split(output_path)
+            name, ext = os.path.splitext(filename)
+
+            # Добавляем _processed
+            processed_filename = f"{name}_processed{ext}"
+
+            # Собираем обратно
+            processed_path = os.path.join(folder, processed_filename)
+
             try:
-                if not os.path.exists(output_path):
-                    with pd.ExcelWriter(output_path, engine="openpyxl", mode="w") as writer:
+                if not os.path.exists(processed_path):
+                    with pd.ExcelWriter(processed_path, engine="openpyxl", mode="w") as writer:
                         df_merged.to_excel(writer, sheet_name=sheet_target, index=False)
                 else:
-                    with pd.ExcelWriter(output_path, engine="openpyxl", mode="a", if_sheet_exists="replace") as writer:
+                    with pd.ExcelWriter(processed_path, engine="openpyxl", mode="a", if_sheet_exists="replace") as writer:
                         df_merged.to_excel(writer, sheet_name=sheet_target, index=False)
 
-                print(f"На лист '{sheet_target}' подтянуты значения из листа '{sheet_prefill}' в файле {excel_file}")
+                print(f"На лист '{sheet_target}' подтянуты значения из листа '{sheet_prefill}' в файле {processed_path}")
             except PermissionError:
-                print(f"Ошибка: нет доступа для записи в файл '{output_path}'. Возможно, он открыт.")
+                print(f"Ошибка: нет доступа для записи в файл '{processed_path}'. Возможно, он открыт.")
             except Exception as e:
                 print(f"Ошибка при сохранении файла: {e}")
         else:
@@ -339,10 +349,14 @@ def merge_by_cols(df, df_py, cols, cols_to_copy):
         pd.DataFrame: обновлённый df
     """
 
-
+    # df_py.to_excel('debug.xlsx')
     missing_cols = [c for c in cols + cols_to_copy if c not in df_py.columns]
     if missing_cols:
-        raise ValueError(f"Отсутствуют колонки в df_py: {missing_cols}")
+        raise ValueError(f"Отсутствуют колонки в анкете прошлого года: {missing_cols}.")
+    
+    for c in cols:
+        df[c] = df[c].astype(str).replace('nan', np.nan)
+        df_py[c] = df_py[c].astype(str).replace('nan', np.nan)
 
     # Уберём дубликаты по ключевым колонкам в df_py
     df_py_unique = df_py.drop_duplicates(subset=cols, keep="first")
