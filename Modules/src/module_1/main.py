@@ -323,24 +323,41 @@ def check_general_info(df_company, lang, df):
     global errors
     # Setting columns names to the russian version
     df.columns = expected_columns_rus
-    fields = {
-        gi_contact_name:    (5, 1),
-        gi_title:           (6, 1),
-        gi_tel:             (7, 1),
-        gi_email:           (8, 1),
-    }
 
-    for col, (r, c) in fields.items():
-        try:
-            df[col] = df_company.iloc[r, c]
-        except Exception:
-            print(f"Отсутствует необязательная колонка в General Info: {col}")
+    try: #добавить проверку на выпадающий список
+        df[company_name] = df_company.iloc[0, 1]
+        df[gi_company_name] = df_company.iloc[0, 1]
+        df[gi_sector] = df_company.iloc[1, 1]
+        df[gi_origin] = df_company.iloc[2, 1]
+        df[gi_headcount_cat] = df_company.iloc[3, 1]
+        df[gi_revenue_cat] = df_company.iloc[4, 1]
+        df[gi_contact_name] = df_company.iloc[5, 1]
+        df[gi_title] = df_company.iloc[6, 1]
+        df[gi_tel] = df_company.iloc[7, 1]
+        df[gi_email] = df_company.iloc[8, 1]
+    except Exception as e:
+        print(e)
+    #     errors['info_errors'] += ["Incorrect General Info"]
+
+    # fields = {
+    #     gi_contact_name:    (5, 1),
+    #     gi_title:           (6, 1),
+    #     gi_tel:             (7, 1),
+    #     gi_email:           (8, 1),
+    # }
+
+    # for col, (r, c) in fields.items():
+    #     try:
+    #         df[col] = df_company.iloc[r, c]
+    #     except Exception:
+    #         print(f"Отсутствует необязательная колонка в General Info: {col}")
 
     for _, row in df_company.loc[0:3, ["Unnamed: 2", "Unnamed: 3"]].iterrows():
         field_name = str(row["Unnamed: 2"]).strip()   # Название поля
         value = row["Unnamed: 3"]                     # Значение
         if is_empty_value(value):
             errors['info_errors'].append(f"Incorrect General Info: {field_name}")
+        
 
     comp_name = df[company_name][0]
     if not re.fullmatch(r"[A-Za-z0-9_]+", str(comp_name)):
