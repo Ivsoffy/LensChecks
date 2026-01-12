@@ -8,9 +8,8 @@
 3. Проверить наличие и версию python командой ```python --version``` (в идеале 3.13.5 или близкая к этому версия). Если в выводе версия питона отсутствует, то его нужно установить. Далее установить requirements.txt, для этого набрать в терминале вашего IDE (например, jupyter) или в обычном терминале: \
 ```pip install -r requirements.txt```
 4. В том же терминале написать ```python -m spacy download ru_core_news_lg```
-5. Скачать модели для выставления кодов (https://disk.360.yandex.ru/d/LCNN_Y88KYkxrQ) и поместить их в папку LensChecks/Modules/src/module_2/function_model/final_models/
-6. Скачать модель для выставления грейдов (https://disk.360.yandex.ru/d/-j2eAAwugIh1Mg) и поместить ее в папку 
-LensChecks/Modules/src/module_4/grade_model/
+5. Скачать модель для выставления кодов (https://disk.360.yandex.ru/d/LCNN_Y88KYkxrQ) и поместить ее в папку LensChecks/Modules/src/module_2/
+6. Скачать модель для выставления грейдов (https://disk.360.yandex.ru/d/-j2eAAwugIh1Mg) и поместить ее в папку LensChecks/Modules/src/module_4/grade_model/
 
 Рекомендуется для удобства также создать внутри каждого модуля папки input и output для хранения соответствующих файлов (тогда в config.yml можно будет прописывать локальные пути, например ```input_folder: src/module_4/input```).
 
