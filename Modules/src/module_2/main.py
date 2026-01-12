@@ -66,9 +66,15 @@ def module_2(input_folder, output_folder, params):
 
             try:
                 df = pd.read_excel(file_path, sheet_name="Total Data", index_col=0)
-            except Exception as e:
-                print(f"Ошибка чтения файла '{file_path}': {e}")
-                continue
+            except:
+                try:
+                    df = pd.read_excel(file_path, sheet_name="Данные", header=6)
+                    df_company = pd.read_excel(file_path, sheet_name=company_data, header=1)
+                    df[gi_sector] = df_company.iloc[1, 3]
+                except Exception as e:
+                    print(f"Ошибка чтения файла '{file_path}': {e}")
+                    continue
+                
 
             if function_code not in df.columns:
                 print(f"Ошибка: отсутствует колонка '{function_code}' в файле '{file_path}'.")
@@ -113,8 +119,8 @@ def module_2(input_folder, output_folder, params):
 
                 df = check_the_result(df)
                 df.to_excel(filename)
-
-        print(f"--------- Обработка файла {file} окончена ---------")
+            print(f"--------- Обработка файла {file} окончена ---------")
+        
 
 def _is_excel_file(filename):
     """
@@ -501,13 +507,13 @@ def process_output_file(df1, df2, cols, output_file, sheet1_name="Prefill", shee
     df2_cols = base_cols_2[:5] + conf_cols + base_cols_2[5:] if "description" in df2.columns else base_cols_2
     df2 = df2[[c for c in df2_cols if c in df2.columns]]
 
-    if "predicted_code" not in df2.columns:
-        raise ValueError("Ошибка: отсутствует колонка predicted_code.")
+    if "predicted_code" in df2.columns:
+        # raise ValueError("Ошибка: отсутствует колонка predicted_code.")
 
-    pred_codes = df2["predicted_code"].astype(str)
-    df2[function_code] = pred_codes.str[:2]
-    df2[subfunction_code] = pred_codes.str[:3]
-    df2[specialization_code] = pred_codes.apply(lambda x: x[:5] if "-" in x else "")
+        pred_codes = df2["predicted_code"].astype(str)
+        df2[function_code] = pred_codes.str[:2]
+        df2[subfunction_code] = pred_codes.str[:3]
+        df2[specialization_code] = pred_codes.apply(lambda x: x[:5] if "-" in x else "")
 
     try:
         book = load_workbook(output_file)

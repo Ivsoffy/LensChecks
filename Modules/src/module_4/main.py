@@ -178,7 +178,6 @@ def map_prefill_to_sheet1(
         else:
             print("Не все колонки из match_cols найдены в обоих листах.")
     
-        return df_merged
     return df_target
     
         

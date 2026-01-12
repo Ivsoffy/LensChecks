@@ -43,8 +43,26 @@ def module_3(input_folder, output_folder, params=None):
 
             # Exporting the dataframe from an excel file
             # For SDFs
-            sheet_name = "Total Data"
-            df = pd.read_excel(file_path, sheet_name=sheet_name, index_col=0)
+            try:
+                df = pd.read_excel(file_path, sheet_name="Total Data", index_col=0)
+            except:
+                try:
+                    df = pd.read_excel(file_path, sheet_name="Данные", header=6)
+                    df_company = pd.read_excel(file_path, sheet_name=company_data, header=1)
+                    df[company_name] = df_company.iloc[0, 3]
+                    df[gi_company_name] = df_company.iloc[0, 3]
+                    df[gi_sector] = df_company.iloc[1, 3]
+                    df[gi_origin] = df_company.iloc[2, 3]
+                    df[gi_headcount_cat] = df_company.iloc[3, 3]
+                    df[gi_revenue_cat] = df_company.iloc[4, 3]
+                    df[gi_contact_name] = df_company.iloc[5, 3]
+                    df[gi_title] = df_company.iloc[6, 3]
+                    df[gi_tel] = df_company.iloc[7, 3]
+                    df[gi_email] = df_company.iloc[8, 3]
+                except Exception as e:
+                    print(f"Ошибка чтения файла '{file_path}': {e}")
+                    continue
+            # df = pd.read_excel(file_path, sheet_name=sheet_name, index_col=0)
             # print(df.keys())
 
             # Apply cleaning to column names
