@@ -469,7 +469,7 @@ def process_output_file(df1, df2, cols, output_file, sheet1_name="Prefill", shee
 
     base_cols_1 = [
         company_name,
-        "гِгçг’‘'г?‘?",
+        'Сектор',
         function_code,
         subfunction_code,
         specialization_code,
@@ -487,7 +487,7 @@ def process_output_file(df1, df2, cols, output_file, sheet1_name="Prefill", shee
 
     base_cols_2 = [
         company_name,
-        "гِгçг’‘'г?‘?",
+        'Сектор',
         "predicted_code",
         dep_level_1,
         dep_level_2,
