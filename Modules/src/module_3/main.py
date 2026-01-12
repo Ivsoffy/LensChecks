@@ -135,6 +135,11 @@ def module_3(input_folder, output_folder, params=None):
 
             ultimate_df = lti_checks(ultimate_df, fact_lti, fact_lti_1, fact_lti_2, fact_lti_3, 'Fact LTI = Fact LTI Parts')
             ultimate_df = lti_checks(ultimate_df, target_lti_per, target_lti_1, target_lti_2, target_lti_3, 'Target LTI = Target LTI Parts')
+            ultimate_df['LTI & grade < 13'] = ultimate_df.apply(lambda x: not (x[grade] < 13 and (not str(x[fact_lti])=='nan')), axis=1)
+
+            ultimate_df['EMA & grade < 17'] = ultimate_df.apply(lambda x: not ((x[grade] < 17) and (x[subfunction_code]=='EMA')), axis=1)
+            ultimate_df['PRB & grade > 14'] = ultimate_df.apply(lambda x: not ((x[grade] > 14) and (x[subfunction_code]=='PRB')), axis=1)
+            ultimate_df['XXZ & grade < 14'] = ultimate_df.apply(lambda x: not ((x[grade] < 14) and (x[subfunction_code][2]=='Z')), axis=1)
 
             ultimate_df = validate_compensation_ranges(
                 ultimate_df, 
