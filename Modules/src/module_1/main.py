@@ -16,6 +16,10 @@ import shutil
 from openpyxl import utils
 import warnings
 import os, tempfile
+import win32com.client
+import shutil, os
+from win32com.client import makepy
+
 # warnings.filterwarnings("ignore", category=UserWarning)
 warnings.simplefilter("ignore", category=UserWarning, lineno=329, append=False)
 warnings.filterwarnings('ignore', message='The behavior of DataFrame concatenation with empty or all-NA entries is deprecated.*',
@@ -394,76 +398,6 @@ def lti_checks(main_lti, lti_1, lti_2, lti_3, index, type_lti):
         errors['data_errors'] += [(type_lti, index)]
     return main_lti
 
-# def add_errors_to_excel(errors, input_path, output_path):
-#     """Добавляет лист 'Ошибки' и подсвечивает ячейки с ошибками на листе 'Данные'."""
-#     # --- Формирование таблицы ошибок ---
-#     info = errors.get('info_errors', [])
-#     data = [col for col, _ in errors.get('data_errors', [])]
-#     unique_data = list(dict.fromkeys(data))
-#     n = max(len(info), len(unique_data))
-#     df_errors = pd.DataFrame({
-#         'info_errors': info + [None] * (n - len(info)),
-#         'data_errors': unique_data + [None] * (n - len(unique_data))
-#     })
-
-#     wb = load_workbook(input_path, data_only=True)
-#     ws_err = wb.create_sheet("Errors", 0)
-
-#     # --- Запись и оформление листа "Ошибки" ---
-#     for r, row in enumerate(dataframe_to_rows(df_errors, index=False, header=True), 1):
-#         for c, v in enumerate(row, 1):
-#             ws_err.cell(r, c, v)
-
-#     header_style = {"font": Font(bold=True, color="FFFFFF"),
-#                     "fill": PatternFill("solid", fgColor="4472C4")}
-#     border = Border(*[Side(style="thin", color="808080")]*4)
-#     for cell in ws_err[1]:
-#         cell.font, cell.fill = header_style["font"], header_style["fill"]
-#         cell.alignment, cell.border = Alignment(horizontal='center'), border
-#     for row in ws_err.iter_rows(min_row=2):
-#         for cell in row:
-#             cell.alignment = Alignment(wrap_text=True, vertical="top")
-#             cell.border = border
-#     for col in ws_err.columns:
-#         ws_err.column_dimensions[col[0].column_letter].width = max(len(str(c.value) or "") for c in col) + 2
-
-#     # --- Определение структуры листа "Данные" ---
-#     data_sheet = next((s for s in wb.sheetnames if (s.strip().lower() == "данные") or s.strip().lower() == "salary data"), None)
-#     if not data_sheet:
-#         raise ValueError("Не найден лист 'Данные'.")
-#     ws_data = wb[data_sheet]
-#     df_head = pd.read_excel(input_path, sheet_name=data_sheet, header=None, nrows=40)
-
-#     non_empty = df_head.notna().sum(axis=1)
-#     header_end = max((i for i, v in enumerate(non_empty) if v >= max(3, df_head.shape[1] * 0.05)), default=0)
-#     data_start = header_end + 2
-
-#     def norm(s): return str(s).strip().lower() if pd.notna(s) else ""
-#     col_map = {norm(df_head.iat[r, c]): c + 1
-#                for r in range(header_end + 1) for c in range(df_head.shape[1])
-#                if pd.notna(df_head.iat[r, c])}
-
-#     # --- Подсветка ошибок ---
-#     orange = PatternFill("solid", fgColor="FFC000")
-#     for col_name, idx in errors.get('data_errors', []):
-#         col_idx = col_map.get(norm(col_name))
-#         if not col_idx:
-#             print(f"Не найдена колонка: {col_name}")
-#             continue
-#         excel_row = 8 + idx
-#         if 1 <= excel_row <= ws_data.max_row:
-#             ws_data.cell(excel_row, col_idx).fill = orange
-#         else:
-#             print(f"Строка вне диапазона: {excel_row}")
-
-#     wb.save(output_path)
-#     print(f"Лист 'Ошибки' добавлен, ячейки подсвечены. Файл: {output_path}")
-
-
-# import win32com.client as win32
-import win32com.client
-import shutil, os
-from win32com.client import makepy
 
 #pip install pywin32 --upgrade
 
@@ -673,13 +607,13 @@ def module_1(input_folder='companies/rus', output_folder='output', params=None):
     if len(unprocessed_files) == 0:
         print(f"\nВсе файлы проверены!")
     else:
+        print("=" * 20 + " WARNING! " + "=" * 20)
+        print(f"List of unprocessed files:")
         for file, issue in unprocessed_files.items():
             data_err = [col for col, _ in issue.get('data_errors', [])]
             unique_data_err = list(dict.fromkeys(data_err))
             # error_df = pd.DataFrame(data=issue)
             print(f'\n')
-            print("=" * 20 + " WARNING! " + "=" * 20)
-            print(f"List of unprocessed files:")
             print(f"File: {file}, Info errors: {issue['info_errors']}\nData errors: {unique_data_err}")
             
             

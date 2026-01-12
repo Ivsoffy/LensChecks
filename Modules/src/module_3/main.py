@@ -225,8 +225,6 @@ def save_db_to_parquet(ultimate_df, output_folder):
 
         print(f"Файл сохранен в {output_file}")
 
-
-
 # Function to compare how realistic is the certain compensation element
 def validate_compensation_ranges(df, comp_column, grade_col, output_col, comp_type='BP'):
     

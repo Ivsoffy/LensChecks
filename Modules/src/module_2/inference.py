@@ -468,7 +468,7 @@ def process_files_and_predict(df, models, encoders, matched_industry, test=False
 
     df["text_input"] = (
         df['Название должности'].astype(str) +
-        " [SEP] " + df["add_info"].astype(str)
+        " | " + df["add_info"].astype(str)
     )
 
     # Get unique job titles
