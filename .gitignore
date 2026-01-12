@@ -6,5 +6,6 @@ __pycache__/
 Modules/src/demo/
 src.lnk
 *.pth
+*.cbm
 Modules/src/module_2/function_model/__pycache__/*
 result_test/

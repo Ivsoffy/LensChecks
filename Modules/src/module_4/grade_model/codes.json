@@ -1,0 +1,4923 @@
+{
+  "ADV": {
+    "industry": "Общий",
+    "description": "Советники",
+    "examples": "Советник генерального директора",
+    "type": "subfunction"
+  },
+  "ASA-A": {
+    "industry": "Общий",
+    "description": "Секретариат",
+    "examples": "Секретарь, секретарь-референт, секретарь ресепшн, офис-менеджер, административный ассистент, ассистент",
+    "type": "specialization",
+    "subfunction": "ASA"
+  },
+  "ASA": {
+    "industry": "Общий",
+    "description": "Секретари / Канцелярские службы",
+    "examples": "nan",
+    "type": "subfunction"
+  },
+  "ASA-B": {
+    "industry": "Общий",
+    "description": "Канцелярия",
+    "examples": "Делопроизводитель, заведующий канцелярией, документовед, специалист по документообороту, специалист по электронному документообороту, специалист по электронному делопроизводству ",
+    "type": "specialization",
+    "subfunction": "ASA"
+  },
+  "ASA-C": {
+    "industry": "Общий",
+    "description": "Архив",
+    "examples": "Архивариус, администратор по архивированию документации",
+    "type": "specialization",
+    "subfunction": "ASA"
+  },
+  "ASB": {
+    "industry": "Общий",
+    "description": "Персональные ассистенты",
+    "examples": "Ассистент директора, персональный ассистент, бизнес-ассистент",
+    "type": "subfunction"
+  },
+  "ASC-A": {
+    "industry": "Общий",
+    "description": "Поддержание чистоты и порядка",
+    "examples": "Уборщик служебных помещений, дворник, мойщик, гладильщик, менеджер по клинингу",
+    "type": "specialization",
+    "subfunction": "ASC"
+  },
+  "ASC": {
+    "industry": "Общий",
+    "description": "Служба поддержки",
+    "examples": "nan",
+    "type": "subfunction"
+  },
+  "ASC-B": {
+    "industry": "Общий",
+    "description": "Автотранспорт",
+    "examples": "Офисный водитель, координатор по транспорту (car fleet manager), руководитель автопарка, персональный водитель, водитель автобуса, водитель легкового автомобиля",
+    "type": "specialization",
+    "subfunction": "ASC"
+  },
+  "ASC-D": {
+    "industry": "Общий",
+    "description": "Курьер",
+    "examples": "Курьер",
+    "type": "specialization",
+    "subfunction": "ASC"
+  },
+  "ASC-E": {
+    "industry": "Общий",
+    "description": "Медицинский работник / Врач",
+    "examples": "Фельдшер здравпункта, медицинская сестра здравпункта, заведующий здравпунктом, врач в офисе, санитар",
+    "type": "specialization",
+    "subfunction": "ASC"
+  },
+  "ASC-F": {
+    "industry": "Общий",
+    "description": "Заведующий хозяйством",
+    "examples": "Специалист АХО, заведующий хозяйством, кастелянша, комендант, подсобный рабочий, рабочий зеленого хозяйства (арбористика)",
+    "type": "specialization",
+    "subfunction": "ASC"
+  },
+  "ASE": {
+    "industry": "Общий",
+    "description": "Изготовление печатной продукции",
+    "examples": "Оператор копировальных и множительных машин, специалист службы изготовления печатной продукции",
+    "type": "subfunction"
+  },
+  "ASF": {
+    "industry": "Общий",
+    "description": "Протокольная служба",
+    "examples": "Специалист по организации деловых поездок и расселению, специалист протокольного отдела, специалист организационно-протокольного отдела, специалист по визовой поддержке",
+    "type": "subfunction"
+  },
+  "ASJ": {
+    "industry": "Общий",
+    "description": "Подготовка документов",
+    "examples": "Специалист по подготовке договоров, специалист по подготовке документов",
+    "type": "subfunction"
+  },
+  "ASK": {
+    "industry": "Общий",
+    "description": "Лингвистическая поддержка",
+    "examples": "Переводчик, Специалист отдела лингвистического сопровождения",
+    "type": "subfunction"
+  },
+  "ASX": {
+    "industry": "Общий",
+    "description": "Прочая деятельность - Администрирование",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "ASZ": {
+    "industry": "Общий",
+    "description": "Руководитель административной функции",
+    "examples": "Административный директор, директор административного департамента",
+    "type": "subfunction"
+  },
+  "AUB": {
+    "industry": "Общий",
+    "description": "Проведение внутреннего аудита",
+    "examples": "Менеджер по внутреннему аудиту, внутренний аудитор",
+    "type": "subfunction"
+  },
+  "AUX": {
+    "industry": "Общий",
+    "description": "Прочая деятельность - Внутренний аудит",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "AUZ": {
+    "industry": "Общий",
+    "description": "Руководитель функции внутреннего аудита",
+    "examples": "Руководитель направления по внутреннему аудиту, директор по внутреннему аудиту, начальник службы внутреннего аудита",
+    "type": "subfunction"
+  },
+  "BPA": {
+    "industry": "Общий",
+    "description": "Эффективность и трансформация бизнес-процессов",
+    "examples": "Менеджер по оптимизации бизнес-процессов, менеджер по операционной эффективности, менеджер по непрерывным улучшениям",
+    "type": "subfunction"
+  },
+  "BPX": {
+    "industry": "Общий",
+    "description": "Прочая деятельность - Эффективность и трансформация бизнес-процессов",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "BPZ": {
+    "industry": "Общий",
+    "description": "Руководитель функции эффективности и трансформации бизнес-процессов",
+    "examples": "Руководитель направления оптимизации и совершенствования бизнес-процессов",
+    "type": "subfunction"
+  },
+  "CAA": {
+    "industry": "Общий",
+    "description": "Связи с государственными органами (GR)",
+    "examples": "Руководитель направления по взаимодействию с региональными органами власти, специалист по взаимодействию с государственными органами, представитель по связям с региональными органами власти, менеджер по институциональным связям",
+    "type": "subfunction"
+  },
+  "CAB": {
+    "industry": "Общий",
+    "description": "Правовое регулирование и регистрирование",
+    "examples": "Менеджер по регистрации, специалист по лицензированию, специалист по регистрации лекарственных средств, специалист по сертификации, специалист по сертификации и лицензированию информационных технологий",
+    "type": "subfunction"
+  },
+  "CAC-A": {
+    "industry": "Общий",
+    "description": "Пресс-служба и связи с общественностью",
+    "examples": "Менеджер по внешним коммуникациям, менеджер по связям с общественностью, руководитель пресс-службы, пресс-секретарь",
+    "type": "specialization",
+    "subfunction": "CAC"
+  },
+  "CAC": {
+    "industry": "Общий",
+    "description": "Связи с общественностью (PR)",
+    "examples": "nan",
+    "type": "subfunction"
+  },
+  "CAC-B": {
+    "industry": "Общий",
+    "description": "Организация мероприятий/ спонсорство",
+    "examples": "Специалист по организации мероприятий, координатор благотворительных проектов",
+    "type": "specialization",
+    "subfunction": "CAC"
+  },
+  "CAD-A": {
+    "industry": "Общий",
+    "description": "Менеджер по связям с инвесторами",
+    "examples": "Менеджер по связям с инвесторами и рынкам капитала",
+    "type": "specialization",
+    "subfunction": "CAD"
+  },
+  "CAD": {
+    "industry": "Общий",
+    "description": "Связи с инвесторами (IR)",
+    "examples": "nan",
+    "type": "subfunction"
+  },
+  "CAD-B": {
+    "industry": "Общий",
+    "description": "Корпоративный секретарь",
+    "examples": "Корпоративный секретарь",
+    "type": "specialization",
+    "subfunction": "CAD"
+  },
+  "CAE": {
+    "industry": "Общий",
+    "description": "Устойчивое развитие (ESG)",
+    "examples": "Менеджер по устойчивому развитию, эксперт ESG",
+    "type": "subfunction"
+  },
+  "CAX": {
+    "industry": "Общий",
+    "description": "Прочая деятельность - Корпоративные связи",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "CAZ": {
+    "industry": "Общий",
+    "description": "Директор по корпоративным связям",
+    "examples": "Директор департамента по корпоративным отношениям и устойчивому развитию бизнеса, директор департамента внешних коммуникаций",
+    "type": "subfunction"
+  },
+  "CCH-A": {
+    "industry": "Общий",
+    "description": "Методолог колл-центра/контроль качества",
+    "examples": "Методолог колл-центра, специалист по контролю исполнения процессов контактного центра",
+    "type": "specialization",
+    "subfunction": "CCH"
+  },
+  "CCH": {
+    "industry": "Общий",
+    "description": "Обработка входящих и исходящих вызовов",
+    "examples": "nan",
+    "type": "subfunction"
+  },
+  "CCH-B": {
+    "industry": "Общий",
+    "description": "Операционная деятельность колл-центра",
+    "examples": "Специалист обработки обращений пользователей, специалист по работе с пользователями, оператор по обработке онлайн-заказов",
+    "type": "specialization",
+    "subfunction": "CCH"
+  },
+  "CCX": {
+    "industry": "Общий",
+    "description": "Прочая деятельность - Call Центр",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "CCZ": {
+    "industry": "Общий",
+    "description": "Руководитель колл-центра",
+    "examples": "Руководитель контактного центра, директор контакт-центра, руководитель колл-центра",
+    "type": "subfunction"
+  },
+  "CMA": {
+    "industry": "Общий",
+    "description": "Управление товарными категориями",
+    "examples": "Категорийный менеджер, специалист по кодификации, специалист по товародвижению и прогнозированию спроса, менеджер по ассортименту",
+    "type": "subfunction"
+  },
+  "CMX": {
+    "industry": "Общий",
+    "description": "Прочая деятельность - Управление товарными категориями",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "CMZ": {
+    "industry": "Общий",
+    "description": "Руководитель подразделения по управлению товарными категориями",
+    "examples": "Директор по товародвижению и прогнозированию, руководитель по категорийному менеджменту",
+    "type": "subfunction"
+  },
+  "CNA": {
+    "industry": "Общий",
+    "description": "Комплаенс контроль и обеспечение соответствия",
+    "examples": "Комплаенс-менеджер",
+    "type": "subfunction"
+  },
+  "CNB-A": {
+    "industry": "Общий",
+    "description": "Безопасность операций",
+    "examples": "Менеджер по противодействию незаконной торговле, антифрод-аналитик",
+    "type": "specialization",
+    "subfunction": "CNB"
+  },
+  "CNB": {
+    "industry": "Общий",
+    "description": "Противодействие мошенничеству/ Антифрод",
+    "examples": "nan",
+    "type": "subfunction"
+  },
+  "CNB-B": {
+    "industry": "Общий",
+    "description": "Безопасность операций с пластиковыми картами",
+    "examples": "Специалист отдела мониторинга операций с пластиковыми картами",
+    "type": "specialization",
+    "subfunction": "CNB"
+  },
+  "CNB-C": {
+    "industry": "Общий",
+    "description": "Безопасность розничных банковских операций",
+    "examples": "Эксперт по сопровождению систем мониторинга банковских операций",
+    "type": "specialization",
+    "subfunction": "CNB"
+  },
+  "CNB-D": {
+    "industry": "Общий",
+    "description": "Безопасность телекоммуникационных услуг",
+    "examples": "Специалист по развитию средств защиты сети",
+    "type": "specialization",
+    "subfunction": "CNB"
+  },
+  "CNC": {
+    "industry": "Общий",
+    "description": "ПОД/ФТ (AML)",
+    "examples": "Руководитель направления развития экспертизы ПОД/ФТ, эксперт по противодействию отмывания денежных средств и финансирования терроризма, эксперт по финансовому мониторингу",
+    "type": "subfunction"
+  },
+  "CND": {
+    "industry": "Общий",
+    "description": "Международный комплаенс-контроль",
+    "examples": "Менеджер отдела международного комплаенс-контроля",
+    "type": "subfunction"
+  },
+  "CNE": {
+    "industry": "Общий",
+    "description": "Контролер профучастника рынка ценных бумаг",
+    "examples": "Контролер профучастника рынка ценных бумаг",
+    "type": "subfunction"
+  },
+  "CNF": {
+    "industry": "Общий",
+    "description": "Контролер спецдепозитария",
+    "examples": "Контролер спецдепозитария",
+    "type": "subfunction"
+  },
+  "CNX": {
+    "industry": "Общий",
+    "description": "Прочая деятельность - Комплаенс",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "CNZ": {
+    "industry": "Общий",
+    "description": "Руководитель функции Комплаенс",
+    "examples": "Директор по контролю за соблюдением правовых норм, начальник службы внутреннего контроля и соответствия требованиям",
+    "type": "subfunction"
+  },
+  "CRA": {
+    "industry": "Общий",
+    "description": "Новости",
+    "examples": "Продюсер информационной программы, редактор новостей",
+    "type": "subfunction"
+  },
+  "CRB": {
+    "industry": "Общий",
+    "description": "Видео",
+    "examples": "Оператор-монтажер, видеограф-монтажер, специалист по видеопроизводству",
+    "type": "subfunction"
+  },
+  "CRC": {
+    "industry": "Общий",
+    "description": "Фотографы",
+    "examples": "Фотограф, ретушер, менеджер по фотопродакшену",
+    "type": "subfunction"
+  },
+  "CRD": {
+    "industry": "Общий",
+    "description": "Продюсирование",
+    "examples": "Продюсер",
+    "type": "subfunction"
+  },
+  "CRE": {
+    "industry": "Общий",
+    "description": "Модерация контента",
+    "examples": "Модератор трансляций, модератор контента",
+    "type": "subfunction"
+  },
+  "CRF": {
+    "industry": "Общий",
+    "description": "Стилисты ",
+    "examples": "Стилист, имиджмейкер",
+    "type": "subfunction"
+  },
+  "CRG": {
+    "industry": "Общий",
+    "description": "Визажист ",
+    "examples": "Визажист, гример ",
+    "type": "subfunction"
+  },
+  "CRH": {
+    "industry": "Общий",
+    "description": "Контент",
+    "examples": "Эксперт по контенту веб-сайта, контент-менеджер, копирайтер, корректор, редактор контента",
+    "type": "subfunction"
+  },
+  "CRX": {
+    "industry": "Общий",
+    "description": "Прочая деятельность - Управление контентом",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "CRZ": {
+    "industry": "Общий",
+    "description": "Руководитель функции \"Управление контентом\"",
+    "examples": "Директор по контенту",
+    "type": "subfunction"
+  },
+  "CSA": {
+    "industry": "Общий",
+    "description": "Клиентская служба - Техническая",
+    "examples": "Специалист по претензионной работе с клиентами, специалист технической поддержки, presale, специалист по техническому сопровождению продаж, менеджер по гарантии, менеджер по сервису, инженер по гарантии, специалист по работе с рекламациям, специалист по послепродажному обслуживанию",
+    "type": "subfunction"
+  },
+  "CSB": {
+    "industry": "Общий",
+    "description": "Клиентская служба - Нетехническая",
+    "examples": "Менеджер по работе с клиентами, специалист операционного отдела, специалист по сопровождению клиентов",
+    "type": "subfunction"
+  },
+  "CSX": {
+    "industry": "Общий",
+    "description": "Прочая деятельность - Клиентская служба",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "CSZ": {
+    "industry": "Общий",
+    "description": "Руководитель клиентской службы",
+    "examples": "Руководитель центра обслуживания клиентов, начальник департамента клиентского сервиса, директор по клиентскому сервису",
+    "type": "subfunction"
+  },
+  "CUB": {
+    "industry": "Общий",
+    "description": "Оценка проектов и заключение договоров",
+    "examples": "Менеджер строительных проектов, инженер по работе с исполнительной документацией и качеству",
+    "type": "subfunction"
+  },
+  "CUC": {
+    "industry": "Общий",
+    "description": "Строительство",
+    "examples": "Строитель",
+    "type": "subfunction"
+  },
+  "CUE": {
+    "industry": "Общий",
+    "description": "Реализация строительных проектов",
+    "examples": "Инженер по капитальному строительству, инженер по сопровождению строительства, специалист по технической документации",
+    "type": "subfunction"
+  },
+  "CUX": {
+    "industry": "Общий",
+    "description": "Прочая деятельность - Строительство",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "CUZ": {
+    "industry": "Общий",
+    "description": "Директор по строительству",
+    "examples": "Директор департамента строительства, директор программ капитального строительства, начальник отдела строительства и эксплуатации",
+    "type": "subfunction"
+  },
+  "DAA": {
+    "industry": "Общий",
+    "description": "Разработка систем работы с \"большими\" данными / Data Science",
+    "examples": "Инженер данных, дата-сайентист, аналитик-разработчик математических моделей и алгоритмов, ML инженер, дата-инженер",
+    "type": "subfunction"
+  },
+  "DAB": {
+    "industry": "Общий",
+    "description": "Аналитика данных / Data analytics",
+    "examples": "Аналитик данных, дата-аналитик, специалист по анализу данных",
+    "type": "subfunction"
+  },
+  "DAX": {
+    "industry": "Общий",
+    "description": "Прочая деятельность - Аналитика данных и Разработка систем работы с \"большими\" данными",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "DAZ": {
+    "industry": "Общий",
+    "description": "Руководитель подразделения аналитики данных",
+    "examples": "Управляющий директор по данным и аналитике, директор офиса больших данных",
+    "type": "subfunction"
+  },
+  "DEA-A": {
+    "industry": "Общий",
+    "description": "Графический дизайн",
+    "examples": "Дизайнер, графический дизайнер, иллюстратор",
+    "type": "specialization",
+    "subfunction": "DEA"
+  },
+  "DEA": {
+    "industry": "Общий",
+    "description": "Дизайнеры",
+    "examples": "nan",
+    "type": "subfunction"
+  },
+  "DEA-B": {
+    "industry": "Общий",
+    "description": "Промышленный дизайн",
+    "examples": "Промышленный дизайнер, Инженер-дизайнер",
+    "type": "specialization",
+    "subfunction": "DEA"
+  },
+  "DEA-C": {
+    "industry": "Общий",
+    "description": "Архитектурный дизайн",
+    "examples": "Дизайнер интерьеров, архитектор-дизайнер",
+    "type": "specialization",
+    "subfunction": "DEA"
+  },
+  "DEA-D": {
+    "industry": "Общий",
+    "description": "Дизайн одежды",
+    "examples": "Дизайнер одежды, модельер, модельер-конструктор одежды",
+    "type": "specialization",
+    "subfunction": "DEA"
+  },
+  "DEB-A": {
+    "industry": "Общий",
+    "description": "Проектирование пользовательских интерфейсов (UX)",
+    "examples": "Архитектор пользовательских интерфейсов, UX-проектировщик, Дизайнер пользовательских интерфейсов",
+    "type": "specialization",
+    "subfunction": "DEB"
+  },
+  "DEB": {
+    "industry": "Общий",
+    "description": "Проектирование и дизайн пользовательских интерфейсов (UX/UI)",
+    "examples": "nan",
+    "type": "subfunction"
+  },
+  "DEB-B": {
+    "industry": "Общий",
+    "description": "Дизайн пользовательских интерфейсов (UI)",
+    "examples": "Дизайнер пользовательских интерфейсов, UI-дизайнер, веб-дизайнер, дизайнер цифровых продуктов",
+    "type": "specialization",
+    "subfunction": "DEB"
+  },
+  "DEX": {
+    "industry": "Общий",
+    "description": "Прочая деятельность - Дизайн",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "DEZ": {
+    "industry": "Общий",
+    "description": "Руководитель группы дизайнеров / Арт-директор",
+    "examples": "Руководитель группы дизайнеров, арт-директор, дизайн-директор",
+    "type": "subfunction"
+  },
+  "EDA": {
+    "industry": "Общий",
+    "description": "Бизнес-тренер",
+    "examples": "Бизнес-тренер, специалист по обучению персонала",
+    "type": "subfunction"
+  },
+  "EDB": {
+    "industry": "Общий",
+    "description": "Техническое обучение",
+    "examples": "Менеджер по обучению, тренер по продукту, технический тренер",
+    "type": "subfunction"
+  },
+  "EDC": {
+    "industry": "Общий",
+    "description": "Образование",
+    "examples": "Преподаватель, учитель начальных классов, методист",
+    "type": "subfunction"
+  },
+  "EDX": {
+    "industry": "Общий",
+    "description": "Обучение - Прочая деятельность",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "EDZ": {
+    "industry": "Общий",
+    "description": "Директор по обучению",
+    "examples": "Директор подразделения по обучению",
+    "type": "subfunction"
+  },
+  "EGA": {
+    "industry": "Общий",
+    "description": "Инженер общего профиля",
+    "examples": "Инженер",
+    "type": "subfunction"
+  },
+  "EGD": {
+    "industry": "Общий",
+    "description": "Гражданская (строительная) инженерия",
+    "examples": "Инженер по зданиям и сооружениям, инженер по автодорожным проектам",
+    "type": "subfunction"
+  },
+  "EGE": {
+    "industry": "Общий",
+    "description": "Инженер-электрик",
+    "examples": "Инженер-электрик, инженер по эксплуатации электрооборудования",
+    "type": "subfunction"
+  },
+  "EGF": {
+    "industry": "Общий",
+    "description": "Инженер-механик",
+    "examples": "Инженер-механик, инженер по ремонту оборудования, инженер по обеспечению надежности работы оборудования, инженер по эксплуатации оборудования",
+    "type": "subfunction"
+  },
+  "EGG": {
+    "industry": "Общий",
+    "description": "Биоинженерия",
+    "examples": "Инженер-микробиолог",
+    "type": "subfunction"
+  },
+  "EGH": {
+    "industry": "Общий",
+    "description": "Инженер-химик",
+    "examples": "Инженер-химик",
+    "type": "subfunction"
+  },
+  "EGJ-A": {
+    "industry": "Общий",
+    "description": "АСУ ТП",
+    "examples": "Инженер АСУ ТП, инженер по автоматизированным системам управления производством, инженер-электроник, программист станков с ЧПУ, инженер по электронике, инженер-электронщик ",
+    "type": "specialization",
+    "subfunction": "EGJ"
+  },
+  "EGJ": {
+    "industry": "Общий",
+    "description": "Промышленная автоматизация",
+    "examples": "nan",
+    "type": "subfunction"
+  },
+  "EGJ-B": {
+    "industry": "Общий",
+    "description": "КИПиА",
+    "examples": "Инженер промышленной автоматики, инженер КИПиА, эксперт по системам автоматики, слесарь КИПиА",
+    "type": "specialization",
+    "subfunction": "EGJ"
+  },
+  "EGJ-C": {
+    "industry": "Общий",
+    "description": "Метрология",
+    "examples": "Инженер-метролог, метролог",
+    "type": "specialization",
+    "subfunction": "EGJ"
+  },
+  "EGO-A": {
+    "industry": "Общий",
+    "description": "Инженерное проектирование",
+    "examples": "Инженер-проектировщик, BIM координатор, BIM менеджер",
+    "type": "specialization",
+    "subfunction": "EGO"
+  },
+  "EGO": {
+    "industry": "Общий",
+    "description": "Инженерное проектирование",
+    "examples": "nan",
+    "type": "subfunction"
+  },
+  "EGO-B": {
+    "industry": "Общий",
+    "description": "Главный инженер проекта (ГИП)",
+    "examples": "Главный инженер проекта",
+    "type": "specialization",
+    "subfunction": "EGO"
+  },
+  "EGO-C": {
+    "industry": "Общий",
+    "description": "Архитектура (в строительстве)",
+    "examples": "Архитектор, главный архитектор проекта",
+    "type": "specialization",
+    "subfunction": "EGO"
+  },
+  "EGP": {
+    "industry": "Общий",
+    "description": "Разработка технологии",
+    "examples": "Инженер-технолог, технолог",
+    "type": "subfunction"
+  },
+  "EGQ": {
+    "industry": "Общий",
+    "description": "Инженер-энергетик",
+    "examples": "Инженер-энергетик",
+    "type": "subfunction"
+  },
+  "EGS": {
+    "industry": "Общий",
+    "description": "Технический надзор",
+    "examples": "Инженер технического надзора, инженер по техническому надзору",
+    "type": "subfunction"
+  },
+  "EGX": {
+    "industry": "Общий",
+    "description": "Прочая деятельность - Инженерные должности",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "EGZ": {
+    "industry": "Общий",
+    "description": "Руководитель инженерно-технического подразделения",
+    "examples": "Главный инженер, заместитель главного инженера",
+    "type": "subfunction"
+  },
+  "EMA-A": {
+    "industry": "Общий",
+    "description": "Генеральный директор / Президент",
+    "examples": "Президент, генеральный директор, CEO",
+    "type": "specialization",
+    "subfunction": "EMA"
+  },
+  "EMA": {
+    "industry": "Общий",
+    "description": "Корпоративное руководство",
+    "examples": "nan",
+    "type": "subfunction"
+  },
+  "EMA-B": {
+    "industry": "Общий",
+    "description": "Заместитель генерального директора",
+    "examples": "Заместитель генерального директора, вице-президент, операционный директор, исполнительный директор",
+    "type": "specialization",
+    "subfunction": "EMA"
+  },
+  "EMB": {
+    "industry": "Общий",
+    "description": "Руководители филиалов / бизнес-единицы / представительства",
+    "examples": "Директор филиала, директор отделения",
+    "type": "subfunction"
+  },
+  "EMD": {
+    "industry": "Общий",
+    "description": "Региональное управление",
+    "examples": "Региональный директор, региональный управляющий, директор регионального развития",
+    "type": "subfunction"
+  },
+  "EMX": {
+    "industry": "Общий",
+    "description": "Прочая деятельность - Высшее руководство",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "ENB": {
+    "industry": "Общий",
+    "description": "Сбыт сырьевых товаров / Трейдинг",
+    "examples": "Менеджер по продажам сырья, менеджер по покупке сырья, менеджер по продажам энергоресурсов, трейдер энергоресурсов, сырьевой трейдер, специалист по реализации электроэнергии",
+    "type": "subfunction"
+  },
+  "ENC": {
+    "industry": "Общий",
+    "description": "Коммерческие контракты в сфере снабжения сырьевыми товарами",
+    "examples": "Специалист по сопровождению коммерческих контрактов в сфере снабжения сырьевыми товарами",
+    "type": "subfunction"
+  },
+  "ENX": {
+    "industry": "Общий",
+    "description": "Прочая деятельность - Маркетинг и сбыт сырьевых товаров",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "ENZ": {
+    "industry": "Общий",
+    "description": "Директор по маркетингу и сбыту сырьевых товаров",
+    "examples": "Директор по маркетингу и сбыту сырьевых товаров",
+    "type": "subfunction"
+  },
+  "FAA-A": {
+    "industry": "Общий",
+    "description": "РСБУ",
+    "examples": "Бухгалтер по расчету заработной платы, бухгалтер по отчетности, бухгалтер по основным средствам",
+    "type": "specialization",
+    "subfunction": "FAA"
+  },
+  "FAA": {
+    "industry": "Общий",
+    "description": "Бухгалтерия",
+    "examples": "nan",
+    "type": "subfunction"
+  },
+  "FAA-B": {
+    "industry": "Общий",
+    "description": "МСФО / GAAP",
+    "examples": "Специалист по международной отчетности, МСФО менеджер",
+    "type": "specialization",
+    "subfunction": "FAA"
+  },
+  "FAC": {
+    "industry": "Общий",
+    "description": "Налогообложение",
+    "examples": "Менеджер по налогам, бухгалтер по налогообложению, специалист по налоговым расчетам",
+    "type": "subfunction"
+  },
+  "FAD": {
+    "industry": "Общий",
+    "description": "Финансовое планирование и анализ",
+    "examples": "Финансовый аналитик, экономист-аналитик, эксперт направления финансового планирования и анализа",
+    "type": "subfunction"
+  },
+  "FAF": {
+    "industry": "Общий",
+    "description": "Казначейство",
+    "examples": "Специалист казначейства, казначей",
+    "type": "subfunction"
+  },
+  "FAH": {
+    "industry": "Общий",
+    "description": "Финансовый контроль",
+    "examples": "Финансовый контролер, менеджер по контроллингу",
+    "type": "subfunction"
+  },
+  "FAI": {
+    "industry": "Общий",
+    "description": "Управление рисками",
+    "examples": "Риск-менеджер",
+    "type": "subfunction"
+  },
+  "FAM": {
+    "industry": "Общий",
+    "description": "Расчетные операции и кредитный контроль",
+    "examples": "Кредитный контролер, менеджер по учету расчетов",
+    "type": "subfunction"
+  },
+  "FAN": {
+    "industry": "Общий",
+    "description": "Бюджетирование",
+    "examples": "Финансовый менеджер, менеджер планирования и контроля операционных затрат, менеджер по бюджетному контролю",
+    "type": "subfunction"
+  },
+  "FAP": {
+    "industry": "Общий",
+    "description": "Привлечение внешнего финансирования",
+    "examples": "Менеджер отдела корпоративного финансирования",
+    "type": "subfunction"
+  },
+  "FAQ": {
+    "industry": "Общий",
+    "description": "Сметно-договорное направление",
+    "examples": "Специалист по договорной работе, сметчик-договорник, специалист сметно-договорного отдела",
+    "type": "subfunction"
+  },
+  "FAX": {
+    "industry": "Общий",
+    "description": "Прочая деятельность - Финансы и Бухгалтерия",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "FAY": {
+    "industry": "Общий",
+    "description": "Главный бухгалтер",
+    "examples": "Главный бухгалтер",
+    "type": "subfunction"
+  },
+  "FAZ": {
+    "industry": "Общий",
+    "description": "Финансовый директор",
+    "examples": "Финансовый директор",
+    "type": "subfunction"
+  },
+  "FHA": {
+    "industry": "Общий",
+    "description": "Франчайзинговые операции",
+    "examples": "Специалист по развитию франчайзинга",
+    "type": "subfunction"
+  },
+  "FHZ": {
+    "industry": "Общий",
+    "description": "Руководитель подразделения франчайзинга",
+    "examples": "Руководитель подразделения франчайзинга",
+    "type": "subfunction"
+  },
+  "HEA": {
+    "industry": "Общий",
+    "description": "Охрана окружающей среды",
+    "examples": "Менеджер по охране окружающей среды, инженер-эколог",
+    "type": "subfunction"
+  },
+  "HEB": {
+    "industry": "Общий",
+    "description": "Охрана труда",
+    "examples": "Специалист по охране труда, специалист по охране здоровья",
+    "type": "subfunction"
+  },
+  "HEC": {
+    "industry": "Общий",
+    "description": "Промышленная безопасность",
+    "examples": "Специалист по промышленной безопасности, инженер по промышленной безопасности, инженер-дозиметрист, газоспасатель",
+    "type": "subfunction"
+  },
+  "HEX": {
+    "industry": "Общий",
+    "description": "Прочая деятельность - Промышленная и экологическая безопасность",
+    "examples": "Инженер по безопасности дорожного движения",
+    "type": "subfunction"
+  },
+  "HEZ": {
+    "industry": "Общий",
+    "description": "Директор подразделения промышленной и экологической безопасности",
+    "examples": "Директор по охране труда, промышленной безопасности и экологии",
+    "type": "subfunction"
+  },
+  "HGA": {
+    "industry": "Общий",
+    "description": "Гражданская оборона и чрезвычайные ситуации",
+    "examples": "Менеджер по гражданской обороне и чрезвычайным ситуациям, инженер по ГО и ЧС, специалист по антитеррористической деятельности, Специалист по мобилизационной работе",
+    "type": "subfunction"
+  },
+  "HGB": {
+    "industry": "Общий",
+    "description": "Пожарная безопасность",
+    "examples": "Специалист по пожарной безопасности, инженер по пожарной безопасности",
+    "type": "subfunction"
+  },
+  "HGX": {
+    "industry": "Общий",
+    "description": "Прочая деятельность - Гражданская оборона и чрезвычайные ситуации",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "HGZ": {
+    "industry": "Общий",
+    "description": "Директор подразделения гражданской обороны и чрезвычайных ситуаций",
+    "examples": "Руководитель направления по гражданской обороне, чрезвычайным ситуациям, пожарной безопасности",
+    "type": "subfunction"
+  },
+  "HRA": {
+    "industry": "Общий",
+    "description": "Менеджер по управлению персоналом (HR Generalist)",
+    "examples": "Менеджер по работе с персоналом, HR дженералист",
+    "type": "subfunction"
+  },
+  "HRB-A": {
+    "industry": "Общий",
+    "description": "Развитие персонала, карьерное планирование",
+    "examples": "Специалист по обучению и развитию персонала, координатор обучения и развития персонала, специалист по развитию талантов, партнер по развитию талантов",
+    "type": "specialization",
+    "subfunction": "HRB"
+  },
+  "HRB": {
+    "industry": "Общий",
+    "description": "Обучение и развитие",
+    "examples": "nan",
+    "type": "subfunction"
+  },
+  "HRB-C": {
+    "industry": "Общий",
+    "description": "Оценка персонала",
+    "examples": "Менеджер по оценке персонала, эксперт по аттестации персонала",
+    "type": "specialization",
+    "subfunction": "HRB"
+  },
+  "HRC": {
+    "industry": "Общий",
+    "description": "Компенсации и льготы",
+    "examples": "Менеджер по компенсациям и льготам",
+    "type": "subfunction"
+  },
+  "HRD": {
+    "industry": "Общий",
+    "description": "Подбор и адаптация персонала",
+    "examples": "Специалист по подбору персонала, менеджер по рекрутингу, рекрутер",
+    "type": "subfunction"
+  },
+  "HRE-A": {
+    "industry": "Общий",
+    "description": "Кадровое администрирование",
+    "examples": "Специалист по кадровому делопроизводству, специалист по кадровому администрированию",
+    "type": "specialization",
+    "subfunction": "HRE"
+  },
+  "HRE": {
+    "industry": "Общий",
+    "description": "Кадровое делопроизводство",
+    "examples": "nan",
+    "type": "subfunction"
+  },
+  "HRE-B": {
+    "industry": "Общий",
+    "description": "Воинский учет",
+    "examples": "Специалист по воинскому учету, специалист по воинскому учету и бронированию",
+    "type": "specialization",
+    "subfunction": "HRE"
+  },
+  "HRG": {
+    "industry": "Общий",
+    "description": "Организационное развитие",
+    "examples": "Менеджер по организационному развитию",
+    "type": "subfunction"
+  },
+  "HRH": {
+    "industry": "Общий",
+    "description": "Внутренние коммуникации",
+    "examples": "Менеджер по коммуникациям, менеджер по корпоративным коммуникациям, менеджер по корпоративным мероприятиям",
+    "type": "subfunction"
+  },
+  "HRJ": {
+    "industry": "Общий",
+    "description": "Бизнес-партнер по управлению персоналом (HRBP)",
+    "examples": "HR бизнес-партнер, бизнес-партнер по управлению персоналом",
+    "type": "subfunction"
+  },
+  "HRK": {
+    "industry": "Общий",
+    "description": "Корпоративная культура и вовлеченность",
+    "examples": "Менеджер по корпоративной культуре",
+    "type": "subfunction"
+  },
+  "HRL": {
+    "industry": "Общий",
+    "description": "HR-аналитика",
+    "examples": "HR-аналитик",
+    "type": "subfunction"
+  },
+  "HRM": {
+    "industry": "Общий",
+    "description": "Социальная политика",
+    "examples": "Специалист по корпоративной социальной политике, специалист по социальным программам, специалист по социальной политике, специалист по программам well-being/благополучия",
+    "type": "subfunction"
+  },
+  "HRN": {
+    "industry": "Общий",
+    "description": "Работа с HR-брендом",
+    "examples": "Менеджер по развитию HR-бренда, менеджер по управлению брендом работодателя",
+    "type": "subfunction"
+  },
+  "HRX": {
+    "industry": "Общий",
+    "description": "Прочая деятельность - Управление персоналом",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "HRZ": {
+    "industry": "Общий",
+    "description": "Директор по управлению персоналом",
+    "examples": "Директор департамента управления персоналом, директор по персоналу",
+    "type": "subfunction"
+  },
+  "ITA-A": {
+    "industry": "Общий",
+    "description": "Архитектура программного обеспечения",
+    "examples": "Архитектор программного обеспечения",
+    "type": "specialization",
+    "subfunction": "ITA"
+  },
+  "ITA": {
+    "industry": "Общий",
+    "description": "Разработка и внедрение программного обеспечения",
+    "examples": "nan",
+    "type": "subfunction"
+  },
+  "ITA-B": {
+    "industry": "Общий",
+    "description": "Кодирование 1C",
+    "examples": "Программист 1C, разработчик 1C",
+    "type": "specialization",
+    "subfunction": "ITA"
+  },
+  "ITA-C": {
+    "industry": "Общий",
+    "description": "Кодирование ABAP (SAP)",
+    "examples": "ABAP-разработчик SAP, специалист ABAP, разработчик ABAP",
+    "type": "specialization",
+    "subfunction": "ITA"
+  },
+  "ITA-D": {
+    "industry": "Общий",
+    "description": "Кодирование AXAPTA",
+    "examples": "Программист AXAPTA, разработчик AXAPTA",
+    "type": "specialization",
+    "subfunction": "ITA"
+  },
+  "ITA-E": {
+    "industry": "Общий",
+    "description": "Кодирование CRM",
+    "examples": "CRM-разработчик, программист CRM",
+    "type": "specialization",
+    "subfunction": "ITA"
+  },
+  "ITA-F": {
+    "industry": "Общий",
+    "description": "Кодирование ERP Прочее",
+    "examples": "Разработчик ERP",
+    "type": "specialization",
+    "subfunction": "ITA"
+  },
+  "ITA-G": {
+    "industry": "Общий",
+    "description": "DevOps",
+    "examples": "DevOps инженер, релиз-инженер (release engineer)",
+    "type": "specialization",
+    "subfunction": "ITA"
+  },
+  "ITA-H": {
+    "industry": "Общий",
+    "description": "Разработка .NET / C#",
+    "examples": "Разработчик .NET C#, .NET разработчик (С#)",
+    "type": "specialization",
+    "subfunction": "ITA"
+  },
+  "ITA-I": {
+    "industry": "Общий",
+    "description": "Разработка для Android",
+    "examples": "Android разработчик",
+    "type": "specialization",
+    "subfunction": "ITA"
+  },
+  "ITA-J": {
+    "industry": "Общий",
+    "description": "Разработка для iOS",
+    "examples": "iOS разработчик",
+    "type": "specialization",
+    "subfunction": "ITA"
+  },
+  "ITA-L": {
+    "industry": "Общий",
+    "description": "Разработка С/C++",
+    "examples": "Программист C/C++, C/C++ разработчик",
+    "type": "specialization",
+    "subfunction": "ITA"
+  },
+  "ITA-M": {
+    "industry": "Общий",
+    "description": "Разработка Go (Golang)",
+    "examples": "Golang разработчик, Go разработчик",
+    "type": "specialization",
+    "subfunction": "ITA"
+  },
+  "ITA-N": {
+    "industry": "Общий",
+    "description": "Разработка Delphi",
+    "examples": "Разработчик Delphi, программист Delphi",
+    "type": "specialization",
+    "subfunction": "ITA"
+  },
+  "ITA-O": {
+    "industry": "Общий",
+    "description": "Разработка Java",
+    "examples": "Java-разработчик, программист Java",
+    "type": "specialization",
+    "subfunction": "ITA"
+  },
+  "ITA-P": {
+    "industry": "Общий",
+    "description": "Разработка JavaScript / TypeScript",
+    "examples": "Разработчик JavaScript, программист JavaScript, Разработчик веб сайтов, Веб разработчик, Frontend (фронтенд) разработчик",
+    "type": "specialization",
+    "subfunction": "ITA"
+  },
+  "ITA-R": {
+    "industry": "Общий",
+    "description": "Разработка Perl",
+    "examples": "Разработчик Perl",
+    "type": "specialization",
+    "subfunction": "ITA"
+  },
+  "ITA-S": {
+    "industry": "Общий",
+    "description": "Разработка PHP",
+    "examples": "PHP-разработчик, Разработчик веб сайтов, Веб разработчик",
+    "type": "specialization",
+    "subfunction": "ITA"
+  },
+  "ITA-T": {
+    "industry": "Общий",
+    "description": "Разработка Python",
+    "examples": "Разработчик Python, программист Python",
+    "type": "specialization",
+    "subfunction": "ITA"
+  },
+  "ITA-U": {
+    "industry": "Общий",
+    "description": "Разработка Ruby",
+    "examples": "Ruby разработчик (RoR), ROR-разработчик",
+    "type": "specialization",
+    "subfunction": "ITA"
+  },
+  "ITA-V": {
+    "industry": "Общий",
+    "description": "Разработка Scala",
+    "examples": "Scala-разработчик",
+    "type": "specialization",
+    "subfunction": "ITA"
+  },
+  "ITB-A": {
+    "industry": "Общий",
+    "description": "Разработка ИТ инфраструктуры",
+    "examples": "Специалист по разработке ИТ инфраструктуры",
+    "type": "specialization",
+    "subfunction": "ITB"
+  },
+  "ITB": {
+    "industry": "Общий",
+    "description": "Инфраструктура",
+    "examples": "nan",
+    "type": "subfunction"
+  },
+  "ITB-B": {
+    "industry": "Общий",
+    "description": "Архитектура ИТ инфраструктуры",
+    "examples": "Архитектор ИТ инфраструктуры, системный архитектор",
+    "type": "specialization",
+    "subfunction": "ITB"
+  },
+  "ITB-C": {
+    "industry": "Общий",
+    "description": "Проектирование и внедрение корпоративных систем телекоммуникаций",
+    "examples": "Специалист по проектированию и внедрению корпоративных систем телекоммуникаций, сетевой инженер, инженер телефонии, инженер балансировщик",
+    "type": "specialization",
+    "subfunction": "ITB"
+  },
+  "ITB-D": {
+    "industry": "Общий",
+    "description": "Проектирование и эксплуатация центров обработки данных (ЦОД)",
+    "examples": "Специалист по проектированию и эксплуатации центров обработки данных, инженер дата-центра",
+    "type": "specialization",
+    "subfunction": "ITB"
+  },
+  "ITB-E": {
+    "industry": "Общий",
+    "description": "Системное администрирование ИТ инфраструктуры",
+    "examples": "Системный администратор, сетевой администратор",
+    "type": "specialization",
+    "subfunction": "ITB"
+  },
+  "ITB-F": {
+    "industry": "Общий",
+    "description": "Обеспечение надежности работы программ (SRE)",
+    "examples": "SRE-инженер, инженер мониторинга, дежурный инженер",
+    "type": "specialization",
+    "subfunction": "ITB"
+  },
+  "ITC": {
+    "industry": "Общий",
+    "description": "Техническая поддержка",
+    "examples": "Специалист по поддержке конечных пользователей (Help desk), специалист технической поддержки L1-L4",
+    "type": "subfunction"
+  },
+  "ITD-A": {
+    "industry": "Общий",
+    "description": "Архитектура баз данных",
+    "examples": "Архитектор баз данных",
+    "type": "specialization",
+    "subfunction": "ITD"
+  },
+  "ITD": {
+    "industry": "Общий",
+    "description": "Управление данными",
+    "examples": "nan",
+    "type": "subfunction"
+  },
+  "ITD-B": {
+    "industry": "Общий",
+    "description": "Разработка баз данных",
+    "examples": "Разработчик баз данных, инженер данных",
+    "type": "specialization",
+    "subfunction": "ITD"
+  },
+  "ITD-C": {
+    "industry": "Общий",
+    "description": "Администрирование баз данных",
+    "examples": "Администратор баз данных",
+    "type": "specialization",
+    "subfunction": "ITD"
+  },
+  "ITD-D": {
+    "industry": "Общий",
+    "description": "Oracle (PL/SQL)",
+    "examples": "Разработчик Oracle, программист Oracle PL/SQL",
+    "type": "specialization",
+    "subfunction": "ITD"
+  },
+  "ITD-E": {
+    "industry": "Общий",
+    "description": "Microsoft SQL",
+    "examples": "Программист SQL, SQL разработчик",
+    "type": "specialization",
+    "subfunction": "ITD"
+  },
+  "ITD-F": {
+    "industry": "Общий",
+    "description": "Разработка архитектуры центров обработки данных (ЦОД)",
+    "examples": "Разработчик архитектуры центров обработки данных",
+    "type": "specialization",
+    "subfunction": "ITD"
+  },
+  "ITE-A": {
+    "industry": "Общий",
+    "description": "Автоматическое тестирование",
+    "examples": "Тестировщик ПО, инженер по автоматическому тестированию",
+    "type": "specialization",
+    "subfunction": "ITE"
+  },
+  "ITE": {
+    "industry": "Общий",
+    "description": "Тестирование программного обеспечения",
+    "examples": "nan",
+    "type": "subfunction"
+  },
+  "ITE-B": {
+    "industry": "Общий",
+    "description": "Ручное тестирование",
+    "examples": "Тестировщик ПО, инженер по ручному тестированию",
+    "type": "specialization",
+    "subfunction": "ITE"
+  },
+  "ITE-C": {
+    "industry": "Общий",
+    "description": "Тестирование мобильных приложений",
+    "examples": "Тестировщик, инженер по тестированию мобильных приложений",
+    "type": "specialization",
+    "subfunction": "ITE"
+  },
+  "ITH-A": {
+    "industry": "Общий",
+    "description": "SAP Консультирование",
+    "examples": "Консультант SAP",
+    "type": "specialization",
+    "subfunction": "ITH"
+  },
+  "ITH": {
+    "industry": "Общий",
+    "description": "Консультирование",
+    "examples": "nan",
+    "type": "subfunction"
+  },
+  "ITH-B": {
+    "industry": "Общий",
+    "description": "AXAPTA Консультирование",
+    "examples": "Консультант AXAPTA",
+    "type": "specialization",
+    "subfunction": "ITH"
+  },
+  "ITH-C": {
+    "industry": "Общий",
+    "description": "1C Консультирование",
+    "examples": "Консультант 1C",
+    "type": "specialization",
+    "subfunction": "ITH"
+  },
+  "ITI-A": {
+    "industry": "Общий",
+    "description": "Анализ систем",
+    "examples": "Системный аналитик",
+    "type": "specialization",
+    "subfunction": "ITI"
+  },
+  "ITI": {
+    "industry": "Общий",
+    "description": "Анализ бизнеса и систем",
+    "examples": "nan",
+    "type": "subfunction"
+  },
+  "ITI-B": {
+    "industry": "Общий",
+    "description": "Анализ бизнес-данных / BI-аналитика",
+    "examples": "BI-аналитик, аналитик бизнес-данных, бизнес-аналитик",
+    "type": "specialization",
+    "subfunction": "ITI"
+  },
+  "ITI-C": {
+    "industry": "Общий",
+    "description": "ГИС аналитика",
+    "examples": "ГИС-аналитик",
+    "type": "specialization",
+    "subfunction": "ITI"
+  },
+  "ITJ": {
+    "industry": "Общий",
+    "description": "Обеспечение взаимосвязи бизнес-стратегии с ИТ решениями ",
+    "examples": "ИТ-бизнес партнер, ИТ-партнер ",
+    "type": "subfunction"
+  },
+  "ITK-A": {
+    "industry": "Общий",
+    "description": "Архитектура и дизайн систем кибербезопасности",
+    "examples": "Архитектор систем кибербезопасности",
+    "type": "specialization",
+    "subfunction": "ITK"
+  },
+  "ITK": {
+    "industry": "Общий",
+    "description": "Кибербезопасность / Информационная безопасность",
+    "examples": "nan",
+    "type": "subfunction"
+  },
+  "ITK-B": {
+    "industry": "Общий",
+    "description": "Проектирование систем кибербезопасности",
+    "examples": "Инженер по кибербезопасности",
+    "type": "specialization",
+    "subfunction": "ITK"
+  },
+  "ITK-C": {
+    "industry": "Общий",
+    "description": "Техническая поддержка и сопровождение систем кибербезопасности",
+    "examples": "Инженер по эксплуатации систем кибербезопасности, специалист по информационной безопасности",
+    "type": "specialization",
+    "subfunction": "ITK"
+  },
+  "ITM": {
+    "industry": "Общий",
+    "description": "Разработка и внедрение облачных технологий",
+    "examples": "Архитектор облачных решений",
+    "type": "subfunction"
+  },
+  "ITN": {
+    "industry": "Общий",
+    "description": "Разработка и внедрение вычислительных систем",
+    "examples": "Специалист по разработке и внедрению вычислительных систем",
+    "type": "subfunction"
+  },
+  "ITO": {
+    "industry": "Общий",
+    "description": "Разработка и внедрение технологий интернета вещей (IoT)",
+    "examples": "Специалист по разработке и внедрению технологий интернета вещей",
+    "type": "subfunction"
+  },
+  "ITQ-A": {
+    "industry": "Общий",
+    "description": "Внедрение и сопровождение ERP-систем",
+    "examples": "Специалист по внедрению и сопровождению ERP-систем",
+    "type": "specialization",
+    "subfunction": "ITQ"
+  },
+  "ITQ": {
+    "industry": "Общий",
+    "description": "Сопровождение информационных систем",
+    "examples": "nan",
+    "type": "subfunction"
+  },
+  "ITQ-B": {
+    "industry": "Общий",
+    "description": "Внедрение и сопровождение CRM-систем",
+    "examples": "Специалист по внедрению и сопровождению CRM-систем",
+    "type": "specialization",
+    "subfunction": "ITQ"
+  },
+  "ITQ-C": {
+    "industry": "Общий",
+    "description": "Внедрение и сопровождение систем бизнес-анализа (BI)",
+    "examples": "Специалист по внедрению и сопровождению систем бизнес-анализа",
+    "type": "specialization",
+    "subfunction": "ITQ"
+  },
+  "ITQ-D": {
+    "industry": "Общий",
+    "description": "Внедрение и сопровождение системы управления телекоммуникационными сетями",
+    "examples": "Специалист по внедрению и сопровождению системы управления телекоммуникационными сетями",
+    "type": "specialization",
+    "subfunction": "ITQ"
+  },
+  "ITQ-E": {
+    "industry": "Общий",
+    "description": "Внедрение и сопровождение систем управления рисками (ERM)",
+    "examples": "Специалист по внедрению и сопровождению систем управления рисками",
+    "type": "specialization",
+    "subfunction": "ITQ"
+  },
+  "ITQ-F": {
+    "industry": "Общий",
+    "description": "Внедрение и сопровождение системы процессинга банковских карт",
+    "examples": "Специалист поддержки процессинга",
+    "type": "specialization",
+    "subfunction": "ITQ"
+  },
+  "ITQ-G": {
+    "industry": "Общий",
+    "description": "Внедрение и сопровождение системы банковских платежей",
+    "examples": "Эксперт группы внедрения и сопровождения системы банковских платежей",
+    "type": "specialization",
+    "subfunction": "ITQ"
+  },
+  "ITQ-H": {
+    "industry": "Общий",
+    "description": "Внедрение и сопровождение системы торговли ценными бумагами",
+    "examples": "Специалист по сопровождению систем электронной торговли, инженер сопровождения трейдинговых систем",
+    "type": "specialization",
+    "subfunction": "ITQ"
+  },
+  "ITQ-I": {
+    "industry": "Общий",
+    "description": "Внедрение и сопровождение системы Банк-Клиент",
+    "examples": "Специалист поддержки и сопровождения системы Банк-Клиент, специалист сопровождения системы дистанционного банковского обслуживания (ДБО)",
+    "type": "specialization",
+    "subfunction": "ITQ"
+  },
+  "ITQ-J": {
+    "industry": "Общий",
+    "description": "Внедрение и сопровождение системы биллинга",
+    "examples": "Специалист по внедрению биллинговых систем",
+    "type": "specialization",
+    "subfunction": "ITQ"
+  },
+  "ITQ-K": {
+    "industry": "Общий",
+    "description": "Внедрение и сопровождение автоматизированных банковских систем (АБС)",
+    "examples": "Инженер по сопровождению АБС, специалист группы сопровождения АБС",
+    "type": "specialization",
+    "subfunction": "ITQ"
+  },
+  "ITT-A": {
+    "industry": "Общий",
+    "description": "Техническая документация",
+    "examples": "Технический писатель, разработчик технической документации, локализатор",
+    "type": "specialization",
+    "subfunction": "ITT"
+  },
+  "ITT": {
+    "industry": "Общий",
+    "description": "Документация в ИТ",
+    "examples": "nan",
+    "type": "subfunction"
+  },
+  "ITX": {
+    "industry": "Общий",
+    "description": "Прочая деятельность - Информационные технологии",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "ITZ": {
+    "industry": "Общий",
+    "description": "ИТ Директор",
+    "examples": "Директор по информационным технологиям, директор ИТ",
+    "type": "subfunction"
+  },
+  "LGA": {
+    "industry": "Общий",
+    "description": "Юридическая поддержка",
+    "examples": "Юрист, юрисконсульт, специалист юридического отдела",
+    "type": "subfunction"
+  },
+  "LGC": {
+    "industry": "Общий",
+    "description": "Договорно-правовое направление",
+    "examples": "Специалист по сопровождению договоров, специалист по контрактам",
+    "type": "subfunction"
+  },
+  "LGD": {
+    "industry": "Общий",
+    "description": "Земельно-имущественные отношения",
+    "examples": "Юрисконсульт по работе с недвижимостью, специалист по земельному праву",
+    "type": "subfunction"
+  },
+  "LGE": {
+    "industry": "Общий",
+    "description": "Международно-правовое направление",
+    "examples": "Юрисконсульт по внешнеэкономической деятельности",
+    "type": "subfunction"
+  },
+  "LGF": {
+    "industry": "Общий",
+    "description": "Корпоративно-правовое направление",
+    "examples": "Юрист группы корпоративного права",
+    "type": "subfunction"
+  },
+  "LGG": {
+    "industry": "Общий",
+    "description": "Претензионно-исковое направление",
+    "examples": "Менеджер по судебной работе",
+    "type": "subfunction"
+  },
+  "LGH": {
+    "industry": "Общий",
+    "description": "Юридическое сопровождение операций на финансовых рынках",
+    "examples": "Специалист управления сопровождения операций на финансовых рынках, юрисконсульт по правовому сопровождению операций на финансовых рынках",
+    "type": "subfunction"
+  },
+  "LGI": {
+    "industry": "Общий",
+    "description": "Юридическое сопровождение инвестиционных операций",
+    "examples": "Специалист управления сопровождения инвестиционных операций, юрисконсульт по правовому сопровождению инвестиционной деятельности",
+    "type": "subfunction"
+  },
+  "LGO": {
+    "industry": "Общий",
+    "description": "Налоговое направление",
+    "examples": "Юрист по налогообложению",
+    "type": "subfunction"
+  },
+  "LGX": {
+    "industry": "Общий",
+    "description": "Прочая деятельность - Юридическая служба",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "LGZ": {
+    "industry": "Общий",
+    "description": "Директор юридического подразделения",
+    "examples": "Директор юридического департамента, начальник юридического отдела",
+    "type": "subfunction"
+  },
+  "LMA": {
+    "industry": "Общий",
+    "description": "Управление земельными ресурсами",
+    "examples": "Специалист по земельным ресурсам",
+    "type": "subfunction"
+  },
+  "LMB": {
+    "industry": "Общий",
+    "description": "Геодезия",
+    "examples": "Геодезист",
+    "type": "subfunction"
+  },
+  "LMX": {
+    "industry": "Общий",
+    "description": "Прочая деятельность - Управление земельными ресурсами",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "LMZ": {
+    "industry": "Общий",
+    "description": "Руководитель управления земельными ресурсами",
+    "examples": "Руководитель управления земельными ресурсами",
+    "type": "subfunction"
+  },
+  "LSA-A": {
+    "industry": "Общий",
+    "description": "Административно-хозяйственные закупки",
+    "examples": "Менеджер отдела административных закупок",
+    "type": "specialization",
+    "subfunction": "LSA"
+  },
+  "LSA": {
+    "industry": "Общий",
+    "description": "Закупки",
+    "examples": "nan",
+    "type": "subfunction"
+  },
+  "LSA-B": {
+    "industry": "Общий",
+    "description": "Закупки в B2B",
+    "examples": "Менеджер по закупкам B2B",
+    "type": "specialization",
+    "subfunction": "LSA"
+  },
+  "LSA-C": {
+    "industry": "Общий",
+    "description": "ИТ закупки",
+    "examples": "Менеджер по ИТ закупкам",
+    "type": "specialization",
+    "subfunction": "LSA"
+  },
+  "LSA-D": {
+    "industry": "Общий",
+    "description": "Закупки телекоммуникационного оборудования",
+    "examples": "Менеджер по закупкам телекоммуникационного оборудования",
+    "type": "specialization",
+    "subfunction": "LSA"
+  },
+  "LSA-E": {
+    "industry": "Общий",
+    "description": "Закупки медиа-контента",
+    "examples": "Специалист по закупкам медиа-контента",
+    "type": "specialization",
+    "subfunction": "LSA"
+  },
+  "LSA-F": {
+    "industry": "Общий",
+    "description": "Закупки услуг",
+    "examples": "Специалист по закупкам услуг",
+    "type": "specialization",
+    "subfunction": "LSA"
+  },
+  "LSA-G": {
+    "industry": "Общий",
+    "description": "Организация тендеров",
+    "examples": "Специалист по тендерам",
+    "type": "specialization",
+    "subfunction": "LSA"
+  },
+  "LSA-H": {
+    "industry": "Общий",
+    "description": "Выбор и оценка поставщиков",
+    "examples": "Менеджер по работе с поставщиками, Специалист по развитию поставщиков",
+    "type": "specialization",
+    "subfunction": "LSA"
+  },
+  "LSB-A": {
+    "industry": "Общий",
+    "description": "Складской учет",
+    "examples": "Оператор склада, специалист по складской логистике, специалист по управлению товарными запасами, кладовщик",
+    "type": "specialization",
+    "subfunction": "LSB"
+  },
+  "LSB": {
+    "industry": "Общий",
+    "description": "Складирование/ Управление материально техническим снабжением",
+    "examples": "nan",
+    "type": "subfunction"
+  },
+  "LSB-B": {
+    "industry": "Общий",
+    "description": "Погрузочные работы",
+    "examples": "Водитель погрузчика, водитель штабелера, водитель ричтрака, грузчик",
+    "type": "specialization",
+    "subfunction": "LSB"
+  },
+  "LSB-C": {
+    "industry": "Общий",
+    "description": "Комплектация",
+    "examples": "Комплектовщик, сборщик заказов",
+    "type": "specialization",
+    "subfunction": "LSB"
+  },
+  "LSC-A": {
+    "industry": "Общий",
+    "description": "Перевозка грузов в рамках города/ области",
+    "examples": "Водитель грузового автомобиля, водитель-экспедитор",
+    "type": "specialization",
+    "subfunction": "LSC"
+  },
+  "LSC": {
+    "industry": "Общий",
+    "description": "Дистрибуция/ Транспортировка",
+    "examples": "nan",
+    "type": "subfunction"
+  },
+  "LSC-B": {
+    "industry": "Общий",
+    "description": "Планирование доставки грузов",
+    "examples": "Диспетчер, специалист по транспортной логистике, специалист по организации перевозок, специалист по управлению автопарком",
+    "type": "specialization",
+    "subfunction": "LSC"
+  },
+  "LSC-C": {
+    "industry": "Общий",
+    "description": "Междугородние/ международные грузовые перевозки (дальнобойщики)",
+    "examples": "Водитель междугородних перевозок",
+    "type": "specialization",
+    "subfunction": "LSC"
+  },
+  "LSD": {
+    "industry": "Общий",
+    "description": "Бизнес-планирование",
+    "examples": "Специалист по планированию товарных запасов, специалист по планированию спроса, аналитик по планированию розничных продаж",
+    "type": "subfunction"
+  },
+  "LSF": {
+    "industry": "Общий",
+    "description": "Работа с таможней / экспортно-импортные операции / ВЭД",
+    "examples": "Специалист по работе с таможней, менеджер по таможенному оформлению, менеджер по ВЭД, декларант",
+    "type": "subfunction"
+  },
+  "LSX": {
+    "industry": "Общий",
+    "description": "Прочая деятельность - Логистика/ Поставки",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "LSZ": {
+    "industry": "Общий",
+    "description": "Руководитель функции Логистика/ Поставки",
+    "examples": "Директор по логистике, директор по управлению цепями поставок",
+    "type": "subfunction"
+  },
+  "MAA": {
+    "industry": "Общий",
+    "description": "Управление морским/речным транспортом",
+    "examples": "Менеджер по вопросам морского транспорта, специалист по морским операциям",
+    "type": "subfunction"
+  },
+  "MAB": {
+    "industry": "Общий",
+    "description": "Экипаж судна",
+    "examples": "Матрос, Боцман, Шкипер, Бортовой механик, капитан",
+    "type": "subfunction"
+  },
+  "MAX": {
+    "industry": "Общий",
+    "description": "Прочая деятельность - Морские и речные грузоперевозки",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "MAZ": {
+    "industry": "Общий",
+    "description": "Руководитель подразделения морских и речных грузоперевозок",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "MKA": {
+    "industry": "Общий",
+    "description": "Изучение поведения клиента и программы лояльности",
+    "examples": "Менеджер по программам лояльности, специалист по маркетинговым исследованиям, маркетинговый аналитик, аналитик отдела маркетинга",
+    "type": "subfunction"
+  },
+  "MKB": {
+    "industry": "Общий",
+    "description": "Управление брендом/ Торговой маркой",
+    "examples": "Специалист по развитию бренда, бренд-менеджер, менеджер по развитию торговых марок, менеджер по продукту, специалист по дилерскому маркетингу",
+    "type": "subfunction"
+  },
+  "MKC": {
+    "industry": "Общий",
+    "description": "Торговый маркетинг",
+    "examples": "Менеджер по торговому маркетингу, трейд-маркетинг менеджер",
+    "type": "subfunction"
+  },
+  "MKD-A": {
+    "industry": "Общий",
+    "description": "Маркетинговые коммуникации ",
+    "examples": "Менеджер по маркетинговым коммуникациям, специалист по продвижению продукта, менеджер по рекламе",
+    "type": "specialization",
+    "subfunction": "MKD"
+  },
+  "MKD": {
+    "industry": "Общий",
+    "description": "Продвижение товаров/ услуг",
+    "examples": "nan",
+    "type": "subfunction"
+  },
+  "MKD-B": {
+    "industry": "Общий",
+    "description": "Инфлюенс-маркетинг ",
+    "examples": "Инфлюенс маркетолог, менеджер по работе с блогерами",
+    "type": "specialization",
+    "subfunction": "MKD"
+  },
+  "MKG": {
+    "industry": "Общий",
+    "description": "Исследование пользовательского опыта (UX/ CX)",
+    "examples": "Исследователь пользовательского опыта, менеджер по развитию клиентского опыта, CX/UX исследователь",
+    "type": "subfunction"
+  },
+  "MKH": {
+    "industry": "Общий",
+    "description": "Социальные сети (SMM)",
+    "examples": "Менеджер по работе с социальными сетями, SMM-менеджер",
+    "type": "subfunction"
+  },
+  "MKI": {
+    "industry": "Общий",
+    "description": "Медийная реклама",
+    "examples": "Менеджер по маркетингу медийной рекламы, специалист по медиапланированию",
+    "type": "subfunction"
+  },
+  "MKJ-A": {
+    "industry": "Общий",
+    "description": "Поисковая оптимизация (SEO)",
+    "examples": "Менеджер по поисковой оптимизации",
+    "type": "specialization",
+    "subfunction": "MKJ"
+  },
+  "MKJ": {
+    "industry": "Общий",
+    "description": "Цифровой маркетинг/ Диджитал-маркетинг",
+    "examples": "nan",
+    "type": "subfunction"
+  },
+  "MKJ-B": {
+    "industry": "Общий",
+    "description": "Performance маркетинг",
+    "examples": "Менеджер по performance маркетингу, performance маркетолог",
+    "type": "specialization",
+    "subfunction": "MKJ"
+  },
+  "MKJ-C": {
+    "industry": "Общий",
+    "description": "Контекстная реклама (SEA)",
+    "examples": "Специалист по контекстной рекламе",
+    "type": "specialization",
+    "subfunction": "MKJ"
+  },
+  "MKJ-D": {
+    "industry": "Общий",
+    "description": "Проведение рассылок",
+    "examples": "Менеджер по онлайн-коммуникациям",
+    "type": "specialization",
+    "subfunction": "MKJ"
+  },
+  "MKJ-E": {
+    "industry": "Общий",
+    "description": "Привлечение трафика через партнеров",
+    "examples": "Менеджер партнерского маркетинга",
+    "type": "specialization",
+    "subfunction": "MKJ"
+  },
+  "MKJ-F": {
+    "industry": "Общий",
+    "description": "Продвижение мобильных приложений (ASO)",
+    "examples": "Менеджер по управлению мобильным маркетингом",
+    "type": "specialization",
+    "subfunction": "MKJ"
+  },
+  "MKJ-G": {
+    "industry": "Общий",
+    "description": "Таргетированная реклама",
+    "examples": "Специалист по таргетированной рекламе",
+    "type": "specialization",
+    "subfunction": "MKJ"
+  },
+  "MKK-A": {
+    "industry": "Общий",
+    "description": "Электронная коммерция B2C",
+    "examples": "Менеджер по развитию на маркетплейсах, менеджер по развитию канала интернет-торговли B2C",
+    "type": "specialization",
+    "subfunction": "MKK"
+  },
+  "MKK": {
+    "industry": "Общий",
+    "description": "Электронная коммерция",
+    "examples": "nan",
+    "type": "subfunction"
+  },
+  "MKK-B": {
+    "industry": "Общий",
+    "description": "Электронная коммерция B2B",
+    "examples": "Менеджер по развитию онлайн-продаж B2B",
+    "type": "specialization",
+    "subfunction": "MKK"
+  },
+  "MKM": {
+    "industry": "Общий",
+    "description": "Ценообразование",
+    "examples": "Менеджер по ценообразованию",
+    "type": "subfunction"
+  },
+  "MKX": {
+    "industry": "Общий",
+    "description": "Прочая деятельность - Маркетинг",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "MKZ": {
+    "industry": "Общий",
+    "description": "Директор по маркетингу",
+    "examples": "Директор по маркетингу",
+    "type": "subfunction"
+  },
+  "PMA": {
+    "industry": "Общий",
+    "description": "Управление проектами / Project management",
+    "examples": "Менеджер проекта, проектный менеджер, руководитель проектов",
+    "type": "subfunction"
+  },
+  "PMC": {
+    "industry": "Общий",
+    "description": "Поддержка проектной деятельности",
+    "examples": "Специалист по проектному контролю, менеджер по сопровождению проектов",
+    "type": "subfunction"
+  },
+  "PME": {
+    "industry": "Общий",
+    "description": "Управление проектами в области ИТ",
+    "examples": "Менеджер внутренних ИТ проектов, scrum master, agile coach",
+    "type": "subfunction"
+  },
+  "PMX": {
+    "industry": "Общий",
+    "description": "Прочая деятельность - Управление проектами и программами (проектный менеджмент)",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "PMZ": {
+    "industry": "Общий",
+    "description": "Руководитель подразделения управления проектами и программами",
+    "examples": "Директор по проектам, директор проектного офиса",
+    "type": "subfunction"
+  },
+  "POA": {
+    "industry": "Общий",
+    "description": "Управление продуктом / Product management",
+    "examples": "Менеджер по IT продукту, product owner (владелец продукта)",
+    "type": "subfunction"
+  },
+  "POB": {
+    "industry": "Общий",
+    "description": "Продуктовая аналитика",
+    "examples": "Продуктовый аналитик",
+    "type": "subfunction"
+  },
+  "POX": {
+    "industry": "Общий",
+    "description": "Прочая деятельность - Управление продуктом",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "POZ": {
+    "industry": "Общий",
+    "description": "Руководитель подразделения управления продуктом",
+    "examples": "Директор департамента продукта, Chief Product Officer / CPO",
+    "type": "subfunction"
+  },
+  "PRA-B": {
+    "industry": "Общий",
+    "description": "Административная поддержка на производстве",
+    "examples": "Специалист по учету, табельщик, диспетчер цеха, диспетчер производства, нормировщик, распределитель работ",
+    "type": "specialization",
+    "subfunction": "PRA"
+  },
+  "PRA": {
+    "industry": "Общий",
+    "description": "Производство",
+    "examples": "nan",
+    "type": "subfunction"
+  },
+  "PRA-C": {
+    "industry": "Общий",
+    "description": "Основное производство: линейные руководители",
+    "examples": "Начальник участка, начальник цеха основного производства, начальник смены основного производства, мастер, бригадир смены",
+    "type": "specialization",
+    "subfunction": "PRA"
+  },
+  "PRA-D": {
+    "industry": "Общий",
+    "description": "Вспомогательное производство: линейные руководители",
+    "examples": "Начальник участка вспомогательного производства, начальник цеха вспомогательного производства, начальник смены (вспомогательное производство)",
+    "type": "specialization",
+    "subfunction": "PRA"
+  },
+  "PRB-A": {
+    "industry": "Общий",
+    "description": "Слесарные работы",
+    "examples": "Слесарь-ремонтник, слесарь по контрольно-измерительным приборам, электрослесарь, автослесарь ",
+    "type": "specialization",
+    "subfunction": "PRB"
+  },
+  "PRB": {
+    "industry": "Общий",
+    "description": "Рабочие должности",
+    "examples": "nan",
+    "type": "subfunction"
+  },
+  "PRB-B": {
+    "industry": "Общий",
+    "description": "Сварочные работы",
+    "examples": "Электрогазосварщик, электросварщик ручной сварки, газорезчик",
+    "type": "specialization",
+    "subfunction": "PRB"
+  },
+  "PRB-C": {
+    "industry": "Общий",
+    "description": "Токарные работы",
+    "examples": "Токарь, станочник, фрезеровщик, шлифовщик",
+    "type": "specialization",
+    "subfunction": "PRB"
+  },
+  "PRB-D": {
+    "industry": "Общий",
+    "description": "Электрик",
+    "examples": "Электромонтер по ремонту и обслуживанию электрооборудования, электрик, электромонтажник, электромеханик",
+    "type": "specialization",
+    "subfunction": "PRB"
+  },
+  "PRB-E": {
+    "industry": "Общий",
+    "description": "Механосборочные работы",
+    "examples": "Механик, наладчик, механик по ремонту, сборщик",
+    "type": "specialization",
+    "subfunction": "PRB"
+  },
+  "PRB-F": {
+    "industry": "Общий",
+    "description": "Другие поддерживающие работы (маляры, стропальщики и т.д.)",
+    "examples": "Маляр, стропальщик, плотник, разнорабочий, столяр",
+    "type": "specialization",
+    "subfunction": "PRB"
+  },
+  "PRB-G": {
+    "industry": "Общий",
+    "description": "Оператор",
+    "examples": "Оператор",
+    "type": "specialization",
+    "subfunction": "PRB"
+  },
+  "PRB-H": {
+    "industry": "Общий",
+    "description": "Аппаратчик",
+    "examples": "Аппаратчик",
+    "type": "specialization",
+    "subfunction": "PRB"
+  },
+  "PRB-I": {
+    "industry": "Общий",
+    "description": "Работы с системами вентиляции и кондиционирования",
+    "examples": "Техник по вентиляции и кондиционированию, мастер по техническому обслуживанию и ремонту систем вентиляции и кондиционирования",
+    "type": "specialization",
+    "subfunction": "PRB"
+  },
+  "PRB-K": {
+    "industry": "Общий",
+    "description": "Водитель/Машинист спецтехники",
+    "examples": "Водитель специальной техники, водитель спецтехники, машинист, машинист экскаватора, машинист крана",
+    "type": "specialization",
+    "subfunction": "PRB"
+  },
+  "PRB-L": {
+    "industry": "Общий",
+    "description": "Машинист установки",
+    "examples": "Машинист холодильных и котельных установок, машинист дробильных установок, машинист аммиачных установок, машинист насосных установок",
+    "type": "specialization",
+    "subfunction": "PRB"
+  },
+  "PRC": {
+    "industry": "Общий",
+    "description": "Планирование производства",
+    "examples": "Менеджер по планированию производства",
+    "type": "subfunction"
+  },
+  "PRD": {
+    "industry": "Общий",
+    "description": "Эффективность и трансформация производственных процессов (производственная система)",
+    "examples": "Специалист по модернизации производственных процессов, специалист управления по непрерывным улучшениям, менеджер по развитию производственной системы, менеджер по организации бережливого производства",
+    "type": "subfunction"
+  },
+  "PRX": {
+    "industry": "Общий",
+    "description": "Прочая деятельность - Производство",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "PRZ": {
+    "industry": "Общий",
+    "description": "Директор производства",
+    "examples": "Директор по производству, технический директор",
+    "type": "subfunction"
+  },
+  "PTA": {
+    "industry": "Общий",
+    "description": "Недвижимость",
+    "examples": "Менеджер по недвижимости",
+    "type": "subfunction"
+  },
+  "PTB": {
+    "industry": "Общий",
+    "description": "Управление объектами недвижимости / Эксплуатация зданий и сооружений",
+    "examples": "Менеджер по сопровождению недвижимости, специалист по эксплуатации и ремонту зданий и сооружений",
+    "type": "subfunction"
+  },
+  "PTX": {
+    "industry": "Общий",
+    "description": "Прочая деятельность - Управление недвижимостью",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "PTZ": {
+    "industry": "Общий",
+    "description": "Директор по недвижимости",
+    "examples": "Директор по недвижимости, руководитель блока недвижимости",
+    "type": "subfunction"
+  },
+  "PVA": {
+    "industry": "Общий",
+    "description": "Разработка товаров/ услуг",
+    "examples": "Менеджер нецифрового продукта, инженер по развитию упаковочных материалов, специалист по развитию продуктов",
+    "type": "subfunction"
+  },
+  "PVX": {
+    "industry": "Общий",
+    "description": "Прочая деятельность - Разработка товаров/ услуг",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "PVZ": {
+    "industry": "Общий",
+    "description": "Директор подразделения по разработке товаров/ услуг",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "QAA": {
+    "industry": "Общий",
+    "description": "Контроль качества",
+    "examples": "Инженер по качеству, специалист по контролю качества, контролер ОТК, контролер качества",
+    "type": "subfunction"
+  },
+  "QAB": {
+    "industry": "Общий",
+    "description": "Лаборатория",
+    "examples": "Лаборант, химик, начальник лаборатории, заведующий лабораторией, дефектоскопист",
+    "type": "subfunction"
+  },
+  "QAC": {
+    "industry": "Общий",
+    "description": "Стандартизация",
+    "examples": "Инженер по стандартизации, специалист по нормконтролю",
+    "type": "subfunction"
+  },
+  "QAX": {
+    "industry": "Общий",
+    "description": "Прочая деятельность - Контроль качества",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "QAZ": {
+    "industry": "Общий",
+    "description": "Директор подразделения по контролю качества",
+    "examples": "Директор по качеству",
+    "type": "subfunction"
+  },
+  "RDB": {
+    "industry": "Общий",
+    "description": "Управление исследованиями и разработками",
+    "examples": "Менеджер по технологиям и инновациям",
+    "type": "subfunction"
+  },
+  "RDC": {
+    "industry": "Общий",
+    "description": "Управление проектами исследований и разработок",
+    "examples": "Инженер по управлению проектами",
+    "type": "subfunction"
+  },
+  "RDD": {
+    "industry": "Общий",
+    "description": "Проведение научных исследований",
+    "examples": "Инженер-исследователь, научный сотрудник",
+    "type": "subfunction"
+  },
+  "RDE": {
+    "industry": "Общий",
+    "description": "Опытно-конструкторские разработки",
+    "examples": "Инженер по разработке, инженер-конструктор",
+    "type": "subfunction"
+  },
+  "RDF": {
+    "industry": "Общий",
+    "description": "Проведение лабораторных исследований",
+    "examples": "Инженер по испытаниям",
+    "type": "subfunction"
+  },
+  "RDG": {
+    "industry": "Общий",
+    "description": "Документационное сопровождение исследований и разработок",
+    "examples": "Специалист по документационному сопровождению исследований и разработок",
+    "type": "subfunction"
+  },
+  "RDH": {
+    "industry": "Общий",
+    "description": "Регистрация научных разработок",
+    "examples": "Специалист по регистрации научных разработок, специалист по патентованию",
+    "type": "subfunction"
+  },
+  "RDX": {
+    "industry": "Общий",
+    "description": "Прочая деятельность - Исследования и разработки",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "RDZ": {
+    "industry": "Общий",
+    "description": "Директор по исследованиям и разработкам",
+    "examples": "Директор по исследованиям и разработкам",
+    "type": "subfunction"
+  },
+  "REB": {
+    "industry": "Общий",
+    "description": "Работа на кухне",
+    "examples": "Повар, буфетчик, кухонный работник",
+    "type": "subfunction"
+  },
+  "REC": {
+    "industry": "Общий",
+    "description": "Технолог общественного питания",
+    "examples": "Технолог общественного питания",
+    "type": "subfunction"
+  },
+  "RED": {
+    "industry": "Общий",
+    "description": "Работа в зале ресторана",
+    "examples": "Официант, кофе-леди, бармен, бариста",
+    "type": "subfunction"
+  },
+  "REE": {
+    "industry": "Общий",
+    "description": "Администрирование общественного питания",
+    "examples": "Администратор",
+    "type": "subfunction"
+  },
+  "REX": {
+    "industry": "Общий",
+    "description": "Общественное питание - Прочая деятельность",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "REZ": {
+    "industry": "Общий",
+    "description": "Руководитель функции Общественное питание",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "RWA": {
+    "industry": "Общий",
+    "description": "Планирование перевозок",
+    "examples": "Дежурный по железнодорожной станции, специалист центра планирования перевозок",
+    "type": "subfunction"
+  },
+  "RWB-A": {
+    "industry": "Общий",
+    "description": "Уборка железнодорожного транспорта",
+    "examples": "Оператор промывочно-пропарочной станции, промывальщик-пропарщик цистерн, мойщик-уборщик подвижного состава",
+    "type": "specialization",
+    "subfunction": "RWB"
+  },
+  "RWB": {
+    "industry": "Общий",
+    "description": "Подготовка железнодорожного транспорта",
+    "examples": "nan",
+    "type": "subfunction"
+  },
+  "RWB-B": {
+    "industry": "Общий",
+    "description": "Ремонт железнодорожного транспорта",
+    "examples": "Слесарь по ремонту подвижного состава, составитель поездов",
+    "type": "specialization",
+    "subfunction": "RWB"
+  },
+  "RWB-C": {
+    "industry": "Общий",
+    "description": "Техническое обслуживание железнодорожного транспорта",
+    "examples": "Инженер по обслуживанию подвижного состава",
+    "type": "specialization",
+    "subfunction": "RWB"
+  },
+  "RWC": {
+    "industry": "Общий",
+    "description": "Управление железнодорожным транспортом",
+    "examples": "Машинист тепловоза",
+    "type": "subfunction"
+  },
+  "RWD": {
+    "industry": "Общий",
+    "description": "Обслуживание железнодорожных путей",
+    "examples": "Инженер по обслуживанию железнодорожных путей, монтёр пути",
+    "type": "subfunction"
+  },
+  "RWE": {
+    "industry": "Общий",
+    "description": "Диспетчерская служба",
+    "examples": "Диспетчер железнодорожного участка, специалист мониторинга железнодорожных перевозок",
+    "type": "subfunction"
+  },
+  "RWF": {
+    "industry": "Общий",
+    "description": "Мониторинг",
+    "examples": "Ревизор по безопасности движения на железнодорожном транспорте",
+    "type": "subfunction"
+  },
+  "RWX": {
+    "industry": "Общий",
+    "description": "Прочая деятельность - Железнодорожная логистика",
+    "examples": "Приемосдатчик груза и багажа",
+    "type": "subfunction"
+  },
+  "RWZ": {
+    "industry": "Общий",
+    "description": "Руководитель подразделения железнодорожной логистики",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "SEA-A": {
+    "industry": "Общий",
+    "description": "Экономическая и внутренняя безопасность",
+    "examples": "Специалист по экономической безопасности, Ревизор, Специалист по внутреннему контролю",
+    "type": "specialization",
+    "subfunction": "SEA"
+  },
+  "SEA": {
+    "industry": "Общий",
+    "description": "Экономическая безопасность",
+    "examples": "nan",
+    "type": "subfunction"
+  },
+  "SEA-B": {
+    "industry": "Общий",
+    "description": "Проверка розничных клиентов",
+    "examples": "Специалист по верификации частных клиентов, специалист по проверке розничных клиентов",
+    "type": "specialization",
+    "subfunction": "SEA"
+  },
+  "SEA-C": {
+    "industry": "Общий",
+    "description": "Проверка корпоративных клиентов",
+    "examples": "Специалист по проверке корпоративных клиентов",
+    "type": "specialization",
+    "subfunction": "SEA"
+  },
+  "SEB": {
+    "industry": "Общий",
+    "description": "Охрана объектов",
+    "examples": "Контролер, охранник, инспектор бюро пропусков, сторож",
+    "type": "subfunction"
+  },
+  "SEC": {
+    "industry": "Общий",
+    "description": "Организация инкассации",
+    "examples": "Водитель-инкассатор, охранник в сопровождение инкассации",
+    "type": "subfunction"
+  },
+  "SEX": {
+    "industry": "Общий",
+    "description": "Прочая деятельность - Безопасность",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "SEZ": {
+    "industry": "Общий",
+    "description": "Руководитель функции Безопасность",
+    "examples": "Директор по безопасности",
+    "type": "subfunction"
+  },
+  "SLA": {
+    "industry": "Общий",
+    "description": "Аналитика и Эффективность продаж",
+    "examples": "Аналитик продаж, специалист по прогнозированию продаж",
+    "type": "subfunction"
+  },
+  "SLD-B": {
+    "industry": "Общий",
+    "description": "Методология корпоративных продаж",
+    "examples": "Менеджер по развитию эффективности продаж",
+    "type": "specialization",
+    "subfunction": "SLD"
+  },
+  "SLD": {
+    "industry": "Общий",
+    "description": "Корпоративные продажи (B2B)",
+    "examples": "nan",
+    "type": "subfunction"
+  },
+  "SLD-C": {
+    "industry": "Общий",
+    "description": "Продажи корпоративным клиентам",
+    "examples": "Менеджер по привлечению клиентов, менеджер по развитию бизнеса",
+    "type": "specialization",
+    "subfunction": "SLD"
+  },
+  "SLD-E": {
+    "industry": "Общий",
+    "description": "Сопровождение корпоративных клиентов",
+    "examples": "Менеджер по ведению корпоративных клиентов, менеджер по работе с ключевыми клиентами, специалист по сопровождению корпоративных клиентов",
+    "type": "specialization",
+    "subfunction": "SLD"
+  },
+  "SLD-G": {
+    "industry": "Общий",
+    "description": "Продажи рекламы",
+    "examples": "Менеджер по продажам рекламы, менеджер по продажам рекламных продуктов",
+    "type": "specialization",
+    "subfunction": "SLD"
+  },
+  "SLD-I": {
+    "industry": "Общий",
+    "description": "Региональные продажи B2B",
+    "examples": "Региональный менеджер по продажам B2B, территориальный менеджер, торговый представитель, медицинский представитель, руководитель продаж в регионе, руководитель региона продаж",
+    "type": "specialization",
+    "subfunction": "SLD"
+  },
+  "SLD-J": {
+    "industry": "Общий",
+    "description": "Корпоративные продажи через партнеров/ дистрибьюторов/ торговые сети",
+    "examples": "Специалист по сопровождению партнеров B2B, менеджер по развитию дилерской сети,\nМенеджер по работе с маркетплейсами",
+    "type": "specialization",
+    "subfunction": "SLD"
+  },
+  "SLE-B": {
+    "industry": "Общий",
+    "description": "Методология розничных продаж",
+    "examples": "Менеджер по разработке методологии розничных продаж",
+    "type": "specialization",
+    "subfunction": "SLE"
+  },
+  "SLE": {
+    "industry": "Общий",
+    "description": "Розничные продажи (B2C)",
+    "examples": "nan",
+    "type": "subfunction"
+  },
+  "SLE-G": {
+    "industry": "Общий",
+    "description": "Продажи розничным клиентам",
+    "examples": "Менеджер по продажам физическим лицам, менеджер по продажам розничным клиентам",
+    "type": "specialization",
+    "subfunction": "SLE"
+  },
+  "SLG": {
+    "industry": "Общий",
+    "description": "Продажи организациям государственного сектора (B2G)",
+    "examples": "Менеджер по работе с государственными заказчиками",
+    "type": "subfunction"
+  },
+  "SLX": {
+    "industry": "Общий",
+    "description": "Прочая деятельность - Продажи",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "SLZ": {
+    "industry": "Общий",
+    "description": "Директор по продажам",
+    "examples": "Директор по продажам, коммерческий директор",
+    "type": "subfunction"
+  },
+  "SPA": {
+    "industry": "Общий",
+    "description": "Разработка стратегии и политик",
+    "examples": "Руководитель по стратегии и развитию, менеджер по стратегическому развитию, менеджер по корпоративному развитию",
+    "type": "subfunction"
+  },
+  "SPB": {
+    "industry": "Общий",
+    "description": "Слияния, поглощения и стратегические инвестиции",
+    "examples": "Менеджер по M&A проектам, менеджер по слияниям и поглощениям, менеджер по инвестиционным проектам",
+    "type": "subfunction"
+  },
+  "SPX": {
+    "industry": "Общий",
+    "description": "Прочая деятельность - Стратегическое и/или корпоративное планирование",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "SPZ": {
+    "industry": "Общий",
+    "description": "Директор по стратегическому и/или корпоративному планированию",
+    "examples": "Директор по стратегическому развитию, директор по инвестициям, слияниям и поглощениям",
+    "type": "subfunction"
+  },
+  "AEA": {
+    "industry": "Банки и Финансы",
+    "description": "Управление портфелем ценных бумаг / Доверительное управление",
+    "examples": "Портфельный менеджер, менеджер блока доверительного управления",
+    "type": "subfunction"
+  },
+  "AEB": {
+    "industry": "Банки и Финансы",
+    "description": "Аналитические исследования",
+    "examples": "Инвестиционный аналитик, портфельный аналитик",
+    "type": "subfunction"
+  },
+  "AEC": {
+    "industry": "Банки и Финансы",
+    "description": "Разработка продуктов по управлению активами",
+    "examples": "Руководитель по созданию инвестиционных продуктов, менеджер по разработке продуктов по управлению активами",
+    "type": "subfunction"
+  },
+  "AEX": {
+    "industry": "Банки и Финансы",
+    "description": "Прочая деятельность - Управление активами",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "AEZ": {
+    "industry": "Банки и Финансы",
+    "description": "Руководитель подразделения по управлению активами",
+    "examples": "Руководитель подразделения по управлению активами",
+    "type": "subfunction"
+  },
+  "BBA-A": {
+    "industry": "Банки и Финансы",
+    "description": "Развитие бизнеса филиальной сети",
+    "examples": "Директор по развитию филиальной сети",
+    "type": "specialization",
+    "subfunction": "BBA"
+  },
+  "BBA": {
+    "industry": "Банки и Финансы",
+    "description": "Эксплуатация и управление сетями",
+    "examples": "nan",
+    "type": "subfunction"
+  },
+  "BBA-B": {
+    "industry": "Банки и Финансы",
+    "description": "Документарные операции",
+    "examples": "Специалист по документарным операциям",
+    "type": "specialization",
+    "subfunction": "BBA"
+  },
+  "BBA-C": {
+    "industry": "Банки и Финансы",
+    "description": "Сопровождение работы филиальной сети",
+    "examples": "Руководитель филиальной сети, директор розничной сети, менеджер по работе с филиалами",
+    "type": "specialization",
+    "subfunction": "BBA"
+  },
+  "BBA-D": {
+    "industry": "Банки и Финансы",
+    "description": "Открытие новых филиалов",
+    "examples": "Менеджер по открытию филиалов, менеджер по открытию региональных филиалов",
+    "type": "specialization",
+    "subfunction": "BBA"
+  },
+  "BBB": {
+    "industry": "Банки и Финансы",
+    "description": "Продажи розничных банковских продуктов и услуг",
+    "examples": "Клиентский менеджер по развитию продаж, клиентский менеджер по ипотеке, менеджер прямых продаж банковских услуг",
+    "type": "subfunction"
+  },
+  "BBE": {
+    "industry": "Банки и Финансы",
+    "description": "Электронные каналы продаж",
+    "examples": "Менеджер по развитию цифровых каналов продаж банковских продуктов",
+    "type": "subfunction"
+  },
+  "BBF-A": {
+    "industry": "Банки и Финансы",
+    "description": "Операционисты",
+    "examples": "Операционист, специалист по обслуживанию клиентов филиала банка",
+    "type": "specialization",
+    "subfunction": "BBF"
+  },
+  "BBF": {
+    "industry": "Банки и Финансы",
+    "description": "Кассиры и операционисты",
+    "examples": "nan",
+    "type": "subfunction"
+  },
+  "BBF-B": {
+    "industry": "Банки и Финансы",
+    "description": "Кассиры",
+    "examples": "Кассир в филиале банка",
+    "type": "specialization",
+    "subfunction": "BBF"
+  },
+  "BBG": {
+    "industry": "Банки и Финансы",
+    "description": "Продажа кредитных карт",
+    "examples": "Менеджер-консультант в отделении банка, консультант по продажам кредитных карт",
+    "type": "subfunction"
+  },
+  "BBI": {
+    "industry": "Банки и Финансы",
+    "description": "Руководитель офиса продаж",
+    "examples": "Руководитель офиса продаж",
+    "type": "subfunction"
+  },
+  "BBX": {
+    "industry": "Банки и Финансы",
+    "description": "Прочая деятельность - Сеть филиалов - финансовые услуги/банки",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "BBZ": {
+    "industry": "Банки и Финансы",
+    "description": "Руководитель функции Сеть филиалов",
+    "examples": "Руководитель управления развития филиальной сети",
+    "type": "subfunction"
+  },
+  "BRA-A": {
+    "industry": "Банки и Финансы",
+    "description": "Разработка кредитных продуктов для розничных клиентов",
+    "examples": "Менеджер по разработке кредитных продуктов",
+    "type": "specialization",
+    "subfunction": "BRA"
+  },
+  "BRA": {
+    "industry": "Банки и Финансы",
+    "description": "Разработка продуктов для розничных клиентов",
+    "examples": "nan",
+    "type": "subfunction"
+  },
+  "BRA-B": {
+    "industry": "Банки и Финансы",
+    "description": "Разработка ипотечных продуктов",
+    "examples": "Менеджер по разработке ипотечных продуктов",
+    "type": "specialization",
+    "subfunction": "BRA"
+  },
+  "BRA-C": {
+    "industry": "Банки и Финансы",
+    "description": "Разработка некредитных розничных продуктов",
+    "examples": "Менеджер по разработке некредитных розничных продуктов",
+    "type": "specialization",
+    "subfunction": "BRA"
+  },
+  "BRA-D": {
+    "industry": "Банки и Финансы",
+    "description": "Разработка карточных продуктов",
+    "examples": "Менеджер по разработке карточных продуктов, специалист по разработке/модификации карточных продуктов",
+    "type": "specialization",
+    "subfunction": "BRA"
+  },
+  "BRA-E": {
+    "industry": "Банки и Финансы",
+    "description": "Разработка розничных инвестиционных продуктов",
+    "examples": "Менеджер по разработке розничных инвестиционных продуктов",
+    "type": "specialization",
+    "subfunction": "BRA"
+  },
+  "BRE-A": {
+    "industry": "Банки и Финансы",
+    "description": "Планирование сети банкоматов",
+    "examples": "Специалист группы развития сети банкоматов",
+    "type": "specialization",
+    "subfunction": "BRE"
+  },
+  "BRE": {
+    "industry": "Банки и Финансы",
+    "description": "Сеть банкоматов",
+    "examples": "nan",
+    "type": "subfunction"
+  },
+  "BRE-B": {
+    "industry": "Банки и Финансы",
+    "description": "Закупка банкоматов",
+    "examples": "Специалист по закупке банкоматов",
+    "type": "specialization",
+    "subfunction": "BRE"
+  },
+  "BRE-C": {
+    "industry": "Банки и Финансы",
+    "description": "Техническое обслуживание банкоматов",
+    "examples": "Техник по обслуживанию терминалов / банкоматов",
+    "type": "specialization",
+    "subfunction": "BRE"
+  },
+  "BRE-D": {
+    "industry": "Банки и Финансы",
+    "description": "Урегулирование сбоев в работе банкоматов",
+    "examples": "Сервисный инженер по обслуживанию банкоматов",
+    "type": "specialization",
+    "subfunction": "BRE"
+  },
+  "BRI": {
+    "industry": "Банки и Финансы",
+    "description": "Развитие сети партнерских продаж розничных продуктов",
+    "examples": "Менеджер по сопровождению партнеров банка",
+    "type": "subfunction"
+  },
+  "BRX": {
+    "industry": "Банки и Финансы",
+    "description": "Прочая деятельность - Услуги для розничных клиентов",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "BRZ": {
+    "industry": "Банки и Финансы",
+    "description": "Руководитель направления по развитию розничного бизнеса",
+    "examples": "Руководитель направления по развитию розничного бизнеса",
+    "type": "subfunction"
+  },
+  "CBA": {
+    "industry": "Банки и Финансы",
+    "description": "Разработка продуктов для корпоративных клиентов",
+    "examples": "Менеджер по разработке продуктов и услуг для корпоративных клиентов",
+    "type": "subfunction"
+  },
+  "CBG": {
+    "industry": "Банки и Финансы",
+    "description": "Услуги для корпоративных клиентов",
+    "examples": "Менеджер по сопровождению корпоративного бизнеса, клиентский менеджер крупного бизнеса",
+    "type": "subfunction"
+  },
+  "CBH": {
+    "industry": "Банки и Финансы",
+    "description": "Торговое финансирование и Факторинг",
+    "examples": "Руководитель направления методологии факторинга, менеджер по развитию факторинговых продуктов, специалист отдела факторинга",
+    "type": "subfunction"
+  },
+  "CBI": {
+    "industry": "Банки и Финансы",
+    "description": "Структурное и проектное финансирование",
+    "examples": "Менеджер по проектному и структурному финансированию",
+    "type": "subfunction"
+  },
+  "CBJ": {
+    "industry": "Банки и Финансы",
+    "description": "Управление денежными средствами",
+    "examples": "Финансовый контролер по управлению денежными средствами, финансовый менеджер по управлению денежными средствами",
+    "type": "subfunction"
+  },
+  "CBK": {
+    "industry": "Банки и Финансы",
+    "description": "Корпоративные / коммерческие банковские операции",
+    "examples": "Экономист отдела оптимизации и развития процессов корпоративного бизнеса, специалист сопровождения корпоративного бизнеса",
+    "type": "subfunction"
+  },
+  "CBM-B": {
+    "industry": "Банки и Финансы",
+    "description": "Работа с международными финансовыми организациями",
+    "examples": "Менеджер по международному развитию, финансовый менеджер по работе с международными подразделениями",
+    "type": "specialization",
+    "subfunction": "CBM"
+  },
+  "CBM": {
+    "industry": "Банки и Финансы",
+    "description": "Международный бизнес",
+    "examples": "nan",
+    "type": "subfunction"
+  },
+  "CBM-C": {
+    "industry": "Банки и Финансы",
+    "description": "Документарные операции",
+    "examples": "Бизнес-аналитик по международным документарным операциям, специалист по международным документарным операциям",
+    "type": "specialization",
+    "subfunction": "CBM"
+  },
+  "CBN-D": {
+    "industry": "Банки и Финансы",
+    "description": "Проведение межбанковских расчетов",
+    "examples": "Специалист по сопровождению межбанковских расчетов",
+    "type": "specialization",
+    "subfunction": "CBN"
+  },
+  "CBN": {
+    "industry": "Банки и Финансы",
+    "description": "Межбанковские расчеты",
+    "examples": "nan",
+    "type": "subfunction"
+  },
+  "CBN-G": {
+    "industry": "Банки и Финансы",
+    "description": "Корреспондентские отношения",
+    "examples": "Специалист по корреспондентским отношениям",
+    "type": "specialization",
+    "subfunction": "CBN"
+  },
+  "CBX": {
+    "industry": "Банки и Финансы",
+    "description": "Прочая деятельность - Услуги для корпоративного бизнеса",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "CBZ": {
+    "industry": "Банки и Финансы",
+    "description": "Руководитель направления по развитию корпоративного бизнеса",
+    "examples": "Руководитель направления по развитию корпоративного бизнеса",
+    "type": "subfunction"
+  },
+  "CDD": {
+    "industry": "Банки и Финансы",
+    "description": "Пластиковые карты",
+    "examples": "Специалист по изготовлению пластиковых карт, менеджер по эквайрингу",
+    "type": "subfunction"
+  },
+  "CDX": {
+    "industry": "Банки и Финансы",
+    "description": "Прочая деятельность - Пластиковые карты",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "CDZ": {
+    "industry": "Банки и Финансы",
+    "description": "Руководитель подразделения по операциям с пластиковыми картами",
+    "examples": "Руководитель подразделения по операциям с пластиковыми картами",
+    "type": "subfunction"
+  },
+  "CEA-A": {
+    "industry": "Банки и Финансы",
+    "description": "Методология возврата долгов",
+    "examples": "Специалист по работе с просроченной задолженностью",
+    "type": "specialization",
+    "subfunction": "CEA"
+  },
+  "CEA": {
+    "industry": "Банки и Финансы",
+    "description": "Взыскание просроченных платежей, урегулирование проблем, возмещение убытков",
+    "examples": "nan",
+    "type": "subfunction"
+  },
+  "CEA-B": {
+    "industry": "Банки и Финансы",
+    "description": "Продажа коллекторских услуг корпоративным клиентам",
+    "examples": "Менеджер по продажам коллекторских услуг",
+    "type": "specialization",
+    "subfunction": "CEA"
+  },
+  "CEA-C": {
+    "industry": "Банки и Финансы",
+    "description": "Возврат долгов корпоративных клиентов по телефону",
+    "examples": "Специалист телефонного урегулирования с корпоративными клиентами",
+    "type": "specialization",
+    "subfunction": "CEA"
+  },
+  "CEA-D": {
+    "industry": "Банки и Финансы",
+    "description": "Возврат долгов частных клиентов по телефону",
+    "examples": "Специалист телефонного урегулирования с частными клиентами",
+    "type": "specialization",
+    "subfunction": "CEA"
+  },
+  "CEA-E": {
+    "industry": "Банки и Финансы",
+    "description": "Выездная работа с задолженностью частных клиентов",
+    "examples": "Специалист выездного взыскания с частных клиентов",
+    "type": "specialization",
+    "subfunction": "CEA"
+  },
+  "CEA-F": {
+    "industry": "Банки и Финансы",
+    "description": "Оценка качества телефонных переговоров с должниками",
+    "examples": "Специалист отдела контроля качества переговоров с должниками",
+    "type": "specialization",
+    "subfunction": "CEA"
+  },
+  "CEA-G": {
+    "industry": "Банки и Финансы",
+    "description": "Работа с проблемной задолженностью корпоративных клиентов",
+    "examples": "Эксперт службы по работе с проблемной задолженностью корпоративных клиентов",
+    "type": "specialization",
+    "subfunction": "CEA"
+  },
+  "CEA-H": {
+    "industry": "Банки и Финансы",
+    "description": "Аналитик по возврату долгов корпоративных клиентов",
+    "examples": "Специалист по взысканию задолженности с корпоративных клиентов",
+    "type": "specialization",
+    "subfunction": "CEA"
+  },
+  "CEA-I": {
+    "industry": "Банки и Финансы",
+    "description": "Взаимодействие с коллекторскими агентствами",
+    "examples": "Специалист по работе с коллекторскими агентствами",
+    "type": "specialization",
+    "subfunction": "CEA"
+  },
+  "CEA-J": {
+    "industry": "Банки и Финансы",
+    "description": "Оценка и продажа имущества",
+    "examples": "Оценщик недвижимости имущества должника",
+    "type": "specialization",
+    "subfunction": "CEA"
+  },
+  "CEG": {
+    "industry": "Банки и Финансы",
+    "description": "Сопровождение кредитных сделок",
+    "examples": "Специалист по сопровождению кредитов, менеджер по сопровождению кредитных сделок",
+    "type": "subfunction"
+  },
+  "CEH": {
+    "industry": "Банки и Финансы",
+    "description": "Подготовка кредитных сделок проектного финансирования",
+    "examples": "Кредитный эксперт, кредитный инспектор",
+    "type": "subfunction"
+  },
+  "CEX": {
+    "industry": "Банки и Финансы",
+    "description": "Прочая деятельность - Кредитование",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "CEZ": {
+    "industry": "Банки и Финансы",
+    "description": "Руководитель подразделения кредитования",
+    "examples": "Руководитель подразделения кредитования",
+    "type": "subfunction"
+  },
+  "CKA": {
+    "industry": "Банки и Финансы",
+    "description": "Рынок капитала",
+    "examples": "Специалист по привлечению капитала",
+    "type": "subfunction"
+  },
+  "CKB-A": {
+    "industry": "Банки и Финансы",
+    "description": "Торговые операции с акциями",
+    "examples": "Трейдер акций",
+    "type": "specialization",
+    "subfunction": "CKB"
+  },
+  "CKB": {
+    "industry": "Банки и Финансы",
+    "description": "Трейдинг",
+    "examples": "nan",
+    "type": "subfunction"
+  },
+  "CKB-B": {
+    "industry": "Банки и Финансы",
+    "description": "Торговые операции с долговыми инструментами",
+    "examples": "Трейдер долговых инструментов, руководитель вексельного направления",
+    "type": "specialization",
+    "subfunction": "CKB"
+  },
+  "CKB-C": {
+    "industry": "Банки и Финансы",
+    "description": "Торговые операции с производными финансовыми инструментами",
+    "examples": "Руководитель направления трейдинга (деривативы), трейдер производных финансовых инструментов",
+    "type": "specialization",
+    "subfunction": "CKB"
+  },
+  "CKM": {
+    "industry": "Банки и Финансы",
+    "description": "Разработка финансовых продуктов на рынках капитала",
+    "examples": "Специалист по разработке финансовых продуктов на рынках капитала",
+    "type": "subfunction"
+  },
+  "CKO": {
+    "industry": "Банки и Финансы",
+    "description": "Продажи ценных бумаг",
+    "examples": "Менеджер по продажам ценных бумаг, специалист по сопровождению сделок на рынках капитала",
+    "type": "subfunction"
+  },
+  "CKP": {
+    "industry": "Банки и Финансы",
+    "description": "Анализ финансовых рынков",
+    "examples": "Аналитик финансовых рынков, аналитик по исследованию рынка акций, макроэкономист-аналитик",
+    "type": "subfunction"
+  },
+  "CKX": {
+    "industry": "Банки и Финансы",
+    "description": "Прочая деятельность - Рынок капитала и трейдинг",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "CKZ": {
+    "industry": "Банки и Финансы",
+    "description": "Руководитель рынков капитала",
+    "examples": "Руководитель рынков капитала",
+    "type": "subfunction"
+  },
+  "FBA": {
+    "industry": "Банки и Финансы",
+    "description": "Брокерская деятельность",
+    "examples": "Специалист в области брокерской деятельности",
+    "type": "subfunction"
+  },
+  "FBX": {
+    "industry": "Банки и Финансы",
+    "description": "Прочая деятельность - Продажа финансовых услуг, 3-я сторона (брокер)",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "FBZ": {
+    "industry": "Банки и Финансы",
+    "description": "Руководитель подразделения брокерских операций",
+    "examples": "Руководитель подразделения брокерских операций",
+    "type": "subfunction"
+  },
+  "FNA-A": {
+    "industry": "Банки и Финансы",
+    "description": "Сопровождение возврата долгов",
+    "examples": "Специалист по работе с задолженностью",
+    "type": "specialization",
+    "subfunction": "FNA"
+  },
+  "FNA": {
+    "industry": "Банки и Финансы",
+    "description": "Учетно-расчетные операции",
+    "examples": "nan",
+    "type": "subfunction"
+  },
+  "FNA-B": {
+    "industry": "Банки и Финансы",
+    "description": "Сопровождение факторинговых операций",
+    "examples": "Специалист по сопровождению факторинговых операций, менеджер по продажам услуг факторинга",
+    "type": "specialization",
+    "subfunction": "FNA"
+  },
+  "FNA-C": {
+    "industry": "Банки и Финансы",
+    "description": "Сопровождение лизинговых сделок",
+    "examples": "Менеджер по сопровождению лизинговых сделок, специалист сектора лизинговых операций",
+    "type": "specialization",
+    "subfunction": "FNA"
+  },
+  "FNA-D": {
+    "industry": "Банки и Финансы",
+    "description": "Сопровождение привлечения внешнего финансирования",
+    "examples": "Специалист отдела внешнего финансирования",
+    "type": "specialization",
+    "subfunction": "FNA"
+  },
+  "FNA-F": {
+    "industry": "Банки и Финансы",
+    "description": "Сопровождение операций с драгметаллами",
+    "examples": "Специалист по сопровождению операций с драгоценными металлами",
+    "type": "specialization",
+    "subfunction": "FNA"
+  },
+  "FNA-G": {
+    "industry": "Банки и Финансы",
+    "description": "Сопровождение казначейских операций",
+    "examples": "Специалист по казначейскому сопровождению, менеджер департамента казначейских операций",
+    "type": "specialization",
+    "subfunction": "FNA"
+  },
+  "FNA-H": {
+    "industry": "Банки и Финансы",
+    "description": "Сопровождение операций",
+    "examples": "Менеджер по сопровождению операций корпоративных и частных клиентов, специалист отдела сопровождения клиентских операций",
+    "type": "specialization",
+    "subfunction": "FNA"
+  },
+  "FNA-I": {
+    "industry": "Банки и Финансы",
+    "description": "Сопровождение операций доверительного управления",
+    "examples": "Менеджер по сопровождению операций доверительного управления",
+    "type": "specialization",
+    "subfunction": "FNA"
+  },
+  "FNA-J": {
+    "industry": "Банки и Финансы",
+    "description": "Сопровождение операций с пластиковыми картами",
+    "examples": "Менеджер по сопровождению операций с пластиковыми картами",
+    "type": "specialization",
+    "subfunction": "FNA"
+  },
+  "FNA-K": {
+    "industry": "Банки и Финансы",
+    "description": "Сопровождение кредитных сделок частных клиентов",
+    "examples": "Специалист по обработке кредитных заявок частных клиентов, специалист по оформлению и сопровождению кредитных сделок частных клиентов",
+    "type": "specialization",
+    "subfunction": "FNA"
+  },
+  "FNA-L": {
+    "industry": "Банки и Финансы",
+    "description": "Сопровождение операций с ценными бумагами",
+    "examples": "Специалист отдела оформления и учета операций с ценными бумагами",
+    "type": "specialization",
+    "subfunction": "FNA"
+  },
+  "FNA-M": {
+    "industry": "Банки и Финансы",
+    "description": "Сопровождение операций паевых инвестиционных фондов",
+    "examples": "Менеджер по сопровождению операций паевых инвестиционных фондов",
+    "type": "specialization",
+    "subfunction": "FNA"
+  },
+  "FNA-N": {
+    "industry": "Банки и Финансы",
+    "description": "Экспертиза ценных бумаг",
+    "examples": "Специалист по экспертизе ценных бумаг",
+    "type": "specialization",
+    "subfunction": "FNA"
+  },
+  "FNB": {
+    "industry": "Банки и Финансы",
+    "description": "Методология сопровождения банковских операций",
+    "examples": "Методолог по сопровождению розничных операций, методолог по банковским операциям",
+    "type": "subfunction"
+  },
+  "FNX": {
+    "industry": "Банки и Финансы",
+    "description": "Прочая деятельность - Учетно-расчетные операции/Бэк офис",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "FNZ": {
+    "industry": "Банки и Финансы",
+    "description": "Руководитель подразделения учетно-расчетных операций",
+    "examples": "Руководитель подразделения учетно-расчетных операций",
+    "type": "subfunction"
+  },
+  "IBJ": {
+    "industry": "Банки и Финансы",
+    "description": "Инвестиционный банкинг",
+    "examples": "Консультант по вопросам совершения сделок слияния и поглощения, консультант M&A, консультант по оценке бизнеса",
+    "type": "subfunction"
+  },
+  "IBX": {
+    "industry": "Банки и Финансы",
+    "description": "Прочая деятельность - Инвестиционная деятельность и сделки по слиянию и поглощению",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "IBZ": {
+    "industry": "Банки и Финансы",
+    "description": "Руководитель инвестиционного подразделения",
+    "examples": "Руководитель инвестиционного подразделения",
+    "type": "subfunction"
+  },
+  "LEA": {
+    "industry": "Банки и Финансы",
+    "description": "Лизинг",
+    "examples": "Менеджер по продажам услуг лизинга, менеджер по лизингу, менеджер по сопровождению лизинговых сделок",
+    "type": "subfunction"
+  },
+  "LEB": {
+    "industry": "Банки и Финансы",
+    "description": "Контроль финансового состояния дебиторов",
+    "examples": "Специалист по работе с дебиторской задолженностью",
+    "type": "subfunction"
+  },
+  "LEC": {
+    "industry": "Банки и Финансы",
+    "description": "Разработка лизинговых продуктов",
+    "examples": "Менеджер по развитию лизинговых продуктов, менеджер по развитию продуктов автолизинга",
+    "type": "subfunction"
+  },
+  "LEF": {
+    "industry": "Банки и Финансы",
+    "description": "Взаимодействие с поставщиками лизингового имущества",
+    "examples": "Специалист по взаимодействию с поставщиками лизингового имущества, менеджер по управлению цепями поставок и логистике в лизинге",
+    "type": "subfunction"
+  },
+  "LEN": {
+    "industry": "Банки и Финансы",
+    "description": "Взаимодействие со страховыми компаниями по лизинговым операциям",
+    "examples": "Специалист по работе со страховыми компаниями по лизинговым операциям, специалист отдела страхования лизингового имущества",
+    "type": "subfunction"
+  },
+  "LEX": {
+    "industry": "Банки и Финансы",
+    "description": "Прочая деятельность - Лизинг",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "LEZ": {
+    "industry": "Банки и Финансы",
+    "description": "Руководитель направления лизинг",
+    "examples": "Руководитель направления лизинг",
+    "type": "subfunction"
+  },
+  "MBA": {
+    "industry": "Банки и Финансы",
+    "description": "Услуги для среднего и малого бизнеса",
+    "examples": "Клиентский менеджер по развитию среднего и малого бизнеса, менеджер по развитию клиентов среднего и малого бизнеса",
+    "type": "subfunction"
+  },
+  "MBX": {
+    "industry": "Банки и Финансы",
+    "description": "Прочая деятельность - Услуги для среднего и малого бизнеса",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "MBZ": {
+    "industry": "Банки и Финансы",
+    "description": "Руководитель направления по развитию среднего и малого бизнеса",
+    "examples": "Руководитель направления по развитию среднего и малого бизнеса",
+    "type": "subfunction"
+  },
+  "PBA": {
+    "industry": "Банки и Финансы",
+    "description": "Продажи услуг состоятельным клиентам",
+    "examples": "Менеджер по продажам частным клиентам, менеджер по продажам ВИП-клиентам",
+    "type": "subfunction"
+  },
+  "PBC": {
+    "industry": "Банки и Финансы",
+    "description": "Консалтинг по вопросам инвестиций",
+    "examples": "Инвестиционный советник, инвестиционный консультант ВИП-клиентов",
+    "type": "subfunction"
+  },
+  "PBD": {
+    "industry": "Банки и Финансы",
+    "description": "Обслуживание состоятельных клиентов",
+    "examples": "Менеджер по работе с частными клиентами, менеджер по работе с ВИП-клиентами, менеджер по работе с состоятельными клиентами",
+    "type": "subfunction"
+  },
+  "PBF": {
+    "industry": "Банки и Финансы",
+    "description": "Предоставление персонализированных банковских услуг для состоятельных клиентов / Управление благосостоянием",
+    "examples": "Советник по управлению благосостоянием",
+    "type": "subfunction"
+  },
+  "PBG": {
+    "industry": "Банки и Финансы",
+    "description": "Организация выполнения требований CRS",
+    "examples": "Специалист по идентификации, эксперт группы контроля по вопросам CRS",
+    "type": "subfunction"
+  },
+  "PBH": {
+    "industry": "Банки и Финансы",
+    "description": "Разработка продуктов для состоятельных клиентов",
+    "examples": "Руководитель развития продуктов и услуг значимым клиентам",
+    "type": "subfunction"
+  },
+  "PBX": {
+    "industry": "Банки и Финансы",
+    "description": "Прочая деятельность - Услуги для состоятельных клиентов (Private Banking)",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "PBZ": {
+    "industry": "Банки и Финансы",
+    "description": "Руководитель направления услуг для состоятельных клиентов (Private Banking)",
+    "examples": "Руководитель направления прайвэт банкинга, директор по работе с клиентами (Private banking), директор по работе с состоятельными клиентами",
+    "type": "subfunction"
+  },
+  "RKA-A": {
+    "industry": "Банки и Финансы",
+    "description": "Анализ рисков кредитования клиентов",
+    "examples": "Экономист кредитной экспертизы и мониторинга, специалист управления анализа кредитных рисков, кредитный риск-аналитик",
+    "type": "specialization",
+    "subfunction": "RKA"
+  },
+  "RKA": {
+    "industry": "Банки и Финансы",
+    "description": "Кредитные риски",
+    "examples": "nan",
+    "type": "subfunction"
+  },
+  "RKA-C": {
+    "industry": "Банки и Финансы",
+    "description": "Подготовка отчетов по кредитному портфелю",
+    "examples": "Специалист по формированию кредитного досье",
+    "type": "specialization",
+    "subfunction": "RKA"
+  },
+  "RKA-D": {
+    "industry": "Банки и Финансы",
+    "description": "Анализ корпоративного кредитного портфеля",
+    "examples": "Аналитик корпоративного кредитного портфеля",
+    "type": "specialization",
+    "subfunction": "RKA"
+  },
+  "RKA-E": {
+    "industry": "Банки и Финансы",
+    "description": "Анализ розничного кредитного портфеля",
+    "examples": "Аналитик розничного кредитного портфеля, аналитик портфеля розничных кредитных продуктов",
+    "type": "specialization",
+    "subfunction": "RKA"
+  },
+  "RKB": {
+    "industry": "Банки и Финансы",
+    "description": "Рыночные риски",
+    "examples": "Рыночный риск-контролер, специалист по оценке рыночных рисков, аналитик по управлению рыночными рисками",
+    "type": "subfunction"
+  },
+  "RKC": {
+    "industry": "Банки и Финансы",
+    "description": "Операционные риски",
+    "examples": "Специалист управления операционных рисков, специалист по контролю операционных рисков, риск-менеджер по операционным рискам",
+    "type": "subfunction"
+  },
+  "RKD": {
+    "industry": "Банки и Финансы",
+    "description": "Методология управления рисками",
+    "examples": "Руководитель направления методологии управления рисками, методолог по операционным/рыночным/кредитным рискам",
+    "type": "subfunction"
+  },
+  "RKE": {
+    "industry": "Банки и Финансы",
+    "description": "Управление рисками инвестиционных проектов",
+    "examples": "Менеджер по управлению рисками инвестиционных проектов",
+    "type": "subfunction"
+  },
+  "RKX": {
+    "industry": "Банки и Финансы",
+    "description": "Прочая деятельность - Управление рисками",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "RKZ": {
+    "industry": "Банки и Финансы",
+    "description": "Руководитель функции Управление рисками",
+    "examples": "Директор департамента риск-менеджмента (CRO), директор по рискам",
+    "type": "subfunction"
+  },
+  "TBA": {
+    "industry": "Банки и Финансы",
+    "description": "Сделки казначейства",
+    "examples": "Менеджер направления операций на валютном рынке, менеджер управление операций на денежном рынке и FOREX",
+    "type": "subfunction"
+  },
+  "TBC-A": {
+    "industry": "Банки и Финансы",
+    "description": "Методология депозитарных операций",
+    "examples": "Методолог отдела сопровождения депозитарных операций",
+    "type": "specialization",
+    "subfunction": "TBC"
+  },
+  "TBC": {
+    "industry": "Банки и Финансы",
+    "description": "Депозитарий",
+    "examples": "nan",
+    "type": "subfunction"
+  },
+  "TBC-B": {
+    "industry": "Банки и Финансы",
+    "description": "Сопровождение депозитарных операций",
+    "examples": "Специалист сопровождения депозитарных операций",
+    "type": "specialization",
+    "subfunction": "TBC"
+  },
+  "TBC-C": {
+    "industry": "Банки и Финансы",
+    "description": "Продажа депозитарных услуг",
+    "examples": "Специалист сопровождения продаж депозитарных услуг",
+    "type": "specialization",
+    "subfunction": "TBC"
+  },
+  "TBC-E": {
+    "industry": "Банки и Финансы",
+    "description": "Спецдепозитарий",
+    "examples": "Специалист специализированного депозитария",
+    "type": "specialization",
+    "subfunction": "TBC"
+  },
+  "TBC-F": {
+    "industry": "Банки и Финансы",
+    "description": "Контроль депозитарных операций",
+    "examples": "Контролер депозитарных операций",
+    "type": "specialization",
+    "subfunction": "TBC"
+  },
+  "TBD": {
+    "industry": "Банки и Финансы",
+    "description": "Продажи продуктов казначейства",
+    "examples": "Специалист отдела продаж казначейских продуктов",
+    "type": "subfunction"
+  },
+  "TBE": {
+    "industry": "Банки и Финансы",
+    "description": "Управление ликвидностью банка",
+    "examples": "Специалист направления управления ликвидностью банка",
+    "type": "subfunction"
+  },
+  "TBF": {
+    "industry": "Банки и Финансы",
+    "description": "Казначейские операции",
+    "examples": "Казначей, руководитель направления банкнотных операций, менеджер направления валютообменных операций, менеджер направление неторговых валютных операций",
+    "type": "subfunction"
+  },
+  "TBX": {
+    "industry": "Банки и Финансы",
+    "description": "Прочая деятельность - Казначейство и депозитарий",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "TBZ": {
+    "industry": "Банки и Финансы",
+    "description": "Руководитель казначейства и депозитария",
+    "examples": "Руководитель казначейства и депозитария",
+    "type": "subfunction"
+  },
+  "HBA": {
+    "industry": "Гостиничное дело",
+    "description": "Управление гостиницей",
+    "examples": "Управляющий гостиничным комплексом, управляющий отелем, генеральный менеджер отеля",
+    "type": "subfunction"
+  },
+  "HBX": {
+    "industry": "Гостиничное дело",
+    "description": "Прочая деятельность - Управление гостиницей",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "HBZ": {
+    "industry": "Гостиничное дело",
+    "description": "Директор гостиницы",
+    "examples": "Директор гостиницы",
+    "type": "subfunction"
+  },
+  "HDA": {
+    "industry": "Гостиничное дело",
+    "description": "Размещение и проживание в гостинице",
+    "examples": "Начальник службы размещения и проживания гостей, администратор службы размещения и проживания",
+    "type": "subfunction"
+  },
+  "HDB": {
+    "industry": "Гостиничное дело",
+    "description": "Прачечная",
+    "examples": "Оператор прачечной, кастелянша, сотрудника прачечной",
+    "type": "subfunction"
+  },
+  "HDC": {
+    "industry": "Гостиничное дело",
+    "description": "Бронирование номеров",
+    "examples": "Специалист по бронированию, менеджер по бронированию",
+    "type": "subfunction"
+  },
+  "HDD": {
+    "industry": "Гостиничное дело",
+    "description": "Прием и размещение гостей",
+    "examples": "Начальник службы приема и размещения гостей, администратор службы приема и размещения, агент по бронированию",
+    "type": "subfunction"
+  },
+  "HDE": {
+    "industry": "Гостиничное дело",
+    "description": "Услуги по предоставлению вилл, коттеджей",
+    "examples": "Менеджер по предоставлению вилл, коттеджей",
+    "type": "subfunction"
+  },
+  "HDF": {
+    "industry": "Гостиничное дело",
+    "description": "Уборка помещений",
+    "examples": "Уборщица помещений гостиницы, горничная",
+    "type": "subfunction"
+  },
+  "HDX": {
+    "industry": "Гостиничное дело",
+    "description": "Прочая деятельность - Размещение и проживание в гостинице",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "HDZ": {
+    "industry": "Гостиничное дело",
+    "description": "Руководитель направления размещения и проживания в гостинице",
+    "examples": "Руководитель направления размещения и проживания в гостинице",
+    "type": "subfunction"
+  },
+  "HLA": {
+    "industry": "Гостиничное дело",
+    "description": "Операционная деятельность в отеле",
+    "examples": "Операционный менеджер в отеле",
+    "type": "subfunction"
+  },
+  "HLX": {
+    "industry": "Гостиничное дело",
+    "description": "Прочая деятельность - Гостиничная операционная деятельность",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "HLZ": {
+    "industry": "Гостиничное дело",
+    "description": "Руководитель операционной деятельности в отеле",
+    "examples": "Руководитель операционной деятельности в отеле, операционный директор гостиничного комплекса",
+    "type": "subfunction"
+  },
+  "FIX": {
+    "industry": "Государственный сектор",
+    "description": "Пожарные и спасатели",
+    "examples": "Пожарный, газоспасатель, начальник аварийно-спасательного отряда",
+    "type": "subfunction"
+  },
+  "FIZ": {
+    "industry": "Государственный сектор",
+    "description": "Начальник противопожарной службы",
+    "examples": "Начальник пожарной части",
+    "type": "subfunction"
+  },
+  "GOA": {
+    "industry": "Государственный сектор",
+    "description": "Полиция",
+    "examples": "Полицейский",
+    "type": "subfunction"
+  },
+  "GOX": {
+    "industry": "Государственный сектор",
+    "description": "Прочая деятельность - Государственные службы",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "GOZ": {
+    "industry": "Государственный сектор",
+    "description": "Начальник полиции",
+    "examples": "Начальник полиции",
+    "type": "subfunction"
+  },
+  "ABA": {
+    "industry": "Здравоохранение",
+    "description": "Вопросы теоретической медицины",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "ABB": {
+    "industry": "Здравоохранение",
+    "description": "Институциональная медицина",
+    "examples": "Научный сотрудник исследовательского института",
+    "type": "subfunction"
+  },
+  "ABC": {
+    "industry": "Здравоохранение",
+    "description": "Исследовательская медицина",
+    "examples": "Медицинский аналитик",
+    "type": "subfunction"
+  },
+  "ABX": {
+    "industry": "Здравоохранение",
+    "description": "Прочая деятельность - Теоретическая медицина",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "ABZ": {
+    "industry": "Здравоохранение",
+    "description": "Руководитель функции теоретической медицины",
+    "examples": "Руководитель функции теоретической медицины",
+    "type": "subfunction"
+  },
+  "OSB": {
+    "industry": "Здравоохранение",
+    "description": "Врач",
+    "examples": "Врач-терапевт, врач клинической лабораторной диагностики, врач УЗИ, врач-хирург, врач- кардиолог, врач-педиатр",
+    "type": "subfunction"
+  },
+  "OSC": {
+    "industry": "Здравоохранение",
+    "description": "Медицинская сестра",
+    "examples": "Медицинская сестра, массажист, медицинский лаборант",
+    "type": "subfunction"
+  },
+  "OSX": {
+    "industry": "Здравоохранение",
+    "description": "Прочая деятельность - Амбулаторные услуги",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "OSZ": {
+    "industry": "Здравоохранение",
+    "description": "Руководитель функции амбулаторных услуг",
+    "examples": "Руководитель функции амбулаторных услуг",
+    "type": "subfunction"
+  },
+  "PWD": {
+    "industry": "Здравоохранение",
+    "description": "Социальная служба",
+    "examples": "Социальный работник",
+    "type": "subfunction"
+  },
+  "AMA": {
+    "industry": "Медиа",
+    "description": "Тиражирование изданий",
+    "examples": "Печатник",
+    "type": "subfunction"
+  },
+  "AMI": {
+    "industry": "Медиа",
+    "description": "Радио",
+    "examples": "Редактор радиоэфира",
+    "type": "subfunction"
+  },
+  "AMK": {
+    "industry": "Медиа",
+    "description": "Телевидение",
+    "examples": "Редактор телеэфиров, менеджер ТВ рекламе, медиапланер рекламных ТВ кампаний",
+    "type": "subfunction"
+  },
+  "AML": {
+    "industry": "Медиа",
+    "description": "Наружная реклама",
+    "examples": "Начальник производства наружной рекламы",
+    "type": "subfunction"
+  },
+  "AMP": {
+    "industry": "Медиа",
+    "description": "Теле-радио ведущие, журналисты",
+    "examples": "Телеведущий, радиоведущий, журналист",
+    "type": "subfunction"
+  },
+  "AMX": {
+    "industry": "Медиа",
+    "description": "Прочая деятельность - Реклама и медиа",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "AMZ": {
+    "industry": "Медиа",
+    "description": "Директор департамента",
+    "examples": "Директор департамента рекламы и медиа",
+    "type": "subfunction"
+  },
+  "DOA": {
+    "industry": "Нефть и Газ / Горнодобывающий сектор",
+    "description": "Водолазные/Инженерные работы",
+    "examples": "Водолаз",
+    "type": "subfunction"
+  },
+  "DOB": {
+    "industry": "Нефть и Газ / Горнодобывающий сектор",
+    "description": "Жизнеобеспечение",
+    "examples": "Специалист по жизнеобеспечению при водолазных работах",
+    "type": "subfunction"
+  },
+  "DOX": {
+    "industry": "Нефть и Газ / Горнодобывающий сектор",
+    "description": "Прочая деятельность - Водолазные работы",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "DOZ": {
+    "industry": "Нефть и Газ / Горнодобывающий сектор",
+    "description": "Начальник водолазных работ",
+    "examples": "Начальник водолазных работ",
+    "type": "subfunction"
+  },
+  "EXB-A": {
+    "industry": "Нефть и Газ / Горнодобывающий сектор",
+    "description": "Региональная геология",
+    "examples": "Региональный геолог",
+    "type": "specialization",
+    "subfunction": "EXB"
+  },
+  "EXB": {
+    "industry": "Нефть и Газ / Горнодобывающий сектор",
+    "description": "Инженерная геология",
+    "examples": "nan",
+    "type": "subfunction"
+  },
+  "EXB-B": {
+    "industry": "Нефть и Газ / Горнодобывающий сектор",
+    "description": "Поисково-разведочная геология",
+    "examples": "Геолог по геологоразведочным работам",
+    "type": "specialization",
+    "subfunction": "EXB"
+  },
+  "EXB-C": {
+    "industry": "Нефть и Газ / Горнодобывающий сектор",
+    "description": "Сейсмическая разведка",
+    "examples": "Начальник отдела сейсмической обработки данных наземных измерений",
+    "type": "specialization",
+    "subfunction": "EXB"
+  },
+  "EXC-A": {
+    "industry": "Нефть и Газ / Горнодобывающий сектор",
+    "description": "Петрофизики",
+    "examples": "Петрофизик",
+    "type": "specialization",
+    "subfunction": "EXC"
+  },
+  "EXC": {
+    "industry": "Нефть и Газ / Горнодобывающий сектор",
+    "description": "Геология/геофизика",
+    "examples": "nan",
+    "type": "subfunction"
+  },
+  "EXC-B": {
+    "industry": "Нефть и Газ / Горнодобывающий сектор",
+    "description": "Маркшейдерия",
+    "examples": "Маркшейдер",
+    "type": "specialization",
+    "subfunction": "EXC"
+  },
+  "EXC-C": {
+    "industry": "Нефть и Газ / Горнодобывающий сектор",
+    "description": "Поисково-разведочное бурение",
+    "examples": "Инженер по буровзрывным работам",
+    "type": "specialization",
+    "subfunction": "EXC"
+  },
+  "EXE": {
+    "industry": "Нефть и Газ / Горнодобывающий сектор",
+    "description": "Управление месторождением",
+    "examples": "Начальник отдела эксплуатации месторождения",
+    "type": "subfunction"
+  },
+  "EXX": {
+    "industry": "Нефть и Газ / Горнодобывающий сектор",
+    "description": "Прочая деятельность - Разведка",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "EXZ": {
+    "industry": "Нефть и Газ / Горнодобывающий сектор",
+    "description": "Руководитель подразделения по разведке недр",
+    "examples": "Технический директор геологоразведочной службы, руководитель подразделения по разведке недр",
+    "type": "subfunction"
+  },
+  "GUA": {
+    "industry": "Нефть и Газ / Горнодобывающий сектор",
+    "description": "Газоснабжение и газораспределение",
+    "examples": "Инженер по газоснабжению, мастер по эксплуатации оборудования газовых объектов",
+    "type": "subfunction"
+  },
+  "GUX": {
+    "industry": "Нефть и Газ / Горнодобывающий сектор",
+    "description": "Прочая деятельность - Газоснабжение",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "GUZ": {
+    "industry": "Нефть и Газ / Горнодобывающий сектор",
+    "description": "Директор газотранспортных систем",
+    "examples": "Директор программ по геологии и разработке запасов газа, директор газотранспортных систем",
+    "type": "subfunction"
+  },
+  "MIA": {
+    "industry": "Нефть и Газ / Горнодобывающий сектор",
+    "description": "Горно-инженерное дело",
+    "examples": "Инженер по горным работам, горный инженер",
+    "type": "subfunction"
+  },
+  "MIB": {
+    "industry": "Нефть и Газ / Горнодобывающий сектор",
+    "description": "Металлургия",
+    "examples": "Металлург, плавильщик, гидрометаллург",
+    "type": "subfunction"
+  },
+  "MIX": {
+    "industry": "Нефть и Газ / Горнодобывающий сектор",
+    "description": "Прочая деятельность - Горно-инженерное дело",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "MIZ": {
+    "industry": "Нефть и Газ / Горнодобывающий сектор",
+    "description": "Руководитель горно-инженерного направления",
+    "examples": "Руководитель горно-инженерного направления, руководитель направления горных работ",
+    "type": "subfunction"
+  },
+  "MOA": {
+    "industry": "Нефть и Газ / Горнодобывающий сектор",
+    "description": "Горнодобывающая деятельность",
+    "examples": "Горнорабочий, проходчик, взрывник",
+    "type": "subfunction"
+  },
+  "MOB": {
+    "industry": "Нефть и Газ / Горнодобывающий сектор",
+    "description": "Служба эксплуатации",
+    "examples": "Горномонтажник подземный, механик по ремонту горного оборудования",
+    "type": "subfunction"
+  },
+  "MOC": {
+    "industry": "Нефть и Газ / Горнодобывающий сектор",
+    "description": "Переработка/дробление",
+    "examples": "Дробильщик",
+    "type": "subfunction"
+  },
+  "MOX": {
+    "industry": "Нефть и Газ / Горнодобывающий сектор",
+    "description": "Прочая деятельность - Горные работы",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "MOZ": {
+    "industry": "Нефть и Газ / Горнодобывающий сектор",
+    "description": "Руководитель горнодобывающего подразделения",
+    "examples": "Руководитель горнодобывающего подразделения, руководитель горного производства",
+    "type": "subfunction"
+  },
+  "OOA": {
+    "industry": "Нефть и Газ / Горнодобывающий сектор",
+    "description": "Береговые операции",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "OOB": {
+    "industry": "Нефть и Газ / Горнодобывающий сектор",
+    "description": "Береговое производство",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "OOX": {
+    "industry": "Нефть и Газ / Горнодобывающий сектор",
+    "description": "Прочая деятельность - Нефтегазовые береговые операции",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "OOZ": {
+    "industry": "Нефть и Газ / Горнодобывающий сектор",
+    "description": "Руководитель нефтегазовых береговых операций",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "PIA": {
+    "industry": "Нефть и Газ / Горнодобывающий сектор",
+    "description": "Эксплуатация трубопровода",
+    "examples": "Мастер по эксплуатации трубопроводов, трубопроводчик, оператор по эксплуатации трубопроводов",
+    "type": "subfunction"
+  },
+  "PIX": {
+    "industry": "Нефть и Газ / Горнодобывающий сектор",
+    "description": "Прочая деятельность - Эксплуатация трубопровода",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "PIZ": {
+    "industry": "Нефть и Газ / Горнодобывающий сектор",
+    "description": "Руководитель направления по эксплуатации трубопровода",
+    "examples": "Руководитель направления по эксплуатации трубопровода",
+    "type": "subfunction"
+  },
+  "PNA-A": {
+    "industry": "Нефть и Газ / Горнодобывающий сектор",
+    "description": "Оперативный мониторинг и анализ добычи",
+    "examples": "Инженер-разработчик нефтяных и газовых месторождений",
+    "type": "specialization",
+    "subfunction": "PNA"
+  },
+  "PNA": {
+    "industry": "Нефть и Газ / Горнодобывающий сектор",
+    "description": "Технологии разработки пласта",
+    "examples": "nan",
+    "type": "subfunction"
+  },
+  "PNA-B": {
+    "industry": "Нефть и Газ / Горнодобывающий сектор",
+    "description": "Технологии подготовки и сдачи нефти и газа",
+    "examples": "Машинист насосной станции по закачке рабочего агента в пласт, оператор обезвоживающей и обессоливающей установки",
+    "type": "specialization",
+    "subfunction": "PNA"
+  },
+  "PNB": {
+    "industry": "Нефть и Газ / Горнодобывающий сектор",
+    "description": "Бурение/Добыча сырья",
+    "examples": "Бурильщик, инженер по бурению",
+    "type": "subfunction"
+  },
+  "PNC": {
+    "industry": "Нефть и Газ / Горнодобывающий сектор",
+    "description": "Нефтедобыча",
+    "examples": "Оператор по добыче нефти и газа, мастер по добыче нефти и газа, технолог по добыче нефти и газа",
+    "type": "subfunction"
+  },
+  "PNE": {
+    "industry": "Нефть и Газ / Горнодобывающий сектор",
+    "description": "Внутрискважинные работы",
+    "examples": "Специалист по текущему и капитальному ремонту скважин",
+    "type": "subfunction"
+  },
+  "PNX": {
+    "industry": "Нефть и Газ / Горнодобывающий сектор",
+    "description": "Прочая деятельность - Технология добычи нефти",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "PNZ": {
+    "industry": "Нефть и Газ / Горнодобывающий сектор",
+    "description": "Руководитель функции \"Технология добычи нефти\"",
+    "examples": "Руководитель управления технологий нефтедобычи",
+    "type": "subfunction"
+  },
+  "RNA": {
+    "industry": "Нефть и Газ / Горнодобывающий сектор",
+    "description": "Переработка нефтепродуктов",
+    "examples": "Инженер технологического отдела проектирования в нефтепереработке, технолог по крекингу",
+    "type": "subfunction"
+  },
+  "RNX": {
+    "industry": "Нефть и Газ / Горнодобывающий сектор",
+    "description": "Прочая деятельность - Переработка нефтепродуктов",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "RNZ": {
+    "industry": "Нефть и Газ / Горнодобывающий сектор",
+    "description": "Руководитель направления по переработке и сбыту сырья",
+    "examples": "Руководитель направления по переработке и сбыту сырья",
+    "type": "subfunction"
+  },
+  "RVA": {
+    "industry": "Нефть и Газ / Горнодобывающий сектор",
+    "description": "Операционная деятельность",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "RVX": {
+    "industry": "Нефть и Газ / Горнодобывающий сектор",
+    "description": "Прочая деятельность - Подводные аппараты с дистанционным управлением",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "RVZ": {
+    "industry": "Нефть и Газ / Горнодобывающий сектор",
+    "description": "Руководитель направления подводных аппаратов с дистанционным управлением",
+    "examples": "Руководитель направления подводных аппаратов с дистанционным управлением",
+    "type": "subfunction"
+  },
+  "XXX": {
+    "industry": "Общий",
+    "description": "Прочее - Прочая деятельность",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "LPA": {
+    "industry": "Розница",
+    "description": "Предотвращение потерь на уровне магазина",
+    "examples": "Менеджер по предотвращению внештатных ситуаций",
+    "type": "subfunction"
+  },
+  "LPB": {
+    "industry": "Розница",
+    "description": "Предотвращение потерь на уровне компании",
+    "examples": "Менеджер по предотвращению потерь на уровне компании",
+    "type": "subfunction"
+  },
+  "LPX": {
+    "industry": "Розница",
+    "description": "Прочая деятельность - Предотвращение потерь",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "LPZ": {
+    "industry": "Розница",
+    "description": "Руководитель департамента предотвращения потерь",
+    "examples": "Руководитель департамента предотвращения потерь",
+    "type": "subfunction"
+  },
+  "MEA": {
+    "industry": "Розница",
+    "description": "Товароведение",
+    "examples": "Товаровед, руководитель отдела товарного учета",
+    "type": "subfunction"
+  },
+  "MEB": {
+    "industry": "Розница",
+    "description": "Закупки товаров",
+    "examples": "Специалист по товарным закупкам, байер",
+    "type": "subfunction"
+  },
+  "MEX": {
+    "industry": "Розница",
+    "description": "Прочая деятельность - Товароведение",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "MEZ": {
+    "industry": "Розница",
+    "description": "Руководитель отдела товароведения (главный товаровед)",
+    "examples": "Руководитель отдела товароведения, главный товаровед",
+    "type": "subfunction"
+  },
+  "RLA": {
+    "industry": "Розница",
+    "description": "Региональное / Территориальное управление",
+    "examples": "Территориальный управляющий, региональный директор",
+    "type": "subfunction"
+  },
+  "RLB": {
+    "industry": "Розница",
+    "description": "Руководство магазина",
+    "examples": "Руководитель магазина, управляющий магазина, директор магазина",
+    "type": "subfunction"
+  },
+  "RLC-A": {
+    "industry": "Розница",
+    "description": "Торговый зал",
+    "examples": "Продавец-консультант, консультант торгового зала, кавист, стилист-консультант, консультант-стилист, специалист по выдаче заказов",
+    "type": "specialization",
+    "subfunction": "RLC"
+  },
+  "RLC": {
+    "industry": "Розница",
+    "description": "Сотрудники магазина (торговый персонал)",
+    "examples": "nan",
+    "type": "subfunction"
+  },
+  "RLC-B": {
+    "industry": "Розница",
+    "description": "Кассовая зона",
+    "examples": "Кассир магазина, кассир-консультант магазина, продавец-кассир магазина",
+    "type": "specialization",
+    "subfunction": "RLC"
+  },
+  "RLC-C": {
+    "industry": "Розница",
+    "description": "Кулинария",
+    "examples": "Мясник, обвальщик, жиловщик, пекарь, кондитер, тестомес",
+    "type": "specialization",
+    "subfunction": "RLC"
+  },
+  "RLD": {
+    "industry": "Розница",
+    "description": "Фармакология",
+    "examples": "Заведующий аптекой, территориальный управляющий аптечной сети, специалист аптечного отдела",
+    "type": "subfunction"
+  },
+  "RLE": {
+    "industry": "Розница",
+    "description": "Розничные операции",
+    "examples": "Администратор магазина, менеджер розничной сети",
+    "type": "subfunction"
+  },
+  "RLF": {
+    "industry": "Розница",
+    "description": "Корпоративная поддержка розничных операций",
+    "examples": "Специалист поддержки розничных продаж",
+    "type": "subfunction"
+  },
+  "RLX": {
+    "industry": "Розница",
+    "description": "Прочая деятельность - Операции розничной торговли",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "RLZ": {
+    "industry": "Розница",
+    "description": "Руководитель розничных операций",
+    "examples": "Руководитель розничных операций, директор по розничным операциям",
+    "type": "subfunction"
+  },
+  "VMA": {
+    "industry": "Розница",
+    "description": "Оформление товарных площадок / Мерчендайзинг",
+    "examples": "Визуальный мерчандайзер, специалист по оформлению витрин и дисплеев",
+    "type": "subfunction"
+  },
+  "VMB": {
+    "industry": "Розница",
+    "description": "Организация и методология мерчендайзинга",
+    "examples": "Менеджер по планированию торгового пространства, менеджер проекта мерчендайзинга, менеджер по мерчендайзингу",
+    "type": "subfunction"
+  },
+  "VMX": {
+    "industry": "Розница",
+    "description": "Прочая деятельность - Оформление товарных площадок / Мерчендайзинг",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "VMZ": {
+    "industry": "Розница",
+    "description": "Глава департамента оформления товарных площадок",
+    "examples": "Директор управления визуального мерчендайзинга, глава департамента оформления товарных площадок",
+    "type": "subfunction"
+  },
+  "AGA": {
+    "industry": "Сельское хозяйство",
+    "description": "Сельское хозяйство",
+    "examples": "Оператор по ветеринарной обработке животных, оператор-животновод, зоотехник, ветеринарный врач (ветеринар), вакцинатор",
+    "type": "subfunction"
+  },
+  "AGB": {
+    "industry": "Сельское хозяйство",
+    "description": "Спецтехника",
+    "examples": "Тракторист-машинист сельскохозяйственного производства, тракторист, машинист автогрейдера",
+    "type": "subfunction"
+  },
+  "AGC": {
+    "industry": "Сельское хозяйство",
+    "description": "Защита растений",
+    "examples": "Дезинфектор",
+    "type": "subfunction"
+  },
+  "AGX": {
+    "industry": "Сельское хозяйство",
+    "description": "Прочая деятельность - Сельское хозяйство / Лесоводство",
+    "examples": "Инженер лесного хозяйства",
+    "type": "subfunction"
+  },
+  "AGZ": {
+    "industry": "Сельское хозяйство",
+    "description": "Руководитель сельскохозяйственной службы",
+    "examples": "Директор по сельскому хозяйству",
+    "type": "subfunction"
+  },
+  "ARA": {
+    "industry": "Сельское хозяйство",
+    "description": "Агрономия",
+    "examples": "Агроном",
+    "type": "subfunction"
+  },
+  "ARC": {
+    "industry": "Сельское хозяйство",
+    "description": "Исследования в агрономии",
+    "examples": "Агроном-исследователь",
+    "type": "subfunction"
+  },
+  "ARD": {
+    "industry": "Сельское хозяйство",
+    "description": "Семеноводство",
+    "examples": "Лаборант семенной лаборатории",
+    "type": "subfunction"
+  },
+  "ARX": {
+    "industry": "Сельское хозяйство",
+    "description": "Прочая деятельность - Агрономия",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "ARZ": {
+    "industry": "Сельское хозяйство",
+    "description": "Руководитель агрономической службы",
+    "examples": "Руководитель агрономической службы",
+    "type": "subfunction"
+  },
+  "CIA": {
+    "industry": "Страхование",
+    "description": "Коммерческий отдел",
+    "examples": "Специалист по страхованию, специалист по продаже страховых продуктов",
+    "type": "subfunction"
+  },
+  "CIX": {
+    "industry": "Страхование",
+    "description": "Прочая деятельность - Продажа страховых продуктов",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "CIZ": {
+    "industry": "Страхование",
+    "description": "Руководитель подразделения продажи страховых продуктов",
+    "examples": "Руководитель подразделения продажи страховых продуктов",
+    "type": "subfunction"
+  },
+  "CLC": {
+    "industry": "Страхование",
+    "description": "Работа с претензиями и жалобами",
+    "examples": "Менеджер по работе с претензиями и жалобами (страхование)",
+    "type": "subfunction"
+  },
+  "CLX": {
+    "industry": "Страхование",
+    "description": "Прочая деятельность - Урегулирование убытков / работа с претензиями и жалобами",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "CLZ": {
+    "industry": "Страхование",
+    "description": "Руководитель подразделения по работе с претензиями и жалобами",
+    "examples": "Руководитель подразделения по работе с претензиями и жалобами",
+    "type": "subfunction"
+  },
+  "PCA": {
+    "industry": "Страхование",
+    "description": "Операции по страховым полисам/Бэк-офис",
+    "examples": "Специалист по выдаче страховых полисов",
+    "type": "subfunction"
+  },
+  "PCX": {
+    "industry": "Страхование",
+    "description": "Прочая деятельность - Операции по страховым полисам/Бэк-офис",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "PCZ": {
+    "industry": "Страхование",
+    "description": "Руководитель подразделения по операциям по страховым полисам",
+    "examples": "Руководитель подразделения по операциям по страховым полисам",
+    "type": "subfunction"
+  },
+  "RIA": {
+    "industry": "Страхование",
+    "description": "Перестрахование",
+    "examples": "Специалист департамента перестрахования, специалист урегулирования по перестрахованию, специалист по перестрахованию",
+    "type": "subfunction"
+  },
+  "RIX": {
+    "industry": "Страхование",
+    "description": "Прочая деятельность - Перестрахование",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "RIZ": {
+    "industry": "Страхование",
+    "description": "Руководитель подразделения перестрахования",
+    "examples": "Руководитель подразделения перестрахования",
+    "type": "subfunction"
+  },
+  "UWC": {
+    "industry": "Страхование",
+    "description": "Андеррайтинг",
+    "examples": "Андеррайтер, специалист отдела андеррайтинга",
+    "type": "subfunction"
+  },
+  "UWX": {
+    "industry": "Страхование",
+    "description": "Прочая деятельность - Андеррайтинг",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "UWZ": {
+    "industry": "Страхование",
+    "description": "Руководитель подразделения андеррайтинга",
+    "examples": "Руководитель подразделения андеррайтинга",
+    "type": "subfunction"
+  },
+  "CTA": {
+    "industry": "Телекоммуникации",
+    "description": "Организация строительства телекоммуникационных сетей",
+    "examples": "Инженер электросвязи, инженер по комплектации оборудования",
+    "type": "subfunction"
+  },
+  "CTB": {
+    "industry": "Телекоммуникации",
+    "description": "Монтаж и настройка телекоммуникационного оборудования",
+    "examples": "Тестировщик радиоэлектронной аппаратуры",
+    "type": "subfunction"
+  },
+  "CTC": {
+    "industry": "Телекоммуникации",
+    "description": "Строительно-монтажные работы телекоммуникационных сетей",
+    "examples": "Мастер на объекте телекоммуникационной сети",
+    "type": "subfunction"
+  },
+  "CTD": {
+    "industry": "Телекоммуникации",
+    "description": "Монтаж и ремонт кабельных систем связи",
+    "examples": "Кабельщик-спайщик, специалист по линейным сооружениям, специалист по станционному оборудованию",
+    "type": "subfunction"
+  },
+  "CTE": {
+    "industry": "Телекоммуникации",
+    "description": "Надзор и приемка работ по строительству телекоммуникационных сетей",
+    "examples": "Инспектор по охранно-предупредительным работам (ОПР)",
+    "type": "subfunction"
+  },
+  "CTF": {
+    "industry": "Телекоммуникации",
+    "description": "Технический учет телекоммуникационного оборудования",
+    "examples": "Инженер линейных сооружений связи и абонентских устройств, инженер электросвязи",
+    "type": "subfunction"
+  },
+  "CTG": {
+    "industry": "Телекоммуникации",
+    "description": "Сметное планирование строительства сетей связи",
+    "examples": "Инженер-сметчик строительства сетей связи",
+    "type": "subfunction"
+  },
+  "CTH": {
+    "industry": "Телекоммуникации",
+    "description": "Инвестиционный анализ инфраструктуры телекоммуникационных проектов",
+    "examples": "Аналитик инфраструктуры телекоммуникационных проектов",
+    "type": "subfunction"
+  },
+  "CTJ": {
+    "industry": "Телекоммуникации",
+    "description": "Инфраструктурная аренда площадок",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "CTX": {
+    "industry": "Телекоммуникации",
+    "description": "Прочая деятельность - Строительство телекоммуникационных сетей",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "CTZ": {
+    "industry": "Телекоммуникации",
+    "description": "Руководитель функции Строительство телекоммуникационных сетей",
+    "examples": "Руководитель направления строительства телекоммуникационных сетей, директор департамента по строительству телекоммуникационных сетей",
+    "type": "subfunction"
+  },
+  "ICB": {
+    "industry": "Телекоммуникации",
+    "description": "Развитие технологических партнерских программ",
+    "examples": "Менеджер по развитию интернет-инфраструктуры, менеджер технологических партнерских программ",
+    "type": "subfunction"
+  },
+  "ICC": {
+    "industry": "Телекоммуникации",
+    "description": "Организация межоператорского взаимодействия",
+    "examples": "Менеджер по межоператорскому взаимодействию",
+    "type": "subfunction"
+  },
+  "ICD": {
+    "industry": "Телекоммуникации",
+    "description": "Технический контроль межоператорского взаимодействия",
+    "examples": "Cпециалист по информационной безопасности телекоммуникационных систем",
+    "type": "subfunction"
+  },
+  "ICE": {
+    "industry": "Телекоммуникации",
+    "description": "Расчеты по услугам межоператорского взаимодействия",
+    "examples": "Менеджер по работе с операторами связи",
+    "type": "subfunction"
+  },
+  "ICX": {
+    "industry": "Телекоммуникации",
+    "description": "Прочая деятельность - Межсетевое взаимодействие",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "ICZ": {
+    "industry": "Телекоммуникации",
+    "description": "Руководитель подразделения межсетевого взаимодействия",
+    "examples": "Руководитель подразделения межсетевого взаимодействия",
+    "type": "subfunction"
+  },
+  "NDA": {
+    "industry": "Телекоммуникации",
+    "description": "Проектирование транспортной сети",
+    "examples": "Инженер-проектировщик транспортных сетей",
+    "type": "subfunction"
+  },
+  "NDB": {
+    "industry": "Телекоммуникации",
+    "description": "Проектирование сети широкополосного доступа (ШПД)",
+    "examples": "Инженер-проектировщик сети широкополосного доступа",
+    "type": "subfunction"
+  },
+  "NDC": {
+    "industry": "Телекоммуникации",
+    "description": "Проектирование сети мобильной связи",
+    "examples": "Инженер-проектировщик сети мобильной связи",
+    "type": "subfunction"
+  },
+  "NDD": {
+    "industry": "Телекоммуникации",
+    "description": "Проектирование сети радиосвязи",
+    "examples": "Инженер-проектировщик сети радиосвязи, инженер радиосвязи",
+    "type": "subfunction"
+  },
+  "NDE": {
+    "industry": "Телекоммуникации",
+    "description": "Проектирование сети спутниковой связи",
+    "examples": "Инженер-проектировщик сети спутниковой связи, сетевой инженер систем спутниковой связи",
+    "type": "subfunction"
+  },
+  "NDF": {
+    "industry": "Телекоммуникации",
+    "description": "Проектирование сети фиксированной связи",
+    "examples": "Инженер-проектировщик сети фиксированной связи",
+    "type": "subfunction"
+  },
+  "NDX": {
+    "industry": "Телекоммуникации",
+    "description": "Прочая деятельность - Проектирование сетей",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "NDZ": {
+    "industry": "Телекоммуникации",
+    "description": "Руководитель подразделения проектирование сетей",
+    "examples": "Руководитель подразделения проектирование сетей, директор по развитию инфраструктуры сети",
+    "type": "subfunction"
+  },
+  "NMB": {
+    "industry": "Телекоммуникации",
+    "description": "Управление планированием и развитием сетей",
+    "examples": "Директор проектов по инфраструктурным сервисам",
+    "type": "subfunction"
+  },
+  "NMC": {
+    "industry": "Телекоммуникации",
+    "description": "Технологическая аренда площадок",
+    "examples": "Менеджер по технологической аренде площадок",
+    "type": "subfunction"
+  },
+  "NME": {
+    "industry": "Телекоммуникации",
+    "description": "Управление трафиком",
+    "examples": "Сетевой инженер",
+    "type": "subfunction"
+  },
+  "NMF": {
+    "industry": "Телекоммуникации",
+    "description": "Планирование и развитие транспортной сети",
+    "examples": "Специалист отдела планирования транспортной сети",
+    "type": "subfunction"
+  },
+  "NMG": {
+    "industry": "Телекоммуникации",
+    "description": "Планирование и развитие сети широкополосного доступа (ШПД)",
+    "examples": "Инженер по планированию интернет-сети",
+    "type": "subfunction"
+  },
+  "NMH": {
+    "industry": "Телекоммуникации",
+    "description": "Планирование и развитие сети мобильной связи",
+    "examples": "Инженер по планированию сети мобильной связи",
+    "type": "subfunction"
+  },
+  "NMI": {
+    "industry": "Телекоммуникации",
+    "description": "Планирование и развитие сети радиосвязи",
+    "examples": "Инженер по планированию радиосети",
+    "type": "subfunction"
+  },
+  "NMJ": {
+    "industry": "Телекоммуникации",
+    "description": "Планирование и развитие сети спутниковой связи",
+    "examples": "Инженер по планированию сети спутниковой связи",
+    "type": "subfunction"
+  },
+  "NMK": {
+    "industry": "Телекоммуникации",
+    "description": "Планирование и развитие сети фиксированной связи",
+    "examples": "Инженер по планированию сети фиксированной связи",
+    "type": "subfunction"
+  },
+  "NMM": {
+    "industry": "Телекоммуникации",
+    "description": "Руководитель телекоммуникационного проекта",
+    "examples": "Руководитель телекоммуникационного проекта",
+    "type": "subfunction"
+  },
+  "NMN": {
+    "industry": "Телекоммуникации",
+    "description": "Управление качеством сети",
+    "examples": "Инженер электросвязи",
+    "type": "subfunction"
+  },
+  "NMO": {
+    "industry": "Телекоммуникации",
+    "description": "Методология управления качеством сети",
+    "examples": "Методолог управления качеством сети",
+    "type": "subfunction"
+  },
+  "NMX": {
+    "industry": "Телекоммуникации",
+    "description": "Прочая деятельность - Управление и развитие сетей",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "NMZ": {
+    "industry": "Телекоммуникации",
+    "description": "Руководитель подразделения управление и развитие сетей",
+    "examples": "Руководитель подразделения управление и развитие сетей",
+    "type": "subfunction"
+  },
+  "NOB-A": {
+    "industry": "Телекоммуникации",
+    "description": "Эксплуатация транспортной сети",
+    "examples": "Инженер службы эксплуатации транспортной сети",
+    "type": "specialization",
+    "subfunction": "NOB"
+  },
+  "NOB": {
+    "industry": "Телекоммуникации",
+    "description": "Эксплуатация сетей",
+    "examples": "nan",
+    "type": "subfunction"
+  },
+  "NOB-B": {
+    "industry": "Телекоммуникации",
+    "description": "Эксплуатация сети передачи данных",
+    "examples": "Инженер по эксплуатации телекоммуникационной сети, инженер эксплуатации сети связи",
+    "type": "specialization",
+    "subfunction": "NOB"
+  },
+  "NOB-C": {
+    "industry": "Телекоммуникации",
+    "description": "Эксплуатация сети широкополосного доступа (ШПД)",
+    "examples": "Инженер-монтажник по эксплуатации сети широкополосного доступа, инженер линейных сооружений связи и абонентских устройств",
+    "type": "specialization",
+    "subfunction": "NOB"
+  },
+  "NOB-D": {
+    "industry": "Телекоммуникации",
+    "description": "Эксплуатация сети мобильной связи",
+    "examples": "Инженер по эксплуатации сети мобильной связи, электромеханик линейных сооружений связи и абонентских устройств",
+    "type": "specialization",
+    "subfunction": "NOB"
+  },
+  "NOB-E": {
+    "industry": "Телекоммуникации",
+    "description": "Эксплуатация базовых станций мобильной связи",
+    "examples": "Инженер по эксплуатации базовых станций сотовой связи",
+    "type": "specialization",
+    "subfunction": "NOB"
+  },
+  "NOB-F": {
+    "industry": "Телекоммуникации",
+    "description": "Эксплуатация коммутационного оборудования сети мобильной связи",
+    "examples": "Инженер эксплуатации коммутационной сети",
+    "type": "specialization",
+    "subfunction": "NOB"
+  },
+  "NOB-G": {
+    "industry": "Телекоммуникации",
+    "description": "Эксплуатация радиоподсистемы сети мобильной связи",
+    "examples": "Инженер эксплуатации радиоподсистемы",
+    "type": "specialization",
+    "subfunction": "NOB"
+  },
+  "NOB-H": {
+    "industry": "Телекоммуникации",
+    "description": "Эксплуатация сети радиосвязи",
+    "examples": "Инженер эксплуатации сети радиосвязи",
+    "type": "specialization",
+    "subfunction": "NOB"
+  },
+  "NOB-I": {
+    "industry": "Телекоммуникации",
+    "description": "Эксплуатация сети спутниковой связи",
+    "examples": "Сетевой инженер систем спутниковой связи, инженер спутниковых систем",
+    "type": "specialization",
+    "subfunction": "NOB"
+  },
+  "NOB-J": {
+    "industry": "Телекоммуникации",
+    "description": "Эксплуатация сети фиксированной связи",
+    "examples": "Инженер по эксплуатации фиксированной сети, специалист отдела эксплуатации сети фиксированного доступа",
+    "type": "specialization",
+    "subfunction": "NOB"
+  },
+  "NOB-K": {
+    "industry": "Телекоммуникации",
+    "description": "Эксплуатация голосовой сети",
+    "examples": "Инженер эксплуатации голосовой сети",
+    "type": "specialization",
+    "subfunction": "NOB"
+  },
+  "NOC": {
+    "industry": "Телекоммуникации",
+    "description": "Управление эксплуатацией сетей связи",
+    "examples": "Инженер линейных сооружений связи и абонентских устройств",
+    "type": "subfunction"
+  },
+  "NOD": {
+    "industry": "Телекоммуникации",
+    "description": "Эксплуатация телефонных станций",
+    "examples": "Инженер по эксплуатации телефонных станций",
+    "type": "subfunction"
+  },
+  "NOF": {
+    "industry": "Телекоммуникации",
+    "description": "Диспетчеризация сетей связи",
+    "examples": "Диспетчер сетей связи, техник связи",
+    "type": "subfunction"
+  },
+  "NOG": {
+    "industry": "Телекоммуникации",
+    "description": "Методология эксплуатации сетей связи",
+    "examples": "Эксперт службы эксплуатации связи",
+    "type": "subfunction"
+  },
+  "NOX": {
+    "industry": "Телекоммуникации",
+    "description": "Прочая деятельность - Эксплуатация и управление сетями",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "NOZ": {
+    "industry": "Телекоммуникации",
+    "description": "Руководитель подразделения эксплуатации и управления сетями",
+    "examples": "Руководитель подразделения эксплуатации и управления сетями",
+    "type": "subfunction"
+  },
+  "RSA": {
+    "industry": "Телекоммуникации",
+    "description": "Радиочастотное обеспечение",
+    "examples": "Инженер группы обеспечения использования радиочастотного ресурса",
+    "type": "subfunction"
+  },
+  "RSB": {
+    "industry": "Телекоммуникации",
+    "description": "Сертификация и лицензирование телекоммуникационных услуг",
+    "examples": "Специалист по лицензированию и сертификации телекоммуникационных услуг",
+    "type": "subfunction"
+  },
+  "RSC": {
+    "industry": "Телекоммуникации",
+    "description": "Согласование с городскими службами",
+    "examples": "Специалист по согласованию при проведении работ по строительству телекоммуникационной сети",
+    "type": "subfunction"
+  },
+  "RSX": {
+    "industry": "Телекоммуникации",
+    "description": "Прочая деятельность - Ресурсно-регуляторное обеспечение",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "RSZ": {
+    "industry": "Телекоммуникации",
+    "description": "Руководитель ресурсно-регуляторного обеспечения",
+    "examples": "Руководитель ресурсно-регуляторного обеспечения",
+    "type": "subfunction"
+  },
+  "SDB": {
+    "industry": "Телекоммуникации",
+    "description": "Инсталляция телекоммуникационных сетей",
+    "examples": "Монтажник по подключению абонентов, монтажник связи",
+    "type": "subfunction"
+  },
+  "SDC": {
+    "industry": "Телекоммуникации",
+    "description": "Управление клиентскими включениями",
+    "examples": "Специалист клиентского сервиса",
+    "type": "subfunction"
+  },
+  "SDX": {
+    "industry": "Телекоммуникации",
+    "description": "Прочая деятельность - Абонентский сервис",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "SDZ": {
+    "industry": "Телекоммуникации",
+    "description": "Руководитель абонентского сервиса",
+    "examples": "Руководитель абонентского сервиса, директор департамента абонентского сервиса",
+    "type": "subfunction"
+  },
+  "TQA": {
+    "industry": "Телекоммуникации",
+    "description": "Управление техническими рисками телекоммуникационных услуг",
+    "examples": "Аналитик по операционным рискам телекоммуникационных услуг",
+    "type": "subfunction"
+  },
+  "TQB": {
+    "industry": "Телекоммуникации",
+    "description": "Управление мониторингом и качеством сети",
+    "examples": "Специалист по мониторингу и качеству работы телекоммуникационных сетей",
+    "type": "subfunction"
+  },
+  "TQC": {
+    "industry": "Телекоммуникации",
+    "description": "Мониторинг качества сети фиксированной связи и широкополосного доступа (ШПД)",
+    "examples": "Системный инженер фиксированной связи и широкополосного доступа",
+    "type": "subfunction"
+  },
+  "TQD": {
+    "industry": "Телекоммуникации",
+    "description": "Мониторинг качества сети мобильной связи",
+    "examples": "Системный инженер мобильной связи",
+    "type": "subfunction"
+  },
+  "TQX": {
+    "industry": "Телекоммуникации",
+    "description": "Прочая деятельность - Мониторинг и управление качеством сети",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "TQZ": {
+    "industry": "Телекоммуникации",
+    "description": "Руководитель мониторинга и управления качеством сети",
+    "examples": "Руководитель мониторинга и управления качеством сети",
+    "type": "subfunction"
+  },
+  "TRA": {
+    "industry": "Телекоммуникации",
+    "description": "Развитие и управление регионом",
+    "examples": "Менеджер по развитию регионов",
+    "type": "subfunction"
+  },
+  "TRX": {
+    "industry": "Телекоммуникации",
+    "description": "Прочая деятельность - Развитие и управление регионом",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "TRZ": {
+    "industry": "Телекоммуникации",
+    "description": "Руководитель функции Развитие и управление регионом",
+    "examples": "Руководитель по развитию в регионах",
+    "type": "subfunction"
+  },
+  "TSA": {
+    "industry": "Телекоммуникации",
+    "description": "Развитие телекоммуникационных технологий",
+    "examples": "Инженер по развитию и внедрению телекоммуникационных технологий",
+    "type": "subfunction"
+  },
+  "TSB": {
+    "industry": "Телекоммуникации",
+    "description": "Управление телекоммуникационными услугами",
+    "examples": "Менеджер по продажам телекоммуникационных услуг, руководитель по продуктам видеонаблюдения и видеоаналитики",
+    "type": "subfunction"
+  },
+  "TSX": {
+    "industry": "Телекоммуникации",
+    "description": "Прочая деятельность - Оказание телекоммуникационных услуг",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "TSZ": {
+    "industry": "Телекоммуникации",
+    "description": "Руководитель функции Оказание телекоммуникационных услуг",
+    "examples": "Руководитель по оказанию телекоммуникационных услуг",
+    "type": "subfunction"
+  },
+  "ATA": {
+    "industry": "Транспорт",
+    "description": "Лётный состав",
+    "examples": "Командир воздушного судна",
+    "type": "subfunction"
+  },
+  "ATB": {
+    "industry": "Транспорт",
+    "description": "Центр управления воздушными операциями",
+    "examples": "Специалист по аэронавигационному обеспечению полетов, Инженер по безопасности авиаперевозок, Менеджер по авиаперевозкам ",
+    "type": "subfunction"
+  },
+  "ATX": {
+    "industry": "Транспорт",
+    "description": "Прочая деятельность - Авиаперевозки",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "ATZ": {
+    "industry": "Транспорт",
+    "description": "Руководитель направления авиаперевозок",
+    "examples": "Руководитель направления авиаперевозок",
+    "type": "subfunction"
+  },
+  "BUA": {
+    "industry": "Услуги",
+    "description": "Бизнес-консультирование",
+    "examples": "Консультант по бизнесу",
+    "type": "subfunction"
+  },
+  "BUX": {
+    "industry": "Услуги",
+    "description": "Прочая деятельность - Бизнес-консультирование",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "BUZ": {
+    "industry": "Услуги",
+    "description": "Руководитель бизнес-консультирования",
+    "examples": "Руководитель бизнес-консультирования",
+    "type": "subfunction"
+  },
+  "CPA": {
+    "industry": "Фармацевтика и медицинское оборудование",
+    "description": "Клинические исследования",
+    "examples": "Монитор клинических исследований, специалист по клиническим исследованиям",
+    "type": "subfunction"
+  },
+  "CPB": {
+    "industry": "Фармацевтика и медицинское оборудование",
+    "description": "Клинические разработки / Биометрия",
+    "examples": "Специалист по эффективности и безопасности лекарственных средств",
+    "type": "subfunction"
+  },
+  "CPC": {
+    "industry": "Фармацевтика и медицинское оборудование",
+    "description": "Управление данными",
+    "examples": "Биостатистик",
+    "type": "subfunction"
+  },
+  "CPD": {
+    "industry": "Фармацевтика и медицинское оборудование",
+    "description": "Административные процессы",
+    "examples": "Специалист по сопровождению клинической разработки",
+    "type": "subfunction"
+  },
+  "CPX": {
+    "industry": "Фармацевтика и медицинское оборудование",
+    "description": "Прочая деятельность - Клинические исследования",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "CPZ": {
+    "industry": "Фармацевтика и медицинское оборудование",
+    "description": "Глава департамента",
+    "examples": "Директор департамента клинических исследований",
+    "type": "subfunction"
+  },
+  "MDB": {
+    "industry": "Фармацевтика и медицинское оборудование",
+    "description": "Фармаконадзор",
+    "examples": "Менеджер по фармаконадзору, специалист по работе с базой данных фармаконадзора",
+    "type": "subfunction"
+  },
+  "MDC": {
+    "industry": "Фармацевтика и медицинское оборудование",
+    "description": "Медицинское консультирование",
+    "examples": "Медицинский советник, медицинский консультант",
+    "type": "subfunction"
+  },
+  "MDD": {
+    "industry": "Фармацевтика и медицинское оборудование",
+    "description": "Медицинская информация",
+    "examples": "Специалист по медицинской информации",
+    "type": "subfunction"
+  },
+  "MDE": {
+    "industry": "Фармацевтика и медицинское оборудование",
+    "description": "Экономика фармацевтики",
+    "examples": "Менеджер по экономике здравоохранения",
+    "type": "subfunction"
+  },
+  "MDF": {
+    "industry": "Фармацевтика и медицинское оборудование",
+    "description": "Клинические исследования (постмаркетинговая фаза IV)",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "MDX": {
+    "industry": "Фармацевтика и медицинское оборудование",
+    "description": "Прочая деятельность - Медицина",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "MDZ": {
+    "industry": "Фармацевтика и медицинское оборудование",
+    "description": "Глава медицинского департамента",
+    "examples": "Директор медицинского департамента",
+    "type": "subfunction"
+  },
+  "PDA": {
+    "industry": "Фармацевтика и медицинское оборудование",
+    "description": "Доклинические исследования",
+    "examples": "Менеджер по сопровождению доклинических исследований",
+    "type": "subfunction"
+  },
+  "PDB": {
+    "industry": "Фармацевтика и медицинское оборудование",
+    "description": "Разработки в области фармацевтики",
+    "examples": "Менеджер проектов фармацевтических разработок, руководитель лаборатории разработки лекарственных средств",
+    "type": "subfunction"
+  },
+  "PDC": {
+    "industry": "Фармацевтика и медицинское оборудование",
+    "description": "Разработка новых лекарственных препаратов",
+    "examples": "Научный сотрудник направления ранней разработки, менеджер по трансферу технологий",
+    "type": "subfunction"
+  },
+  "PDX": {
+    "industry": "Фармацевтика и медицинское оборудование",
+    "description": "Прочая деятельность - Исследования и разработки в области фармацевтики",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "PDZ": {
+    "industry": "Фармацевтика и медицинское оборудование",
+    "description": "Директор по исследованиям и разработкам в области фармацевтики",
+    "examples": "Директор по исследованиям и разработкам в области фармацевтики",
+    "type": "subfunction"
+  },
+  "PHA": {
+    "industry": "Фармацевтика и медицинское оборудование",
+    "description": "Фармацевтическое производство",
+    "examples": "Химик-аналитик, химик-синтетик",
+    "type": "subfunction"
+  },
+  "PHX": {
+    "industry": "Фармацевтика и медицинское оборудование",
+    "description": "Прочая деятельность - Фармацевтическое производство",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "PHZ": {
+    "industry": "Фармацевтика и медицинское оборудование",
+    "description": "Глава департамента",
+    "examples": "Директор фармацевтического производства",
+    "type": "subfunction"
+  },
+  "ALB": {
+    "industry": "Энергетика",
+    "description": "Ветроэнергетика",
+    "examples": "Инженер по ремонту лопастей ветроэнергетической установки",
+    "type": "subfunction"
+  },
+  "ALC": {
+    "industry": "Энергетика",
+    "description": "Гидроэнергетика",
+    "examples": "Эксперт по эксплуатации гидроэнергетических установок",
+    "type": "subfunction"
+  },
+  "ALD": {
+    "industry": "Энергетика",
+    "description": "Солнечная энергетика",
+    "examples": "Инженер энергетик (солнечная энергетика), монтажник солнечных батарей",
+    "type": "subfunction"
+  },
+  "ALX": {
+    "industry": "Энергетика",
+    "description": "Прочая деятельность - Альтернативная энергетика",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "ALZ": {
+    "industry": "Энергетика",
+    "description": "Руководитель направления альтернативной энергетики",
+    "examples": "Руководитель направления альтернативной энергетики",
+    "type": "subfunction"
+  },
+  "EUA": {
+    "industry": "Энергетика",
+    "description": "Производство электроэнергии",
+    "examples": "Энергетик, энергоменеджер, Оператор котельной, машинист-обходчик, машинист котлов",
+    "type": "subfunction"
+  },
+  "EUB": {
+    "industry": "Энергетика",
+    "description": "Передача и распределение электроэнергии",
+    "examples": "Инженер по учету энергоресурсов, Специалист по планированию и использованию ресурсов ТЭЦ",
+    "type": "subfunction"
+  },
+  "EUC": {
+    "industry": "Энергетика",
+    "description": "Эксплуатация и техническое обслуживание",
+    "examples": "Инженер по эксплуатации и ремонту электроустановок и электрооборудования",
+    "type": "subfunction"
+  },
+  "EUX": {
+    "industry": "Энергетика",
+    "description": "Прочая деятельность - Службы по производству энергии",
+    "examples": NaN,
+    "type": "subfunction"
+  },
+  "EUZ": {
+    "industry": "Энергетика",
+    "description": "Руководитель направления производства энергии",
+    "examples": NaN,
+    "type": "subfunction"
+  }
+}

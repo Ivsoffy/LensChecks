@@ -25,7 +25,7 @@ sys.path.insert(0, parent_dir)
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 from LP import *
-from src.module_4.model import GradePredictor
+from inference_grades import predict_grades
 
 def module_4(input_folder, output_folder, params):
     print("Модуль 4: Выставление грейдов.")
@@ -61,7 +61,7 @@ def module_4(input_folder, output_folder, params):
                         found_files = check_if_past_year_exist(company, folder_py)
                         if found_files:
                             file_to_cmp = os.path.join(folder_py, found_files[0])
-                            df_py = pd.read_excel(file_to_cmp, sheet_name=rem_data, header=6, index_col=None)
+                            df_py = pd.read_excel(file_to_cmp, sheet_name=rem_data, header=6)
                             cols_to_copy = [grade]
                             # Заполняем данными с прошлого года
                             df = merge_by_cols(df, df_py, cols, cols_to_copy)
@@ -224,10 +224,12 @@ def process_output_file(df1, df2, cols, output_file, sheet1_name='Prefill', shee
                         job_title]]
     
     if len(df2.columns)>1:
-        if grade in df2.columns:
+        if 'prediction_confidence' in df2.columns:
             # print(3)
-            df2 = df2.loc[:, [company_name, function_code, subfunction_code, specialization_code, grade,'description',
-                dep_level_1, dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6, job_title, base_pay]]
+            df2 = df2.loc[:, [company_name, function_code, subfunction_code, specialization_code, grade,
+                'prediction_confidence',
+                    dep_level_1, dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6,
+                                    job_title]]
         else:
             # print(4)
             df2 = df2.loc[:, [company_name, function_code, subfunction_code, specialization_code,
@@ -300,8 +302,7 @@ def process_unfilled(df, df_orig):
         count_past_year = df.shape[0] - count_model
         # Там где прошлого года нет, проставляем нейронкой
         if count_model != 0:
-            model = GradePredictor(path_to_model='src/module_4/grade_model/model_best.cbm')
-            preds = model.predict(df_without_py)
+            preds = predict_grades(df_without_py)
             preds = preds.loc[preds[company_name].apply(lambda x: str(x).lower().strip() == 'nan') == False]
 
     return df_orig, preds, count_past_year, count_model
