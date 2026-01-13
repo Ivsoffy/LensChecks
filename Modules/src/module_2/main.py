@@ -70,7 +70,16 @@ def module_2(input_folder, output_folder, params):
                 try:
                     df = pd.read_excel(file_path, sheet_name="Данные", header=6)
                     df_company = pd.read_excel(file_path, sheet_name=company_data, header=1)
+                    df[company_name] = df_company.iloc[0, 3]
+                    df[gi_company_name] = df_company.iloc[0, 3]
                     df[gi_sector] = df_company.iloc[1, 3]
+                    df[gi_origin] = df_company.iloc[2, 3]
+                    df[gi_headcount_cat] = df_company.iloc[3, 3]
+                    df[gi_revenue_cat] = df_company.iloc[4, 3]
+                    df[gi_contact_name] = df_company.iloc[5, 3]
+                    df[gi_title] = df_company.iloc[6, 3]
+                    df[gi_tel] = df_company.iloc[7, 3]
+                    df[gi_email] = df_company.iloc[8, 3]
                 except Exception as e:
                     print(f"Ошибка чтения файла '{file_path}': {e}")
                     continue
