@@ -1,14 +1,14 @@
 ############### all modules ##############
-input_folder: src/module_2/input_for_sdb/
-output_folder: src/module_2/output
-module: 2
-############### module 1 #################
+input_folder:
+module: 5
+############## module 1 #################
 single_db: False                         # True = Все анкеты склеиваются в единую БД
 save_db_only_without_errors: False       # True = База данных создается только если ни в одной анкете нет ошибок
-drop_empty_month_salary: False           # True = Строки с пустыми значениями ежемесячного оклада удаляются
-############### module 2,3 ###############
-folder_past_year: src/module_2/          # Путь до папки с файлами анкет прошлого года
-after_fix: False                         # True = Ставится после того, как аналитик проверил выставленные коды
-############### module 4 #################
-save_to_parquet: True                    # True = Создается файл с расширением .parquet
+drop_empty_month_salary: True            # True = Строки с пустыми значениями ежемесячного оклада удаляются
+############### module 2,4 ###############
+folder_past_year:                        # Путь до папки с файлами анкет прошлого года
+after_fix: True                          # True = Ставится после того, как аналитик проверил выставленные коды
+############### module 3 #################
+save_to_parquet: False                   # True = Создается файл с расширением .parquet
 ##########################################
+clean: True

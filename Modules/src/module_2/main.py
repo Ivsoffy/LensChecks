@@ -62,14 +62,14 @@ def module_2(input_folder, output_folder, params):
     for file in os.listdir(input_folder):
         if _is_excel_file(file):
             output_file = os.path.join(output_folder, file)
-            file_path = os.path.join(input_folder, file)
+            input_file = os.path.join(input_folder, file)
 
             try:
-                df = pd.read_excel(file_path, sheet_name="Total Data", index_col=0)
+                df = pd.read_excel(input_file, sheet_name="Total Data", index_col=0)
             except:
                 try:
-                    df = pd.read_excel(file_path, sheet_name="Данные", header=6)
-                    df_company = pd.read_excel(file_path, sheet_name=company_data, header=1)
+                    df = pd.read_excel(input_file, sheet_name="Данные", header=6)
+                    df_company = pd.read_excel(input_file, sheet_name=company_data, header=1)
                     df[company_name] = df_company.iloc[0, 3]
                     df[gi_company_name] = df_company.iloc[0, 3]
                     df[gi_sector] = df_company.iloc[1, 3]
@@ -81,12 +81,12 @@ def module_2(input_folder, output_folder, params):
                     df[gi_tel] = df_company.iloc[7, 3]
                     df[gi_email] = df_company.iloc[8, 3]
                 except Exception as e:
-                    print(f"Ошибка чтения файла '{file_path}': {e}")
+                    print(f"Ошибка чтения файла '{input_file}': {e}")
                     continue
                 
 
             if function_code not in df.columns:
-                print(f"Ошибка: отсутствует колонка '{function_code}' в файле '{file_path}'.")
+                print(f"Ошибка: отсутствует колонка '{function_code}' в файле '{input_file}'.")
                 continue
 
             if not already_fixed:
@@ -121,13 +121,14 @@ def module_2(input_folder, output_folder, params):
                 add_info(info, output_file)
             else:
                 print("Модуль 2: Проставление проверенных кодов функций.")
-                file_path = os.path.join(output_folder, file)
 
-                map_prefill_to_sheet1(file_path, output_file, sheet_prefill="Prefill")
-                df, filename = map_prefill_to_sheet1(file_path, output_file, sheet_prefill="Model")
-
+                map_prefill_to_sheet1(input_file, output_file, sheet_prefill="Prefill")
+                df, _ = map_prefill_to_sheet1(input_file, output_file, sheet_prefill="Model")
                 df = check_the_result(df)
-                df.to_excel(filename)
+                
+                df = df.loc[:, ~df.columns.str.startswith("Unnamed:")]
+                df.to_excel(output_file, sheet_name='Total Data')
+                print(f"Файл {output_file} сохранен.")
             print(f"--------- Обработка файла {file} окончена ---------")
         
 
@@ -216,9 +217,6 @@ def process_past_year(folder_py, df):
             file_name = found_files[0] if found_files else "неизвестный файл"
             print(f"Ошибка при обработке прошлогоднего файла '{file_name}': {e}")
     return df
-
-
-
 
 
 def check_column_rules(df, col_name, allowed_values):
@@ -387,6 +385,9 @@ def map_prefill_to_sheet1(
         except Exception as e:
             print(f"Ошибка чтения Excel: {e}")
             return df_merged, output_path
+
+        if df_prefill.empty:
+            return df_target, output_path
 
         if match_cols is None:
             match_cols = [col for col in df_prefill.columns if col not in code_cols]

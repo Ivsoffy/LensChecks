@@ -27,47 +27,95 @@ sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 from LP import *
 from src.module_4.model import GradePredictor
 
-def module_4(input_folder, output_folder, params):
-    print("Модуль 4: Выставление грейдов.")
 
+cols = [
+    company_name,
+    dep_level_1,
+    dep_level_2,
+    dep_level_3,
+    dep_level_4,
+    dep_level_5,
+    dep_level_6,
+    job_title,
+]
+
+def _is_excel_file(filename):
+    """
+    Summary: Check if a filename is an Excel file.
+    Args:
+        filename (str): File name or path.
+    Returns:
+        bool: True if the extension is an Excel type.
+    Raises:
+        None
+    """
+    if not isinstance(filename, str):
+        return False
+    return filename.lower().endswith((".xlsx", ".xls", ".xlsm"))
+
+def process_past_year(folder_py, df):
+    """
+    Summary: Merge past-year codes into the current dataset by company.
+    Args:
+        folder_py (str): Folder path with past-year files.
+        df (pd.DataFrame): Current input dataframe.
+    Returns:
+        pd.DataFrame: Updated dataframe with past-year codes if found.
+    Raises:
+        ValueError: If required columns are missing.
+    """
+
+    if not isinstance(folder_py, str) or not os.path.exists(folder_py):
+        print(f"Предупреждение: путь к папке прошлогодних файлов некорректен: {folder_py}")
+        return df
+
+    companies = df[company_name].unique()
+
+    for company in companies:
+        found_files = []
+        try:
+            found_files = check_if_past_year_exist(company, folder_py)
+            if found_files:
+                file_to_cmp = os.path.join(folder_py, found_files[0])
+                df_py = pd.read_excel(file_to_cmp, sheet_name=rem_data, header=6, index_col=None)
+                cols_to_copy = [
+                    function_code,
+                    subfunction_code,
+                    specialization_code,
+                    function,
+                    subfunction,
+                    specialization,
+                ]
+                df = merge_by_cols(df, df_py, cols, cols_to_copy)
+        except Exception as e:
+            file_name = found_files[0] if found_files else "неизвестный файл"
+            print(f"Ошибка при обработке прошлогоднего файла '{file_name}': {e}")
+    return df
+
+
+def module_4(input_folder, output_folder, params):
     folder_py = params['folder_past_year']
     already_fixed = params['after_fix']
     
     counter = 0
     found_files=[]
-    if not already_fixed: # Первичная обработка
-        for file in os.listdir(input_folder):
-            # Check if the file is an Excel file
-            if file.endswith('.xlsx') or file.endswith('.xls') or file.endswith('.xlsm'):
-                counter+=1
-                output_file = os.path.join(output_folder, file)
-                file_path = os.path.join(input_folder, file)
-                filename, _ = os.path.splitext(file)
+    for file in os.listdir(input_folder):
+        if _is_excel_file(file):
+            output_file = os.path.join(output_folder, file)
+            input_file = os.path.join(input_folder, file)
 
-                print(f"Processing file {counter}: {file}")
-                # df = pd.read_excel(file_path, sheet_name='Total Data')
-                # df.to_excel(output_file)
-                cols = [company_name, dep_level_1, dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6,
-                                    job_title]
-                
-                df = pd.read_excel(file_path, sheet_name='Total Data')
-                companies = df[company_name].unique()
+            print(f"Processing file {counter}: {file}")
+            # df = pd.read_excel(file_path, sheet_name='Total Data')
+            # df.to_excel(output_file)
+            cols = [company_name, dep_level_1, dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6,
+                                job_title]
+            df = pd.read_excel(input_file, sheet_name='Total Data', index_col=0)
 
-                if not isinstance(folder_py, str) or not os.path.exists(folder_py):
-                    print(f"Папка {folder_py} с анкетами прошлого года не найдена")
-                elif os.path.exists(folder_py):
-                    for company in companies:
-                        print(f"Ищем анкету с прошлого года для компании {company}")
-                        found_files = check_if_past_year_exist(company, folder_py)
-                        if found_files:
-                            file_to_cmp = os.path.join(folder_py, found_files[0])
-                            df_py = pd.read_excel(file_to_cmp, sheet_name=rem_data, header=6, index_col=None)
-                            cols_to_copy = [grade]
-                            # Заполняем данными с прошлого года
-                            df = merge_by_cols(df, df_py, cols, cols_to_copy)
-                            # df.to_excel('debug.xlsx')
-            
-                
+            if not already_fixed:
+                print("Модуль 4: Выставление грейдов.")
+                print("Проставление кодов из анкеты прошлого года (если она найдена)")
+                df = process_past_year(folder_py, df)
+
                 # Делим данные на заполненные и незаполненные
                 unfilled = df.loc[df[grade].apply(lambda x: str(x).lower().strip() == 'nan') == True] #add subfunction
                 filled = df[~df.index.isin(unfilled.index)]
@@ -79,38 +127,32 @@ def module_4(input_folder, output_folder, params):
 
                 df, unfilled_and_processed, count_past_year, count_model = process_unfilled(unfilled, df)
                 df.to_excel(output_file, sheet_name='Total Data')
+
+                # print(df.columns)
                 
                 process_output_file(filled_and_processed, unfilled_and_processed, cols, output_file)
 
                 info = {
-                    'Файлы с прошлого года': str(found_files) if found_files else 'Отсутствуют',
-                    'Отсутствующих грейдов в файле':  empty_count, 
-                    'Всего строк в файле': df.shape[0],
-                    'Подтянуто из прошлого года': count_past_year,
-                    'Проставлено нейросетью': count_model
+                    "past_year_files": str(found_files) if found_files else "No files",
+                    "empty_count": empty_count,
+                    "total_count": df.shape[0],
+                    "count_past_year": count_past_year,
+                    "count_model": count_model,
                 }
 
                 add_info(info, output_file)
-                print("-----------------------")
-                print()
-    else: # Аналитик проверил и исправил анкету
-        for file in os.listdir(output_folder):
-            if file.endswith('.xlsx') or file.endswith('.xls') or file.endswith('.xlsm'):
-                counter+=1
-                output_file = os.path.join(output_folder, file)
-                file_path = os.path.join(output_folder, file)
-                filename, _ = os.path.splitext(file)
+            else: # Аналитик проверил и исправил анкету
+                print("Модуль 4: Проставление проверенных грейдов.")
+                map_prefill_to_sheet1(input_file, output_file, sheet_prefill='Prefill')
+                df_final = map_prefill_to_sheet1(input_file, output_file, sheet_prefill='Model')
 
-                print(f"Processing file {counter}: {file}")
+                _, filename = os.path.split(output_file)
 
-                map_prefill_to_sheet1(file_path, output_file, sheet_prefill='Prefill')
-                df_final = map_prefill_to_sheet1(file_path, output_file, sheet_prefill='Model')
-
-                output_file = os.path.join(output_folder, filename+'_final.parquet')
-                df_final.to_parquet(output_file)
+                output_file = os.path.join(output_folder, filename)
+                df_final = df_final.loc[:, ~df_final.columns.str.startswith("Unnamed:")]
+                df_final.to_excel(output_file, sheet_name='Total Data')
                 print(f"Файл {output_file} сохранен.")
-                print("-----------------------")
-                print()
+            print(f"--------- Обработка файла {file} окончена ---------")
 
 
 def map_prefill_to_sheet1(
@@ -156,15 +198,8 @@ def map_prefill_to_sheet1(
             for col in code_cols:
                 df_merged[col] = df_merged[f"{col}_prefill"].combine_first(df_merged[col])
                 df_merged.drop(columns=f"{col}_prefill", inplace=True)
-            
-            folder, filename = os.path.split(output_path)
-            name, ext = os.path.splitext(filename)
 
-            # Добавляем _processed
-            processed_filename = f"{name}_processed{ext}"
-
-            # Собираем обратно
-            processed_path = os.path.join(folder, processed_filename)
+            processed_path = output_path
 
             # сохраняем результат
             if not os.path.exists(processed_path):

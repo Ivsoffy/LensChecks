@@ -135,11 +135,11 @@ def module_3(input_folder, output_folder, params=None):
 
             ultimate_df = lti_checks(ultimate_df, fact_lti, fact_lti_1, fact_lti_2, fact_lti_3, 'Fact LTI = Fact LTI Parts')
             ultimate_df = lti_checks(ultimate_df, target_lti_per, target_lti_1, target_lti_2, target_lti_3, 'Target LTI = Target LTI Parts')
-            ultimate_df['LTI & grade < 13'] = ultimate_df.apply(lambda x: not (x[grade] < 13 and (not str(x[fact_lti])=='nan')), axis=1)
+            ultimate_df['LTI & grade >= 13'] = ultimate_df.apply(lambda x: not (x[grade] < 13 and (not str(x[fact_lti])=='nan')), axis=1)
 
-            ultimate_df['EMA & grade < 17'] = ultimate_df.apply(lambda x: not ((x[grade] < 17) and (x[subfunction_code]=='EMA')), axis=1)
-            ultimate_df['PRB & grade > 14'] = ultimate_df.apply(lambda x: not ((x[grade] > 14) and (x[subfunction_code]=='PRB')), axis=1)
-            ultimate_df['XXZ & grade < 14'] = ultimate_df.apply(lambda x: not ((x[grade] < 14) and (x[subfunction_code][2]=='Z')), axis=1)
+            ultimate_df['EMA & grade >= 17'] = ultimate_df.apply(lambda x: not ((x[grade] < 17) and (x[subfunction_code]=='EMA')), axis=1)
+            ultimate_df['PRB & grade <= 14'] = ultimate_df.apply(lambda x: not ((x[grade] > 14) and (x[subfunction_code]=='PRB')), axis=1)
+            ultimate_df['XXZ & grade >= 14'] = ultimate_df.apply(lambda x: not ((x[grade] < 14) and (x[subfunction_code][2]=='Z')), axis=1)
 
             ultimate_df = validate_compensation_ranges(
                 ultimate_df, 
@@ -178,8 +178,11 @@ def module_3(input_folder, output_folder, params=None):
 
             try:
                 output_path = os.path.join(output_folder, file)
+                res_df = res_df.loc[:, ~res_df.columns.str.contains('^Unnamed')]
+                res_lower_mrot_df = res_lower_mrot_df.loc[:, ~res_lower_mrot_df.columns.str.contains('^Unnamed')]
+                res_high_ti = res_high_ti.loc[:, ~res_high_ti.columns.str.contains('^Unnamed')]
                 with pd.ExcelWriter(output_path) as writer:
-                    res_df.to_excel(writer, index=False, sheet_name='Total Data')
+                    res_df.to_excel(writer, index=True, sheet_name='Total Data')
                     res_lower_mrot_df.to_excel(writer, index=True, sheet_name='Lower than MROT')
                     res_high_ti.to_excel(writer, index=True, sheet_name='High TI')
                 print(f"Successfully saved Excel file to: {output_path}")

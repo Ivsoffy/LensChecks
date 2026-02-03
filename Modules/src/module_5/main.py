@@ -436,7 +436,7 @@ def add_errors_to_excel(errors, input_path, output_path):
     data_sheet = None
     for s in wb.Sheets:
         name = s.Name.strip().lower()
-        if name in ("данные", "salary data"):
+        if name in ("данные", "salary data", 'total data'):
             data_sheet = s
             break
     if not data_sheet:
@@ -587,7 +587,7 @@ def module_5(input_folder='companies/rus', output_folder='output', params=None):
             
             
     # Create unprocessed folder if it doesn't exist
-    unprocessed_folder = os.path.join(input_folder, 'unprocessed')
+    unprocessed_folder = os.path.join(output_folder, 'unprocessed')
     os.makedirs(unprocessed_folder, exist_ok=True)
 
     # Copy unprocessed files to the unprocessed folder (overwrite if exists)

@@ -19,6 +19,7 @@ import os, tempfile
 import win32com.client
 import shutil, os
 from win32com.client import makepy
+from pathlib import Path
 
 # warnings.filterwarnings("ignore", category=UserWarning)
 warnings.simplefilter("ignore", category=UserWarning, lineno=329, append=False)
@@ -31,6 +32,8 @@ sys.path.insert(0, parent_dir)
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 from ..LP import *
+
+MODULE = 1
 
 # print('Calculating compensation elements and running checks on data\nProperty of Lens Consulting & Lens Digital\nRelease version: 1.0\n\n')
 
@@ -582,8 +585,9 @@ def check_and_process_data(df, lang, params):
         errors = errors_rus_to_eng(errors)
     return df
 
+
 # Проверка каждого файла на наличие всех нужных колонок. При любой ошибке файл попадает в unprocessed.
-def module_1(input_folder='companies/rus', output_folder='output', params=None):
+def module_1(input_folder, output_folder, params=None):
 
     print("Модуль 1: Техническая проверка.")
 
@@ -599,7 +603,7 @@ def module_1(input_folder='companies/rus', output_folder='output', params=None):
     # Creating the final df
     # Iterate through all the files in the input folder
     process_start = time.time()
-    # print("Current working directory:", os.getcwd())
+
     unprocessed_files = file_processing(input_folder, output_folder, final_cols, params)
     proces_end = time.time()
     print(f'Обработка файлов заняла: {proces_end - process_start}')
@@ -618,7 +622,7 @@ def module_1(input_folder='companies/rus', output_folder='output', params=None):
             
             
     # Create unprocessed folder if it doesn't exist
-    unprocessed_folder = os.path.join(input_folder, 'unprocessed')
+    unprocessed_folder = os.path.join(output_folder, 'unprocessed')
     os.makedirs(unprocessed_folder, exist_ok=True)
 
     # Copy unprocessed files to the unprocessed folder (overwrite if exists)

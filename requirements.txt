@@ -12,3 +12,4 @@ torch
 ipython
 sentencepiece
 pywin32
+catboost

@@ -7,5 +7,9 @@ Modules/src/demo/
 src.lnk
 *.pth
 *.cbm
+*.pkl
+*.xlsx
 Modules/src/module_2/function_model/__pycache__/*
 result_test/
+model/
+grade_model/
