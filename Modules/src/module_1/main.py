@@ -34,9 +34,8 @@ sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 from ..LP import *
 
 MODULE = 1
-lti_auto_message_printed = False
+lti_auto_message_printed = True
 
-# print('Calculating compensation elements and running checks on data\nProperty of Lens Consulting & Lens Digital\nRelease version: 1.0\n\n')
 
 # Function to enter the file paths
 def get_valid_path(prompt):
@@ -296,8 +295,7 @@ def lti_eligibility_normalization(value, row, index, lti_cols):
             return "Нет"
 
     has_lti_values = any(
-        (col in row.index) and (not is_empty_value(row[col])) and (not pd.isna(row[col]))
-        for col in lti_cols
+        (not is_empty_value(row[col])) for col in lti_cols
     )
 
     if has_lti_values:
@@ -331,7 +329,7 @@ def region_normalization(text: str, index: int, lang) -> str:
 
 def convert_some_columns_to_numeric(df):
     # Defining columns where ',' will be replaced with '.' so that it is recognized as a number
-    columns_to_numeric = [monthly_salary, salary_rate, number_monthly_salaries, fact_sti, fact_lti, target_lti_per, additional_pay, grade]
+    columns_to_numeric = [monthly_salary, salary_rate, number_monthly_salaries, fact_sti, fact_lti, fact_lti_1, fact_lti_2, fact_lti_3, target_lti_per, additional_pay, grade]
     
     for column in columns_to_numeric:
         df[column] = df[column].astype(str).str.replace(',', '.').str.replace(u'\xa0', '')
@@ -575,10 +573,21 @@ def target_sti_normalization(text: str, index: int) -> str:
     # Оставлять ли проценты
     return text
     
-
+def to_num_or_zero(v):
+        if is_empty_value(v) or pd.isna(v):
+            return 0.0
+        try:
+            return float(v)
+        except Exception:
+            return 0.0
+        
 def lti_checks(main_lti, lti_1, lti_2, lti_3, index, type_lti):
     global errors
-    if not ((main_lti == (lti_1 + lti_2 + lti_3)) | np.isnan(main_lti)):
+
+    main_val = to_num_or_zero(main_lti)
+    sum_parts = to_num_or_zero(lti_1) + to_num_or_zero(lti_2) + to_num_or_zero(lti_3)
+
+    if not ((main_val == sum_parts) | np.isnan(main_val)):
         errors['data_errors'] += [(type_lti, index)]
     return main_lti
 
@@ -853,6 +862,7 @@ def check_and_process_data(df, lang, params):
     df = check_codes(df)
     # Право на участие в LTIP
     lti_cols = [
+        fact_lti, target_lti_per,
         lti_prog_1, fact_lti_1, target_lti_1, lti_pay_freq_1,
         lti_prog_2, fact_lti_2, target_lti_2, lti_pay_freq_2,
         lti_prog_3, fact_lti_3, target_lti_3, lti_pay_freq_3
