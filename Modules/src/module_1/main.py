@@ -2,7 +2,7 @@
 # All the variables are imported from LP.py file
 import pandas as pd
 import numpy as np
-from datetime import datetime
+from datetime import datetime, date
 from openpyxl import load_workbook
 from openpyxl.utils.dataframe import dataframe_to_rows
 from openpyxl.styles import Font, Alignment, PatternFill, Border, Side, numbers
@@ -32,6 +32,7 @@ sys.path.insert(0, parent_dir)
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 from ..LP import *
+from ..utils import write_df_with_template
 
 MODULE = 1
 lti_auto_message_printed = True
@@ -129,6 +130,17 @@ def number_monthly_salaries_normalization(num, index):
         errors['data_errors'] += [(number_monthly_salaries, index)]
     return num
 
+def expat_normalization(text: str, index: int) -> str:
+    if is_empty_value(text):
+        return text
+    else:
+        value = text.strip().lower()
+        if value in ['да', 'д', 'yes', 'y']:
+            return "Да"
+        elif value in ['нет', 'н', 'no', 'n']:
+            return "Нет"
+        else:
+            return ''
 
 def gender_normalization(text: str, index: int) -> str:
     global errors
@@ -157,7 +169,7 @@ def gender_normalization(text: str, index: int) -> str:
     return '-'
 
 
-def bod_normalization(value, index, min_year=1900, max_year=2026):
+def bod_normalization(value, index, min_year=1936, max_year=2020):
     """
     Normalize year of birth to YYYY.
     Empty values are allowed. Invalid or unclear values add a data error.
@@ -167,39 +179,60 @@ def bod_normalization(value, index, min_year=1900, max_year=2026):
     if is_empty_value(value) or pd.isna(value):
         return np.nan
 
-    if isinstance(value, (pd.Timestamp, datetime, np.datetime64)):
+    # 1) datetime/date
+    if isinstance(value, (pd.Timestamp, datetime, date, np.datetime64)):
         year = int(value.year)
         if min_year <= year <= max_year:
             return year
         errors['data_errors'] += [(bod, index)]
         return value
-
-    s = str(value).strip()
-
-    # Extract 4-digit year if present in the string
-    match = re.search(r"\b(\d{4})\b", s)
-    if match:
-        year = int(match.group(1))
+    
+     # 2) числовые типы
+    if isinstance(value, (int, float)) and not isinstance(value, bool):
+        try:
+            year = int(value)
+        except Exception:
+            errors['data_errors'] += [(bod, index)]
+            return value
         if min_year <= year <= max_year:
             return year
         errors['data_errors'] += [(bod, index)]
         return value
 
-    # Try numeric value (e.g. 1985.0)
-    try:
-        num = float(s)
-        if num.is_integer():
-            year = int(num)
-            if min_year <= year <= max_year:
+
+     # 3) строки
+    if isinstance(value, str):
+        s = value.strip()
+        if s == "":
+            errors['data_errors'] += [(bod, index)]
+            return value
+
+        # если строка — это просто число
+        if re.fullmatch(r"\d{4}", s):
+            year = int(s)
+            if min_year <= year <= 2020:
                 return year
-    except Exception:
-        pass
+            errors['data_errors'] += [(bod, index)]
+            return value
+
+        # попытка вытащить год из даты (dd.mm.yyyy, yyyy-mm-dd и т.п.)
+        m = re.search(r"(?<!\d)(19\d{2}|20\d{2})(?!\d)", s)
+        if m:
+            year = int(m.group(1))
+            if min_year <= year <= 2020:
+                return year
+            errors['data_errors'] += [(bod, index)]
+            return value
+
+        # строка не число и не дата
+        errors['data_errors'] += [(bod, index)]
+        return value
 
     errors['data_errors'] += [(bod, index)]
     return value
 
 
-def hired_date_normalization(value, index, min_year=1900, max_year=2026):
+def hired_date_normalization(value, index, min_year=1940, max_year=2026):
     """
     Normalize hire date to dd.mm.yyyy.
     Empty values are allowed. Invalid or out-of-range values add a data error.
@@ -233,21 +266,18 @@ def tenure_normalization(tenure_value, hired_value, index):
     - If hire date is present and < 1 year ago, set to "Меньше года"
     - Otherwise keep original value
     """
+    
+    if not is_empty_value(hired_value):
+        dt = pd.to_datetime(str(hired_value).strip(), dayfirst=True, errors='coerce')
+        if not pd.isna(dt):
+            if (datetime.today().date() - dt.date()).days < 365:
+                return "Меньше года"
+            else:
+                return ''
     if isinstance(tenure_value, str):
         s = tenure_value.strip().lower()
         if s in ("меньше года", "менее года"):
             return "Меньше года"
-
-    if is_empty_value(hired_value) or pd.isna(hired_value):
-        return tenure_value
-
-    dt = pd.to_datetime(str(hired_value).strip(), dayfirst=True, errors='coerce')
-    if pd.isna(dt):
-        return tenure_value
-
-    if (datetime.today().date() - dt.date()).days < 365:
-        return "Меньше года"
-
     return tenure_value
 
 
@@ -852,6 +882,9 @@ def check_and_process_data(df, lang, params):
     df[gender_id] = df.apply(lambda x: gender_normalization(x[gender_id], x.name), axis=1)
     # Год рождения
     df[bod] = df.apply(lambda x: bod_normalization(x[bod], x.name), axis=1)
+    df[bod] = df[bod].astype(str)
+    # Экспат
+    df[expat] = df.apply(lambda x: expat_normalization(x[expat], x.name), axis=1)
     # Дата приема на работу
     df[hired_date] = df.apply(lambda x: hired_date_normalization(x[hired_date], x.name), axis=1)
     # Стаж
@@ -873,7 +906,12 @@ def check_and_process_data(df, lang, params):
         axis=1
     )
     # Регион/область (заполняется автоматически)
+    df[region] = df[region].where(
+        ~df[region].isna() & (df[region].astype(str).str.strip() != ''),
+        df[region_client_fill]
+    )
     df[region] = df[region].astype(str).str.lower()
+    df = translate_values(df, region, final_region)
     if lang == 'RUS':
         df = translate_values(df, region, final_region)
     else:
@@ -951,7 +989,7 @@ def module_1(input_folder, output_folder, params=None):
         print(f"\nСохраняем {len(unprocessed_files)} файлов в 'unprocessed'...")
 
         for file_name, issue in unprocessed_files.items():
-            source_path = os.path.join(input_folder, file_name)
+            source_path = os.path.join(output_folder, file_name)
             destination_path = os.path.join(unprocessed_folder, file_name)
             # print(source_path)
             # print(destination_path)
@@ -1041,11 +1079,12 @@ def file_processing(input_folder, output_folder, columns, params):
                 if not single_db and ((errors['data_errors'] == [] and errors['info_errors'] == []) or not save_db_only_without_errors):
                     # Save the processed DataFrame to the output folder
                     file_output_path = os.path.join(output_folder, file)
-                    df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
-                    df.to_excel(file_output_path, sheet_name='Total Data')
+                    # df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
+                    # df.to_excel(file_output_path, sheet_name='Total Data')
+                    write_df_with_template(df,file_path, file_output_path)
                     print(f"Анкета {file} сохранена в {output_folder}!")
             if errors['data_errors'] != [] or errors['info_errors'] != []:
-                unprocessed_files[os.path.basename(file_path)] = errors
+                unprocessed_files[os.path.basename(file_output_path)] = errors
             else:
                 print("В файле не обнаружено ошибок, мои поздравления!")
     
