@@ -9,7 +9,13 @@ import json
 import os
 import sys
 import json
-from LP import job_title
+
+parent_dir = os.path.dirname(os.getcwd())
+sys.path.insert(0, parent_dir)
+
+sys.path.append(os.path.abspath(os.path.dirname(__file__)))
+
+from ..LP import *
 
 sys.path.append('src/module_2/model/')
 from model import FunctionModel

@@ -32,6 +32,7 @@ subfunction = 'Название подфункции (заполняется а�
 specialization = 'Название специализации (заполняется автоматически)'
 salary_rate = 'Размер ставки'
 monthly_salary = 'Ежемесячный оклад'
+region_coeff = 'Районный коэффициент и северная надбавка в месяц'
 number_monthly_salaries = 'Число окладов в году'
 additional_pay = 'Постоянные надбавки и доплаты (общая сумма за год)'
 sti_eligibility = 'Право на получение переменного вознаграждения'
@@ -115,7 +116,7 @@ expected_columns_rus = [company_name, dep_level_1, dep_level_2, dep_level_3, dep
                              job_title, employee_code, manager_code, man_emp, performance, n_level, expat, gender_id, bod,
                              hired_date, tenure, region_client_fill, region, internal_grade, grade, function_code,
                              subfunction_code, specialization_code, function, subfunction, specialization, salary_rate,
-                             monthly_salary, number_monthly_salaries, additional_pay, sti_eligibility, fact_sti,
+                             monthly_salary, region_coeff, number_monthly_salaries, additional_pay, sti_eligibility, fact_sti,
                              target_sti, lti_eligibility, fact_lti, target_lti_per, lti_prog_1, fact_lti_1,
                              target_lti_1, lti_pay_freq_1, lti_prog_2, fact_lti_2, target_lti_2, lti_pay_freq_2,
                              lti_prog_3, fact_lti_3, target_lti_3, lti_pay_freq_3, comments]
@@ -161,7 +162,7 @@ expected_columns_market_df = [company_name, dep_level_1, dep_level_2, dep_level_
                              job_title, employee_code, manager_code, man_emp, performance, n_level, expat, gender_id, bod,
                              hired_date, tenure, region_client_fill, region, internal_grade, grade, function_code,
                              subfunction_code, specialization_code, function, subfunction, specialization, salary_rate,
-                             monthly_salary, number_monthly_salaries, additional_pay, sti_eligibility, fact_sti,
+                             monthly_salary, region_coeff, number_monthly_salaries, additional_pay, sti_eligibility, fact_sti,
                              target_sti, lti_eligibility, fact_lti, target_lti_per, lti_prog_1, fact_lti_1,
                              target_lti_1, lti_pay_freq_1, lti_prog_2, fact_lti_2, target_lti_2, lti_pay_freq_2,
                              lti_prog_3, fact_lti_3, target_lti_3, lti_pay_freq_3, comments, macroregion, gi_sector, gi_origin, gi_headcount_cat,
@@ -172,7 +173,7 @@ expected_columns_market_df_preload = [company_name, dep_level_1, dep_level_2, de
                              job_title, employee_code, manager_code, man_emp, performance, n_level, expat, gender_id, bod,
                              hired_date, tenure, region_client_fill, region, internal_grade, grade, function_code,
                              subfunction_code, specialization_code, function, subfunction, specialization, salary_rate,
-                             monthly_salary, number_monthly_salaries, additional_pay, sti_eligibility, fact_sti,
+                             monthly_salary, region_coeff, number_monthly_salaries, additional_pay, sti_eligibility, fact_sti,
                              target_sti, lti_eligibility, fact_lti, target_lti_per, lti_prog_1, fact_lti_1,
                              target_lti_1, lti_pay_freq_1, lti_prog_2, fact_lti_2, target_lti_2, lti_pay_freq_2,
                              lti_prog_3, fact_lti_3, target_lti_3, lti_pay_freq_3, comments, gi_sector, gi_origin, gi_headcount_cat,
@@ -182,12 +183,42 @@ exepcted_columns_final_sdfs = [company_name, dep_level_1, dep_level_2, dep_level
                              job_title, employee_code, manager_code, man_emp, performance, n_level, expat, gender_id, bod,
                              hired_date, tenure, region_client_fill, region, internal_grade, grade, function_code,
                              subfunction_code, specialization_code, function, subfunction, specialization, salary_rate,
-                             monthly_salary, number_monthly_salaries, additional_pay, sti_eligibility, fact_sti,
+                             monthly_salary, region_coeff, number_monthly_salaries, additional_pay, sti_eligibility, fact_sti,
                              target_sti, lti_eligibility, fact_lti, target_lti_per, lti_prog_1, fact_lti_1,
                              target_lti_1, lti_pay_freq_1, lti_prog_2, fact_lti_2, target_lti_2, lti_pay_freq_2,
                              lti_prog_3, fact_lti_3, target_lti_3, lti_pay_freq_3, comments, annual_salary, base_pay,
                              fact_sti_out, target_sti_out, tc_pay, ttc_pay, ltip_pay, tltip_pay, tdc_pay, ttdc_pay, macroregion]
 
+# Regions with coefficients
+regions_with_coeff = [
+    'Мурманская Область',
+    'Архангельская Область',
+    'Ямало-Ненецкий автономный округ и Салехард',
+    'Коми Республика и Сыктывкар',
+    'Тюменская Область',
+    'Ханты-Мансийский автономный округ',
+    'Красноярский Край Север',
+    'Красноярский Край Кроме Севера',
+    'Иркутская Область',
+    'Саха Республика и Якутск',
+    'Магаданская Область и Магадан',
+    'Чукотский автономный округ и Анадырь',
+    'Камчатский Край и Петропавловск-Камчатский',
+    'Карелия Республика',
+    'Хабаровский Край',
+    'Сахалин',
+    'Тыва Республика и Кызыл',
+    'Пермский Край',
+    'Томская Область и Томск',
+    'Бурятия Республика и Улан-Удэ',
+    'Забайкальский Край и Чита',
+    'Амурская Область и Благовещенск',
+    'Приморский Край',
+    'Алтайский Край',
+    'Красноярск',
+    'Мурманск',
+    'Архангельск'
+]
 
 # Tabs definitions
 rem_data_eng = 'Salary Data'

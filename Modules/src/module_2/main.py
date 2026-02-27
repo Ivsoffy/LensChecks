@@ -18,10 +18,12 @@ warnings.simplefilter(action="ignore", category=pd.errors.SettingWithCopyWarning
 pd.set_option("future.no_silent_downcasting", True)
 parent_dir = os.path.dirname(os.getcwd())
 sys.path.insert(0, parent_dir)
+
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
-from LP import *
-from pipeline import CodeModel
+from ..LP import *
+from .pipeline import CodeModel
+
 
 cols = [
     company_name,

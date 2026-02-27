@@ -48,8 +48,6 @@ def get_valid_path(prompt):
         else:
             print("Invalid path. Please try again.")
 
-
-# ### Функции для проверок
 def man_emp_normalization(text: str, index) -> str:
     global errors
 
@@ -76,7 +74,6 @@ def man_emp_normalization(text: str, index) -> str:
     errors['data_errors'] += [(man_emp, index)]
     return text
 
-
 def expectation_normalization(text: str, index: int) -> str:
     global errors
     valid = ["Соответствует ожиданиям", "Ниже ожиданий", "Выше ожиданий"]
@@ -102,7 +99,6 @@ def expectation_normalization(text: str, index: int) -> str:
         # return text
         return '-'
 
-
 def level_normalization(value, index) -> str:
     """
     Преобразует значение в формат 'N-X' (где X от 1 до 20)
@@ -119,7 +115,6 @@ def level_normalization(value, index) -> str:
     
     # errors['data_errors'] += [(n_level, index)]
     return '-'
-
 
 def number_monthly_salaries_normalization(num, index):
     global errors
@@ -168,7 +163,6 @@ def gender_normalization(text: str, index: int) -> str:
     # errors['data_errors'] += [(gender_id, index)]
     return '-'
 
-
 def bod_normalization(value, index, min_year=1936, max_year=2020):
     """
     Normalize year of birth to YYYY.
@@ -185,7 +179,7 @@ def bod_normalization(value, index, min_year=1936, max_year=2020):
         if min_year <= year <= max_year:
             return year
         errors['data_errors'] += [(bod, index)]
-        return value
+        return year
     
      # 2) числовые типы
     if isinstance(value, (int, float)) and not isinstance(value, bool):
@@ -197,7 +191,7 @@ def bod_normalization(value, index, min_year=1936, max_year=2020):
         if min_year <= year <= max_year:
             return year
         errors['data_errors'] += [(bod, index)]
-        return value
+        return year
 
 
      # 3) строки
@@ -210,19 +204,19 @@ def bod_normalization(value, index, min_year=1936, max_year=2020):
         # если строка — это просто число
         if re.fullmatch(r"\d{4}", s):
             year = int(s)
-            if min_year <= year <= 2020:
+            if min_year <= year <= max_year:
                 return year
             errors['data_errors'] += [(bod, index)]
-            return value
+            return year
 
         # попытка вытащить год из даты (dd.mm.yyyy, yyyy-mm-dd и т.п.)
         m = re.search(r"(?<!\d)(19\d{2}|20\d{2})(?!\d)", s)
         if m:
             year = int(m.group(1))
-            if min_year <= year <= 2020:
+            if min_year <= year <=max_year:
                 return year
             errors['data_errors'] += [(bod, index)]
-            return value
+            return year
 
         # строка не число и не дата
         errors['data_errors'] += [(bod, index)]
@@ -230,7 +224,6 @@ def bod_normalization(value, index, min_year=1936, max_year=2020):
 
     errors['data_errors'] += [(bod, index)]
     return value
-
 
 def hired_date_normalization(value, index, min_year=1940, max_year=2026):
     """
@@ -258,7 +251,6 @@ def hired_date_normalization(value, index, min_year=1940, max_year=2026):
 
     return dt.strftime("%d.%m.%Y")
 
-
 def tenure_normalization(tenure_value, hired_value, index):
     """
     Normalize tenure values:
@@ -279,7 +271,6 @@ def tenure_normalization(tenure_value, hired_value, index):
         if s in ("меньше года", "менее года"):
             return "Меньше года"
     return tenure_value
-
 
 def grade_normalization(value, index, min_grade=7, max_grade=30):
     """
@@ -306,7 +297,6 @@ def grade_normalization(value, index, min_grade=7, max_grade=30):
         return value
 
     return num
-
 
 def lti_eligibility_normalization(value, row, index, lti_cols):
     """
@@ -340,7 +330,6 @@ def lti_eligibility_normalization(value, row, index, lti_cols):
 
     return v
             
-
 def region_normalization(text: str, index: int, lang) -> str:
     global errors
 
@@ -356,7 +345,6 @@ def region_normalization(text: str, index: int, lang) -> str:
 
     return text
 
-
 def convert_some_columns_to_numeric(df):
     # Defining columns where ',' will be replaced with '.' so that it is recognized as a number
     columns_to_numeric = [monthly_salary, salary_rate, number_monthly_salaries, fact_sti, fact_lti, fact_lti_1, fact_lti_2, fact_lti_3, target_lti_per, additional_pay, grade]
@@ -366,7 +354,6 @@ def convert_some_columns_to_numeric(df):
         df[column] = pd.to_numeric(df[column], errors='coerce')
         df[column] = df[column].replace('nan', np.nan)
     return df
-
 
 def convert_some_columns_to_str(df):
     columns_to_str = [man_emp, gender_id, sti_eligibility, lti_eligibility, expat, performance, function_code, subfunction_code, specialization_code]
@@ -403,7 +390,6 @@ def translate_values(df, columns, translation_map):
     
     return df_copy
 
-
 def map_column_values(df, check_column, amend_column, mapping_dict):
     """
     Check values in one column and assign mapped values to another column.
@@ -433,7 +419,6 @@ def map_column_values(df, check_column, amend_column, mapping_dict):
     df_copy[amend_column] = df_copy[check_column].map(mapping_dict).fillna(df_copy[amend_column])
     
     return df_copy
-
 
 def eng_to_rus(df):
     # Apply translations using the tranlsation function | Converting English version to Russian
@@ -470,7 +455,6 @@ def additional_pay_normalization(value, index):
 
     return value
 
-
 def eligibility_normalization(fact, target, value, index):
     if not pd.isna(value):
         value = value.strip().lower()
@@ -493,7 +477,6 @@ def fact_sti_normalization(eligibility, value, index):
         errors['data_errors'] += [(fact_sti, index)]
     return value
 
-
 def is_empty_value(x):
     """Возвращает True, если значение можно считать пустым."""
     if x is None:
@@ -507,7 +490,6 @@ def is_empty_value(x):
     if isinstance(x, (list, tuple, dict, set)) and len(x) == 0:
         return True
     return False
-
 
 def normalize_employee_code(series, min_value=1, max_value=None):
     """
@@ -550,7 +532,6 @@ def normalize_employee_code(series, min_value=1, max_value=None):
 
     return pd.to_numeric(s, errors='coerce').astype("int64")
 
-# Проверка листа "Общая информация"
 def check_general_info(df_company, lang, df):
     global errors
     # Setting columns names to the russian version
@@ -586,7 +567,6 @@ def check_general_info(df_company, lang, df):
     return df 
 
 def save_excel(input_path, output_path):
-
     wb = load_workbook(input_path, data_only=False, keep_vba=False)  # для .xlsm ставь True
     tmp_fd, tmp_path = tempfile.mkstemp(suffix=".xlsx")
     os.close(tmp_fd)
@@ -597,12 +577,28 @@ def save_excel(input_path, output_path):
 
     print(f"✅ Копия книги сохранена как: {output_path}")
 
-
-def target_sti_normalization(text: str, index: int) -> str:
+def target_sti_normalization(value: str, index: int) -> str:
     global errors
-    # Оставлять ли проценты
-    return text
+
+    if is_empty_value(value):
+        return value
+
+    s = str(value).strip()
+    s_ns = s.replace(" ", "")
+
+    # Разрешено: число, опционально десятичная часть
+    if not re.fullmatch(r"\d+([.,]\d+)?", s_ns):
+        errors['data_errors'] += [(target_sti, index)]
+        return value
+
+    # Нормализация для дальнейших расчетов
+    s_ns = s_ns.rstrip("%").replace(",", ".")
     
+    if not (2 < (float(s_ns) * 100) < 300):
+        errors['data_errors'] += [(target_sti, index)]
+        return value
+    return s_ns
+
 def to_num_or_zero(v):
         if is_empty_value(v) or pd.isna(v):
             return 0.0
@@ -621,13 +617,8 @@ def lti_checks(main_lti, lti_1, lti_2, lti_3, index, type_lti):
         errors['data_errors'] += [(type_lti, index)]
     return main_lti
 
-
-#pip install pywin32 --upgrade
-
 def add_errors_to_excel(errors, input_path, output_path):
     """Добавляет лист 'Errors' и подсвечивает ячейки с ошибками с использованием win32com."""
-
-    
     try:
         excel = win32com.client.Dispatch("Excel.Application")
     except AttributeError:
@@ -746,7 +737,6 @@ def errors_rus_to_eng(errors):
         new_error = (expected_columns_eng[new_error_ind], error[1])
         errors['data_errors'][ind] = new_error
     return errors
-    # находим индекс ошибки в expected_columns_rus, меняем на колонку-ошибку из expected_columns_eng
 
 def check_column_rules(df, col_name, allowed_values):
     """
@@ -776,9 +766,16 @@ def check_column_rules(df, col_name, allowed_values):
     invalid = (~mask_empty) & (~mask_allowed)
 
     # Replace invalid values with empty
-    df.loc[invalid, col_name] = ""
+    df.loc[invalid, [function_code, subfunction_code, specialization_code]] = ""
     # Normalize empties to empty string
-    df.loc[mask_empty, col_name] = ""
+    df.loc[mask_empty, [function_code, subfunction_code, specialization_code]] = ""
+
+    func = df[function_code].astype(str).str.strip()
+    subfunc = df[subfunction_code].astype(str).str.strip()
+    spec = df[specialization_code].astype(str).str.strip()
+
+    df["errors_subfunc"] = func != subfunc.str[:2]
+    df["errors_spec"] = ~((subfunc == spec.str[:3]) | (spec == "NAN"))
 
     return df
 
@@ -826,7 +823,32 @@ def fill_function_name_from_sdf(
 
     return df
 
+def target_lti_normalization(value, index, column):
+    global errors
+
+    if is_empty_value(value):
+        return value
+
+    s = str(value).strip()
+    s_ns = s.replace(" ", "").replace(u"\xa0", "")
+
+    # Excel percent-formatted cells are often read by pandas as fractions (e.g. 23.88% -> 0.2388)
+    if re.fullmatch(r"\d+([.,]\d+)?", s_ns):
+        s_num = s_ns.replace(",", ".")
+        num = float(s_num)
+        if 0.01 <= num <= 3:
+            return s_num
+
+    errors['data_errors'] += [(column, index)]
+    return value
+
+def codes_not_correspond(value, index, column):
+    global errors
+    if value:
+        errors['data_errors'] += [(column, index)]
+
 def check_codes(df):
+    global errors
     """
     Summary: Validate codes against the SDF reference file and fill names.
     Args:
@@ -853,9 +875,61 @@ def check_codes(df):
     df = fill_function_name_from_sdf(df, sdf, col_name=function_code, new_col_name=function, col_sdf="Название функции")
     df = fill_function_name_from_sdf(df, sdf, col_name=subfunction_code, new_col_name=subfunction, col_sdf="Название подфункции")
     df = fill_function_name_from_sdf(df, sdf, col_name=specialization_code, new_col_name=specialization, col_sdf="Специализация")
+    
+    func = df[function_code].astype(str).str.strip()
+    subfunc = df[subfunction_code].astype(str).str.strip()
+    spec = df[specialization_code].astype(str).str.strip()
+
+    df["errors_subfunc"] = func != subfunc.str[:2]
+    df["errors_spec"] = ~((subfunc == spec.str[:3]) | (spec == "NAN"))
+
+    df.apply(lambda x: codes_not_correspond(x["errors_subfunc"], x.name, subfunction_code), axis=1)
+    df.apply(lambda x: codes_not_correspond(x["errors_spec"], x.name, specialization_code), axis=1)
     return df
 
-# ### Проверка 
+def lti_prog_checks(text, index, column):
+    global errors
+    valid = ['Фантомные акции / Phantom stock',
+        'Акции с ограничением / Restricted stock units (RSU)',
+        'Restricted stock awards (RSA)',
+        'Акции результативности / Performance stock units (PSU)',
+        'Юнит результативности/долгосрочная премия / Performance unit/long-term cash',
+        'Опцион на акции / Stock option',
+        'Право на оценку акций / Stock appreciation rights (SAR)'
+        ]
+
+    if is_empty_value(text):
+        return text
+
+    text = text.strip().lower()
+    match = difflib.get_close_matches(text, [v.lower() for v in valid], n=1, cutoff=0.6)
+
+    if match:
+        for v in valid:
+            if v.lower() == match[0]:
+                return v
+    else:
+        errors['data_errors'] += [(column, index)]
+        return text
+    
+def lti_freq_checks(value, index, column):
+    global errors
+    valid = [0.25, 0.5, 1, 2, 3, 4]
+
+    if is_empty_value(value):
+        return value
+
+    if not int(value) in valid:
+        errors['data_errors'] += [(column, index)]
+    return value
+
+def region_coeff_normalization(region, coef, index):
+    global errors
+
+    if region in regions_with_coeff and (is_empty_value(coef) or coef==0):
+        errors['data_errors'] += [(region_coeff, index)]
+
+
 def check_and_process_data(df, lang, params):
     global errors
 
@@ -926,6 +1000,8 @@ def check_and_process_data(df, lang, params):
         df.dropna(subset=[monthly_salary], inplace=True)
     else:
         df[monthly_salary] = df.apply(lambda x: monthly_salary_normalization(x[monthly_salary], x.name), axis=1)
+    # Районный коэффициент и северная надбавка в месяц
+    df.apply(lambda x: region_coeff_normalization(x[region], x[region_coeff], x.name), axis=1)
     # Число окладов в году
     df[number_monthly_salaries] = df.apply(lambda x: number_monthly_salaries_normalization(x[number_monthly_salaries], x.name), axis=1)
     # Постоянные надбавки и доплаты (общая сумма за год)
@@ -938,15 +1014,25 @@ def check_and_process_data(df, lang, params):
     df[target_sti] = df.apply(lambda x: target_sti_normalization(x[target_sti], x.name), axis=1)
     # Фактическая стоимость всех предоставленных типов LTI за 1 год (AK)
     df[fact_lti] = df.apply(lambda x: lti_checks(x[fact_lti], x[fact_lti_1], x[fact_lti_2], x[fact_lti_3], x.name, fact_lti), axis=1)
+    # Целевая стоимость вознаграждения 1 как % от базового оклада за 1 год
+    df[target_lti_1] = df.apply(lambda x: target_lti_normalization(x[target_lti_1], x.name, target_lti_1), axis=1)
+    df[target_lti_2] = df.apply(lambda x: target_lti_normalization(x[target_lti_2], x.name, target_lti_2), axis=1)
+    df[target_lti_3] = df.apply(lambda x: target_lti_normalization(x[target_lti_3], x.name, target_lti_3), axis=1)
     # Целевая стоимость всех предоставленных типов LTI в % от базового оклада за 1 год
     df[target_lti_per] = df.apply(lambda x: lti_checks(x[target_lti_per], x[target_lti_1], x[target_lti_2], x[target_lti_3], x.name, target_lti_per), axis=1)
+    # Тип программы
+    prog_cols = [lti_prog_1, lti_prog_2, lti_prog_3]
+    for prog in prog_cols:
+        df[prog] = df.apply(lambda x: lti_prog_checks(x[prog], x.name, prog), axis=1)
+    # Частота выплат
+    freq_cols = [lti_pay_freq_1, lti_pay_freq_2, lti_pay_freq_3]
+    for freq in freq_cols:
+        df[freq] = df.apply(lambda x: lti_freq_checks(x[freq], x.name, freq), axis=1)
     # Целевая стоимость вознаграждения как % от базового оклада [Данные] AO, AS, AW
     if lang == 'ENG':
         errors = errors_rus_to_eng(errors)
     return df
 
-
-# Проверка каждого файла на наличие всех нужных колонок. При любой ошибке файл попадает в unprocessed.
 def module_1(input_folder, output_folder, params=None):
 
     print("Модуль 1: Техническая проверка.")
@@ -999,8 +1085,10 @@ def module_1(input_folder, output_folder, params=None):
                     if os.path.exists(destination_path):
                         os.remove(destination_path)
                     add_errors_to_excel(issue, source_path, destination_path)
+                    os.remove(source_path)
             except Exception as e:
                 print(f"Не удалось сохранить файл {file_name} в unprocessed: {str(e)}")
+        
 
 def file_processing(input_folder, output_folder, columns, params):
     global errors
@@ -1078,12 +1166,13 @@ def file_processing(input_folder, output_folder, columns, params):
                 
                 if not single_db and ((errors['data_errors'] == [] and errors['info_errors'] == []) or not save_db_only_without_errors):
                     # Save the processed DataFrame to the output folder
-                    file_output_path = os.path.join(output_folder, file)
-                    # df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
-                    # df.to_excel(file_output_path, sheet_name='Total Data')
-                    write_df_with_template(df,file_path, file_output_path)
+                    file_output_path_no_format = os.path.join(output_folder, file)
+                    df.to_excel(file_output_path_no_format, sheet_name="Total Data")
                     print(f"Анкета {file} сохранена в {output_folder}!")
             if errors['data_errors'] != [] or errors['info_errors'] != []:
+                base, ext = os.path.splitext(file)
+                file_output_path = os.path.join(output_folder, f'{base}_unprocessed_{ext}')
+                write_df_with_template(df, file_path, file_output_path)
                 unprocessed_files[os.path.basename(file_output_path)] = errors
             else:
                 print("В файле не обнаружено ошибок, мои поздравления!")

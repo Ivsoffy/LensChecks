@@ -24,7 +24,7 @@ parent_dir = os.path.dirname(os.getcwd())
 sys.path.insert(0, parent_dir)
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
-from LP import *
+from ..LP import *
 from src.module_4.model import GradePredictor
 
 

@@ -15,8 +15,10 @@ warnings.filterwarnings("ignore", category=UserWarning)
 def find_input_folder(input_folder, module, already_fixed):
     if module > 1:
         if module != 2 and module != 4 or ((module == 2 or module == 4) and not already_fixed):
-            module = module - 1
-            input = 'src/module_'+str(module)+'/output'
+            input = 'src/module_'+str(module-1)+'/output'
+            if Path(input).is_dir():
+                return input
+            input = 'src/module_'+str(module)+'/input'
             if Path(input).is_dir():
                 return input
         else:
@@ -60,7 +62,13 @@ def cleaning_folders():
                 dst_dir = archive / f"module_{i}" / name
                 dst_dir.mkdir(parents=True, exist_ok=True)
                 for item in src_dir.iterdir():
-                    shutil.move(str(item), str(dst_dir / item.name))
+                    dst_item = dst_dir / item.name
+                    if dst_item.exists():
+                        if dst_item.is_dir():
+                            shutil.rmtree(dst_item)
+                        else:
+                            dst_item.unlink()
+                    shutil.move(str(item), str(dst_item))
 
 def main():
     modules = [module_1, module_2, module_3, module_4, module_5]
@@ -87,7 +95,9 @@ def main():
     input_folder = find_input_folder(input_folder, config['module'], config['after_fix'])
     output_folder = find_output_folder(config['module'], config['after_fix'])
     if input_folder == None:
-        print(f'Директория {input_folder} с анкетами не найдена!')
+        print(f'Директория input_folder: {input_folder} с анкетами не найдена!')
+        if (config['module'] == 2) or (config['module'] == 4):
+            print(f"Проверьте параметр after_fix в config.yml!")
         return
     
     print("Проверяемая директория: ", input_folder)
