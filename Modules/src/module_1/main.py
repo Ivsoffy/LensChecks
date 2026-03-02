@@ -889,6 +889,7 @@ def check_codes(df):
 
 def lti_prog_checks(text, index, column):
     global errors
+
     valid = ['Фантомные акции / Phantom stock',
         'Акции с ограничением / Restricted stock units (RSU)',
         'Restricted stock awards (RSA)',
@@ -901,7 +902,7 @@ def lti_prog_checks(text, index, column):
     if is_empty_value(text):
         return text
 
-    text = text.strip().lower()
+    text = str(text).strip().lower()
     match = difflib.get_close_matches(text, [v.lower() for v in valid], n=1, cutoff=0.6)
 
     if match:
