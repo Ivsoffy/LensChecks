@@ -726,7 +726,6 @@ def add_errors_to_excel(errors, input_path, output_path):
 
     print(f"Лист 'Errors' добавлен, ячейки подсвечены. Файл: {output_path}")
 
-
 def monthly_salary_normalization(row, index):
     global errors
     if pd.isna(row):
@@ -892,22 +891,68 @@ def check_codes(df):
 def check_one_interval(grade, val, min, max, index, col):
     global errors
     if not is_empty_value(val):
-        if not (min[grade] < val < max[grade]):
-            print('error ', val)
-            errors['data_errors'] += [(col, index)]
+        try:
+            if not (min[grade] < val < max[grade]):
+                errors['data_errors'] += [(col, index)]
+        except:
+            errors['data_errors'] += [(grade, index)]
     return val
 
 def check_intervals(df):
-    intervals_path = 'src/module_5/intervals.xlsx'
-    if not os.path.exists(intervals_path):
-        raise FileNotFoundError(f"Ошибка: файл SDF не найден: {intervals_path}")
-    intervals = pd.read_excel(intervals_path, index_col=0)
-
     cols_to_check = [base_pay,tc_pay,ttc_pay,tdc_pay,target_sti_out]
+
+    intervals_path = 'src/module_5/intervals.parquet'
+    if not os.path.exists(intervals_path):
+        raise FileNotFoundError(f"Ошибка: файл intervals не найден: {intervals_path}")
+    intervals = pd.read_parquet(intervals_path)
+    intervals = intervals.set_index(intervals.columns[0])
+
     for col in cols_to_check:
         col_min = col+'_Min'
         col_max = col+'_Max'
         df[col] = df.apply(lambda x: check_one_interval(x[grade], x[col], intervals[col_min], intervals[col_max], x.name, col), axis=1)
+
+def find_outliers_iqr(data):
+    data = np.array(data)
+
+    q1 = np.percentile(data, 25)
+    q3 = np.percentile(data, 75)
+    iqr = q3 - q1
+
+    lower_bound = q1 - 1.5 * iqr
+    upper_bound = q3 + 1.5 * iqr
+
+    outliers = data[(data < lower_bound) | (data > upper_bound)]
+    return [(outlier, lower_bound, upper_bound) for outlier in outliers.tolist()]
+
+def check_outliers(df):
+    global errors
+    cols_to_check = [base_pay,tc_pay,ttc_pay]
+    df['outlier'] = False
+    for col in cols_to_check:
+        df[f'{col}_lower_bound'] = np.nan
+        df[f'{col}_upper_bound'] = np.nan
+
+    for col in cols_to_check:
+        for _, group_df in df.groupby(grade):
+            series = group_df[col].dropna()
+            if series.empty:
+                continue
+
+            outlier_info = find_outliers_iqr(series.to_numpy())
+            if not outlier_info:
+                continue
+            outliers = [item[0] for item in outlier_info]
+            lower_bound = outlier_info[0][1]
+            upper_bound = outlier_info[0][2]
+            outlier_series = series[series.isin(outliers)]
+            for ind, _ in outlier_series.items():
+                errors['data_errors'] += [(col, ind)]
+                df.loc[ind, 'outlier'] = True
+                df.loc[ind, f'{col}_lower_bound'] = lower_bound
+                df.loc[ind, f'{col}_upper_bound'] = upper_bound
+
+    return df
 
 def lti_prog_checks(text, index, column):
     global errors
@@ -1026,8 +1071,10 @@ def check_and_process_data(df, params):
     for freq in freq_cols:
         df[freq] = df.apply(lambda x: lti_freq_checks(x[freq], x.name, freq), axis=1)
     
-    # Проверка компенсационных элементов на интервалы
+    # Проверка компенсационных элементов на универсальные интервалы
     check_intervals(df)
+    # Проверка компенсационных элементов на выбросы относительно практики компании
+    df = check_outliers(df)
 
     return df
 
@@ -1073,7 +1120,7 @@ def module_5(input_folder, output_folder, params=None):
         print(f"\nСохраняем {len(unprocessed_files)} файлов в 'unprocessed'...")
 
         for file_name, issue in unprocessed_files.items():
-            source_path = os.path.join(input_folder, file_name)
+            source_path = os.path.join(output_folder, file_name)
             destination_path = os.path.join(unprocessed_folder, file_name)
             # print(source_path)
             # print(destination_path)
