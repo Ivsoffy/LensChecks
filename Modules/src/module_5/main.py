@@ -888,11 +888,11 @@ def check_codes(df):
     df.apply(lambda x: codes_not_correspond(x["errors_spec"], x.name, specialization_code), axis=1)
     return df
 
-def check_one_interval(grade, val, min, max, index, col):
+def check_one_interval(grade_num, val, min, max, index, col):
     global errors
     if not is_empty_value(val):
         try:
-            if not (min[grade] < val < max[grade]):
+            if not (min[grade_num] < val < max[grade_num]):
                 errors['data_errors'] += [(col, index)]
         except:
             errors['data_errors'] += [(grade, index)]
