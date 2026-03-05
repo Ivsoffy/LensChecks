@@ -127,8 +127,6 @@ def module_4(input_folder, output_folder, params):
 
                 df, unfilled_and_processed, count_past_year, count_model = process_unfilled(unfilled, df)
                 df.to_excel(output_file, sheet_name='Total Data')
-
-                # print(df.columns)
                 
                 process_output_file(filled_and_processed, unfilled_and_processed, cols, output_file)
 
@@ -143,8 +141,9 @@ def module_4(input_folder, output_folder, params):
                 add_info(info, output_file)
             else: # Аналитик проверил и исправил анкету
                 print("Модуль 4: Проставление проверенных грейдов.")
-                map_prefill_to_sheet1(input_file, output_file, sheet_prefill='Prefill')
-                df_final = map_prefill_to_sheet1(input_file, output_file, sheet_prefill='Model')
+                df_final = pd.read_excel(input_file, sheet_name='Total Data')
+                df_final = map_prefill_to_sheet1(input_file, sheet_prefill='Prefill', df_target=df_final)
+                df_final = map_prefill_to_sheet1(input_file, sheet_prefill='Model', df_target=df_final)
 
                 _, filename = os.path.split(output_file)
 
@@ -157,8 +156,8 @@ def module_4(input_folder, output_folder, params):
 
 def map_prefill_to_sheet1(
     excel_file: str,
-    output_path,
     sheet_prefill,
+    df_target=None,
     match_cols=[company_name, dep_level_1, dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6, job_title],
     code_cols=[grade],
     sheet_target='Total Data'
@@ -167,55 +166,60 @@ def map_prefill_to_sheet1(
     Маппит значения кодов из листа Prefill на данные в листе Sheet1 по совпадению колонок.
     """
 
-    # --- читаем оба листа ---
+    # --- базовый датафрейм ---
     xls = pd.ExcelFile(excel_file)
-    df_target = pd.read_excel(excel_file, sheet_name=sheet_target)
+    if df_target is None:
+        df_target = pd.read_excel(excel_file, sheet_name=sheet_target)
+    else:
+        df_target = df_target.copy()
 
-    if sheet_prefill in xls.sheet_names:
-        df_prefill = pd.read_excel(excel_file, sheet_name=sheet_prefill)
+    if sheet_prefill not in xls.sheet_names:
+        print(f"Лист '{sheet_prefill}' не найден в файле {excel_file}.")
+        return df_target
 
-        # df_target = pd.read_excel(excel_file, sheet_name=sheet_target)
+    df_prefill = pd.read_excel(excel_file, sheet_name=sheet_prefill)
+    if df_prefill.empty:
+        return df_target
 
-        if match_cols is None:
-            match_cols = [col for col in df_prefill.columns if col not in code_cols]
+    if match_cols is None:
+        match_cols = [col for col in df_prefill.columns if col not in code_cols]
 
-        # приведение типов к строке для колонок совпадений
-        for col in match_cols:
-            if col in df_prefill.columns:
-                df_prefill[col] = df_prefill[col].astype(str).fillna('')
-            if col in df_target.columns:
-                df_target[col] = df_target[col].astype(str).fillna('')
+    available_code_cols = [col for col in code_cols if col in df_prefill.columns]
+    if not available_code_cols:
+        return df_target
 
-        if set(match_cols).issubset(df_prefill.columns) and set(match_cols).issubset(df_target.columns):
-            df_merged = df_target.merge(
-                df_prefill[match_cols + list(code_cols)],
-                on=match_cols,
-                how='left',
-                suffixes=('', '_prefill')
-            )
+    # приведение типов к строке для колонок совпадений
+    for col in match_cols:
+        if col in df_prefill.columns:
+            df_prefill[col] = df_prefill[col].fillna('').astype(str).str.strip()
+        if col in df_target.columns:
+            df_target[col] = df_target[col].fillna('').astype(str).str.strip()
 
-            # --- заменяем коды из Prefill, если там есть значения ---
-            for col in code_cols:
-                df_merged[col] = df_merged[f"{col}_prefill"].combine_first(df_merged[col])
-                df_merged.drop(columns=f"{col}_prefill", inplace=True)
+    if not (set(match_cols).issubset(df_prefill.columns) and set(match_cols).issubset(df_target.columns)):
+        print("Не все колонки из match_cols найдены в обоих листах.")
+        return df_target
 
-            processed_path = output_path
+    df_prefill_unique = df_prefill.drop_duplicates(subset=match_cols, keep='first')
+    df_merged = df_target.merge(
+        df_prefill_unique[match_cols + available_code_cols],
+        on=match_cols,
+        how='left',
+        suffixes=('', '_prefill')
+    )
 
-            # сохраняем результат
-            if not os.path.exists(processed_path):
-                with pd.ExcelWriter(processed_path, engine="openpyxl", mode="w") as writer:
-                    df_merged.to_excel(writer, sheet_name=sheet_target, index=False)
+    # --- заменяем коды из Prefill/Model, если там есть значения ---
+    for col in available_code_cols:
+        prefill_col = f"{col}_prefill"
+        if prefill_col in df_merged.columns:
+            if col in df_merged.columns:
+                df_merged[col] = df_merged[prefill_col].combine_first(df_merged[col])
             else:
-                with pd.ExcelWriter(processed_path, engine="openpyxl", mode="a", if_sheet_exists="replace") as writer:
-                    df_merged.to_excel(writer, sheet_name=sheet_target, index=False)
+                df_merged[col] = df_merged[prefill_col]
+            df_merged.drop(columns=prefill_col, inplace=True)
 
-            print(f"На лист '{sheet_target}' подтянуты значения из листа '{sheet_prefill}' в файле {processed_path}")
-        else:
-            print("Не все колонки из match_cols найдены в обоих листах.")
-    
-    return df_target
-    
-        
+    print(f"На лист '{sheet_target}' подтянуты значения из листа '{sheet_prefill}'.")
+    return df_merged
+
 def add_info(info, output_file):
     info = pd.DataFrame(data=[info])
     book = load_workbook(output_file)

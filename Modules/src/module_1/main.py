@@ -930,6 +930,9 @@ def region_coeff_normalization(region, coef, index):
     if region in regions_with_coeff and (is_empty_value(coef) or coef==0):
         errors['data_errors'] += [(region_coeff, index)]
 
+    if not (region in regions_with_coeff) and not (is_empty_value(coef) or coef==0):
+        errors['data_errors'] += [(region_coeff, index)]
+
 def check_and_process_data(df, lang, params):
     global errors
 
