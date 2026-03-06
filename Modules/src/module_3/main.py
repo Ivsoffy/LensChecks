@@ -29,7 +29,7 @@ def module_3(input_folder, output_folder, params=None):
     res_df = pd.DataFrame()
     res_lower_mrot_df = pd.DataFrame()
     res_high_ti = pd.DataFrame()
-    print("Модуль 3: Компенсационные элементы.")
+    print("Module 3: Compensating Elements.")
 
     for file in os.listdir(input_folder):
         # Check if the file is an Excel file
@@ -60,7 +60,7 @@ def module_3(input_folder, output_folder, params=None):
                     df[gi_tel] = df_company.iloc[7, 3]
                     df[gi_email] = df_company.iloc[8, 3]
                 except Exception as e:
-                    print(f"Ошибка чтения файла '{file_path}': {e}")
+                    print(f"Error reading file '{file_path}': {e}")
                     continue
             # df = pd.read_excel(file_path, sheet_name=sheet_name, index_col=0)
             # print(df.keys())
@@ -412,6 +412,31 @@ def calculate_compensation_elements(df,
     Returns:
     pd.DataFrame: Modified dataframe with calculated compensation elements
     """
+
+    def _to_numeric(series):
+        # Handles common Excel text formats like "1 234,56"
+        return pd.to_numeric(
+            series.astype(str)
+            .str.replace('\xa0', '', regex=False)
+            .str.replace(' ', '', regex=False)
+            .str.replace(',', '.', regex=False),
+            errors='coerce'
+        )
+
+    numeric_columns = [
+        monthly_salary,
+        salary_rate,
+        number_annual_salaries,
+        additional_pay,
+        region_coeff,
+        fact_sti,
+        target_sti,
+        fact_lti,
+        target_lti_per
+    ]
+
+    for col in numeric_columns:
+        df[col] = _to_numeric(df[col])
     
     # Annual salary calculation
     df[annual_salary] = df[monthly_salary] / df[salary_rate] * df[number_annual_salaries]

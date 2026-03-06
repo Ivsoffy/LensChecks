@@ -25,7 +25,17 @@ sys.path.insert(0, parent_dir)
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 from ..LP import *
-from ..utils import main_checks
+from ..utils import (
+    main_checks,
+    convert_some_columns_to_numeric,
+    convert_some_columns_to_str,
+    is_empty_value,
+    init_errors,
+    has_errors,
+    is_excel_file,
+    normalize_column_names,
+    prepare_total_data,
+)
 
 
 def get_valid_path(prompt):
@@ -36,36 +46,6 @@ def get_valid_path(prompt):
             return path
         else:
             print("Invalid path. Please try again.")
-
-def convert_some_columns_to_numeric(df):
-    # Defining columns where ',' will be replaced with '.' so that it is recognized as a number
-    columns_to_numeric = [monthly_salary, salary_rate, number_monthly_salaries, fact_sti, fact_lti, fact_lti_1, fact_lti_2, fact_lti_3, target_lti_per, additional_pay, grade]
-    
-    for column in columns_to_numeric:
-        df[column] = df[column].astype(str).str.replace(',', '.').str.replace(u'\xa0', '')
-        df[column] = pd.to_numeric(df[column], errors='coerce')
-        df[column] = df[column].replace('nan', np.nan)
-    return df
-
-def convert_some_columns_to_str(df):
-    columns_to_str = [man_emp, gender_id, sti_eligibility, lti_eligibility, expat, performance, function_code, subfunction_code, specialization_code]
-    for column in columns_to_str:
-        df[column] = df[column].astype(str)
-    return df
-
-def is_empty_value(x):
-    """Возвращает True, если значение можно считать пустым."""
-    if x is None:
-        return True
-    if isinstance(x, (float, np.floating)) and pd.isna(x):
-        return True
-    if isinstance(x, str):
-        s = x.strip().lower()
-        if s in ("", "nan", "none", "null", "n/a", "na", "-", "--"):
-            return True
-    if isinstance(x, (list, tuple, dict, set)) and len(x) == 0:
-        return True
-    return False
 
 def check_general_info(errors, df):
     # Setting columns names to the russian version
@@ -284,44 +264,11 @@ def check_and_process_data(errors, df, params):
 
     return errors, df
 
-def _init_errors():
-    """Create error storage for one input file."""
-    return {
-        'info_errors': [],
-        'data_errors': []
-    }
-
-def _has_errors(errors):
-    """Return True when at least one validation error exists."""
-    return bool(errors['info_errors'] or errors['data_errors'])
-
-def _is_excel_file(file_name):
-    """Return True for supported Excel file extensions."""
-    return file_name.lower().endswith(('.xlsx', '.xls', '.xlsm'))
-
-def _normalize_column_names(df):
-    """Normalize DataFrame column names by removing extra whitespace."""
-    df = df.copy()
-    df.columns = [
-        re.sub(r'\s+', ' ', str(col).replace('\n', ' ').replace('\r', ' ')).strip()
-        for col in df.columns
-    ]
-    return df
-
-def _prepare_total_data(df):
-    """Remove rows where both company name and job title are empty."""
-    df = df.copy()
-    rows_to_drop = [company_name, job_title]
-    for column in rows_to_drop:
-        df[column] = df[column].replace('', np.nan)
-    df.dropna(subset=rows_to_drop, how='all', inplace=True)
-    return df
-
 def _process_single_file(file_path, params):
     """Read, validate and process one SDF file."""
-    errors = _init_errors()
+    errors = init_errors()
     df = pd.read_excel(file_path, sheet_name="Total Data", index_col=0)
-    df = _normalize_column_names(df)
+    df = normalize_column_names(df)
 
     missing_columns = [
         col for col in expected_columns_market_df_preload if col not in df.columns
@@ -332,7 +279,7 @@ def _process_single_file(file_path, params):
         )
         return None, errors
 
-    df = _prepare_total_data(df)
+    df = prepare_total_data(df, [company_name, job_title])
     print("Checking General Info section...")
     errors, df = check_general_info(errors, df)
     print("Checking employee data...")
@@ -415,21 +362,21 @@ def file_processing(input_folder, output_folder, params):
     single_db = params.get('single_db', False)
     save_db_only_without_errors = params.get('save_db_only_without_errors', False)
 
-    excel_files = [file_name for file_name in os.listdir(input_folder) if _is_excel_file(file_name)]
+    excel_files = [file_name for file_name in os.listdir(input_folder) if is_excel_file(file_name)]
     for counter, file_name in enumerate(excel_files, start=1):
         print(f"Processing file {counter}: {file_name}")
         file_path = os.path.join(input_folder, file_name)
         df, errors = _process_single_file(file_path, params)
-        has_errors = _has_errors(errors)
+        has_validation_errors = has_errors(errors)
 
         if df is not None:
-            should_save = (not has_errors) or (not save_db_only_without_errors)
+            should_save = (not has_validation_errors) or (not save_db_only_without_errors)
             if single_db and should_save:
                 result_frames.append(df)
             if not single_db and should_save:
                 _save_processed_file(df, file_name, output_folder)
 
-        if has_errors:
+        if has_validation_errors:
             unprocessed_files[file_name] = errors
         else:
             print("No validation issues were found in this file.")

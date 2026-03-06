@@ -49,13 +49,13 @@ def module_2(input_folder, output_folder, params):
         ValueError: If folders or params are invalid.
     """
     if not isinstance(params, dict):
-        raise ValueError("Ошибка: параметры должны быть словарем.")
+        raise ValueError("Error: params must be a dictionary.")
     if "folder_past_year" not in params or "after_fix" not in params:
-        raise ValueError("Ошибка: отсутствуют параметры 'folder_past_year' или 'after_fix'.")
+        raise ValueError("Error: missing required params 'folder_past_year' or 'after_fix'.")
     if not os.path.isdir(input_folder):
-        raise ValueError(f"Ошибка: входная папка не найдена: {input_folder}")
+        raise ValueError(f"Error: input folder not found: {input_folder}")
     if not os.path.isdir(output_folder):
-        raise ValueError(f"Ошибка: выходная папка не найдена: {output_folder}")
+        raise ValueError(f"Error: output folder not found: {output_folder}")
 
     folder_py = params["folder_past_year"]
     already_fixed = params["after_fix"]
@@ -83,17 +83,17 @@ def module_2(input_folder, output_folder, params):
                     df[gi_tel] = df_company.iloc[7, 3]
                     df[gi_email] = df_company.iloc[8, 3]
                 except Exception as e:
-                    print(f"Ошибка чтения файла '{input_file}': {e}")
+                    print(f"Error reading file '{input_file}': {e}")
                     continue
                 
 
             if function_code not in df.columns:
-                print(f"Ошибка: отсутствует колонка '{function_code}' в файле '{input_file}'.")
+                print(f"Error: missing column '{function_code}' in file '{input_file}'.")
                 continue
 
             if not already_fixed:
-                print("Модуль 2: Проставление кодов функций.")
-                print("Проставление кодов из анкеты прошлого года (если она найдена)")
+                print("Module 2: Assigning function codes.")
+                print("Assigning codes from last year's questionnaire (if found)")
                 df = process_past_year(folder_py, df)
 
                 unfilled = df.loc[
@@ -122,7 +122,7 @@ def module_2(input_folder, output_folder, params):
 
                 add_info(info, output_file)
             else:
-                print("Модуль 2: Проставление проверенных кодов функций.")
+                print("Module 2: Assigning validated function codes.")
 
                 map_prefill_to_sheet1(input_file, output_file, sheet_prefill="Prefill")
                 df, _ = map_prefill_to_sheet1(input_file, output_file, sheet_prefill="Model")
@@ -130,8 +130,8 @@ def module_2(input_folder, output_folder, params):
                 
                 df = df.loc[:, ~df.columns.str.startswith("Unnamed:")]
                 df.to_excel(output_file, sheet_name='Total Data')
-                print(f"Файл {output_file} сохранен.")
-            print(f"--------- Обработка файла {file} окончена ---------")
+                print(f"File {output_file} saved.")
+            print(f"--------- Processing file {file} completed ---------")
         
 
 def _is_excel_file(filename):
@@ -191,10 +191,10 @@ def process_past_year(folder_py, df):
         ValueError: If required columns are missing.
     """
     if company_name not in df.columns:
-        raise ValueError("Ошибка: отсутствует обязательная колонка Название компании.")
+        raise ValueError("Error: required column 'Company name' is missing.")
 
     if not isinstance(folder_py, str) or not os.path.exists(folder_py):
-        print(f"Предупреждение: путь к папке прошлогодних файлов некорректен: {folder_py}")
+        print(f"Warning: invalid path to last year's files folder: {folder_py}")
         return df
 
     companies = df[company_name].unique()
@@ -216,8 +216,8 @@ def process_past_year(folder_py, df):
                 ]
                 df = merge_by_cols(df, df_py, cols, cols_to_copy)
         except Exception as e:
-            file_name = found_files[0] if found_files else "неизвестный файл"
-            print(f"Ошибка при обработке прошлогоднего файла '{file_name}': {e}")
+            file_name = found_files[0] if found_files else "unknown file"
+            print(f"Error processing last year's file '{file_name}': {e}")
     return df
 
 
@@ -234,9 +234,9 @@ def check_column_rules(df, col_name, allowed_values):
         ValueError: If column or allowed values are missing.
     """
     if col_name not in df.columns:
-        raise ValueError(f"Ошибка: отсутствует колонка '{col_name}'.")
+        raise ValueError(f"Error: missing column '{col_name}'.")
     if allowed_values is None:
-        raise ValueError("Ошибка: список допустимых значений не задан.")
+        raise ValueError("Error: allowed values list is not provided.")
 
     df = df.copy()
     df[col_name] = df[col_name].astype(str).str.strip().str.upper()
@@ -266,7 +266,7 @@ def check_the_result(df):
     """
     sdf_path = "src/module_2/SDF.xlsx"
     if not os.path.exists(sdf_path):
-        raise FileNotFoundError(f"Ошибка: файл SDF не найден: {sdf_path}")
+        raise FileNotFoundError(f"Error: SDF file not found: {sdf_path}")
 
     sdf = pd.read_excel(sdf_path, sheet_name="Каталог функций", header=4)
     allowed_funcs = sdf[function_code]
@@ -314,10 +314,10 @@ def fill_function_name_from_sdf(
 
     missing_cols = [c for c in [col_name] if c not in df.columns]
     if missing_cols:
-        raise ValueError(f"Ошибка: отсутствуют колонки в данных: {missing_cols}")
+        raise ValueError(f"Error: missing columns in data: {missing_cols}")
     missing_sdf = [c for c in [col_name, col_sdf] if c not in sdf.columns]
     if missing_sdf:
-        raise ValueError(f"Ошибка: отсутствуют колонки в SDF: {missing_sdf}")
+        raise ValueError(f"Error: missing columns in SDF: {missing_sdf}")
 
     mapping = (
         sdf[[col_name, col_sdf]]
@@ -370,22 +370,22 @@ def map_prefill_to_sheet1(
     processed_path = output_path
 
     if not isinstance(excel_file, str) or not excel_file:
-        raise ValueError("Ошибка: путь к исходному файлу не задан.")
+        raise ValueError("Error: source file path is not provided.")
     if not isinstance(output_path, str) or not output_path:
-        raise ValueError("Ошибка: путь для выходного файла не задан.")
+        raise ValueError("Error: output file path is not provided.")
 
     try:
         try:
             df_prefill = pd.read_excel(excel_file, sheet_name=sheet_prefill)
             df_target = pd.read_excel(excel_file, sheet_name=sheet_target)
         except FileNotFoundError:
-            print(f"Ошибка: файл не найден: '{excel_file}'.")
+            print(f"Error: file not found: '{excel_file}'.")
             return df_merged, output_path
         except ValueError as e:
-            print(f"Ошибка чтения листа Excel: {e}")
+            print(f"Error reading Excel sheet: {e}")
             return df_merged, output_path
         except Exception as e:
-            print(f"Ошибка чтения Excel: {e}")
+            print(f"Error reading Excel: {e}")
             return df_merged, output_path
 
         if df_prefill.empty:
@@ -409,10 +409,10 @@ def map_prefill_to_sheet1(
                     suffixes=("", "_prefill"),
                 )
             except KeyError as e:
-                print(f"Ошибка: отсутствует колонка при слиянии: {e}")
+                print(f"Error: missing column during merge: {e}")
                 return df_merged, output_path
             except Exception as e:
-                print(f"Ошибка при слиянии данных: {e}")
+                print(f"Error merging data: {e}")
                 return df_merged, output_path
 
             for col in code_cols:
@@ -420,19 +420,19 @@ def map_prefill_to_sheet1(
                     df_merged[col] = df_merged[f"{col}_prefill"].combine_first(df_merged[col])
                     df_merged.drop(columns=f"{col}_prefill", inplace=True)
                 except KeyError:
-                    print(f"Ошибка: колонка '{col}' отсутствует в данных Prefill.")
+                    print(f"Error: column '{col}' is missing in Prefill data.")
                 except Exception as e:
-                    print(f"Ошибка объединения колонки '{col}': {e}")
+                    print(f"Error merging column '{col}': {e}")
 
             folder, filename = os.path.split(output_path)
             name, ext = os.path.splitext(filename)
             processed_filename = f"{name}_processed{ext}"
             processed_path = os.path.join(folder, processed_filename)
         else:
-            print("Ошибка: match_cols отсутствуют в Prefill или Target.")
+            print("Error: match_cols are missing in Prefill or Target.")
             return df_merged, output_path
     except Exception as e:
-        print(f"Ошибка при обработке Prefill: {e}")
+        print(f"Error processing Prefill: {e}")
         return df_merged, output_path
     return df_merged, processed_path
 
@@ -452,7 +452,7 @@ def add_info(info, output_file):
     try:
         book = load_workbook(output_file)
     except FileNotFoundError:
-        raise FileNotFoundError(f"Ошибка: выходной файл не найден: {output_file}")
+        raise FileNotFoundError(f"Error: output file not found: {output_file}")
 
     ws3 = book.create_sheet(title="Info")
 
@@ -520,7 +520,7 @@ def process_output_file(df1, df2, cols, output_file, sheet1_name="Prefill", shee
     df2 = df2[[c for c in df2_cols if c in df2.columns]]
 
     if "predicted_code" in df2.columns:
-        # raise ValueError("Ошибка: отсутствует колонка predicted_code.")
+        # raise ValueError("Error: missing column predicted_code.")
 
         pred_codes = df2["predicted_code"].astype(str)
         df2[function_code] = pred_codes.str[:2]
@@ -530,7 +530,7 @@ def process_output_file(df1, df2, cols, output_file, sheet1_name="Prefill", shee
     try:
         book = load_workbook(output_file)
     except FileNotFoundError:
-        print(f"Ошибка: выходной файл не найден: {output_file}")
+        print(f"Error: output file not found: {output_file}")
         return
 
     red_fill = PatternFill(start_color="FFC7CE", end_color="FFC7CE", fill_type="solid")
@@ -575,7 +575,7 @@ def process_unfilled(df, df_orig):
         df_orig[specialization_code].update(df["spec_old"])
 
     if function_code not in df_orig.columns:
-        raise ValueError("Ошибка: отсутствует колонка function_code.")
+        raise ValueError("Error: missing column function_code.")
 
     df_without_py = df_orig.loc[
         df_orig[function_code].astype(str).str.lower().str.strip().eq("nan")
@@ -583,7 +583,7 @@ def process_unfilled(df, df_orig):
     count_model = df_without_py.shape[0]
     count_past_year = df.shape[0] - count_model
     if count_model != 0:
-        print("Проставление кодов нейросетью")
+        print("Assigning codes with neural network")
         model = CodeModel()
         preds = model.predict(df_without_py, test=True)
 
@@ -625,11 +625,11 @@ def merge_by_cols(df, df_py, cols, cols_to_copy):
     """
     missing_cols_df = [c for c in cols if c not in df.columns]
     if missing_cols_df:
-        raise ValueError(f"Ошибка: отсутствуют колонки в текущих данных: {missing_cols_df}.")
+        raise ValueError(f"Error: missing columns in current data: {missing_cols_df}.")
 
     missing_cols = [c for c in cols + cols_to_copy if c not in df_py.columns]
     if missing_cols:
-        raise ValueError(f"Ошибка: отсутствуют колонки в прошлогодних данных: {missing_cols}.")
+        raise ValueError(f"Error: missing columns in last year's data: {missing_cols}.")
 
     for c in cols:
         df[c] = df[c].astype(str).replace("nan", np.nan)
@@ -668,7 +668,7 @@ def check_if_past_year_exist(company, folder_py):
         ValueError: If the folder path is invalid.
     """
     if not os.path.isdir(folder_py):
-        raise ValueError(f"Ошибка: папка не найдена: {folder_py}")
+        raise ValueError(f"Error: folder not found: {folder_py}")
 
     company_str = str(company).strip()
     found_files = []

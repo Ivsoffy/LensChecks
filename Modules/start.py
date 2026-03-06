@@ -95,13 +95,13 @@ def main():
     input_folder = find_input_folder(input_folder, config['module'], config['after_fix'])
     output_folder = find_output_folder(config['module'], config['after_fix'])
     if input_folder == None:
-        print(f'Директория input_folder: {input_folder} с анкетами не найдена!')
+        print(f'Directory input_folder: {input_folder} not found!')
         if (config['module'] == 2) or (config['module'] == 4):
-            print(f"Проверьте параметр after_fix в config.yml!")
+            print(f"Check parameter after_fix в config.yml!")
         return
     
-    print("Проверяемая директория: ", input_folder)
-    print("Проверенные файлы будут сохранены в директорию ", output_folder)
+    print("Directory to check: ", input_folder)
+    print("Checked files will be saved in the directory: ", output_folder)
 
     param_names = params_for_each_module[module_num]
     params = {}

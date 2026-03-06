@@ -30,7 +30,18 @@ sys.path.insert(0, parent_dir)
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 from ..LP import *
-from ..utils import main_checks, write_df_with_template, is_empty_value
+from ..utils import (
+    main_checks,
+    write_df_with_template,
+    is_empty_value,
+    convert_some_columns_to_numeric,
+    convert_some_columns_to_str,
+    init_errors,
+    has_errors,
+    is_excel_file,
+    normalize_column_names,
+    prepare_total_data,
+)
 
 
 def get_valid_path(prompt):
@@ -101,22 +112,6 @@ def region_normalization(errors, text: str, index: int, lang) -> str:
     if not(not_missing and in_dict_values):
         errors['data_errors'] += [(region, index)]
     return text
-
-def convert_some_columns_to_numeric(df):
-    # Defining columns where ',' will be replaced with '.' so that it is recognized as a number
-    columns_to_numeric = [monthly_salary, salary_rate, number_monthly_salaries, fact_sti, fact_lti, fact_lti_1, fact_lti_2, fact_lti_3, target_lti_per, additional_pay, grade]
-    
-    for column in columns_to_numeric:
-        df[column] = df[column].astype(str).str.replace(',', '.').str.replace(u'\xa0', '')
-        df[column] = pd.to_numeric(df[column], errors='coerce')
-        df[column] = df[column].replace('nan', np.nan)
-    return df
-
-def convert_some_columns_to_str(df):
-    columns_to_str = [man_emp, gender_id, sti_eligibility, lti_eligibility, expat, performance, function_code, subfunction_code, specialization_code]
-    for column in columns_to_str:
-        df[column] = df[column].astype(str)
-    return df
 
 # Function to assign values based on a mapping
 def translate_values(df, columns, translation_map):
@@ -262,7 +257,7 @@ def add_errors_to_excel(errors, input_path, output_path):
     if not data_sheet:
         wb.Close(SaveChanges=False)
         excel.Quit()
-        raise ValueError("Не найден лист 'Данные'.")
+        raise ValueError("Sheet 'Данные'/'Salary Data' not found.")
 
     ws_data = data_sheet
 
@@ -284,20 +279,20 @@ def add_errors_to_excel(errors, input_path, output_path):
     for col_name, idx in errors.get('data_errors', []):
         col_idx = col_map.get(norm(col_name))
         if not col_idx:
-            print(f"Не найдена колонка: {col_name}")
+            print(f"Column {col_name} not found.")
             continue
         excel_row = 8 + idx
         if 1 <= excel_row <= ws_data.UsedRange.Rows.Count:
             ws_data.Cells(excel_row, col_idx).Interior.Color = orange_color
         else:
-            print(f"Строка вне диапазона: {excel_row}")
+            print(f"Row {excel_row} doesn't exist.")
 
     # --- Сохранение и закрытие ---
     wb.SaveAs(output_path)
     wb.Close(SaveChanges=True)
     excel.Quit()
 
-    print(f"Лист 'Errors' добавлен, ячейки подсвечены. Файл: {output_path}")
+    print(f"The 'Errors' sheet has been added, and the cells are highlighted. File: {output_path}")
 
 def add_regions(errors, df, lang):
     df[region] = df[region].where(
@@ -339,150 +334,134 @@ def check_and_process_data(errors, df, lang, params):
     
     return errors, df
 
-def module_1(input_folder, output_folder, params=None):
+def _print_unprocessed_summary(unprocessed_files):
+    """Print concise validation summary for files with errors."""
+    if not unprocessed_files:
+        print("\nTest completed!")
+        return
 
-    print("Модуль 1: Техническая проверка.")
+    print("=" * 20 + " WARNING! " + "=" * 20)
+    print("List of unprocessed files:")
+    for file_name, issue in unprocessed_files.items():
+        data_err = [col for col, _ in issue.get('data_errors', [])]
+        unique_data_err = list(dict.fromkeys(data_err))
+        print(f"\nFile: {file_name}, Info errors: {issue['info_errors']}\nData errors: {unique_data_err}")
 
-    # Additional columns from General Info sheet from the SDFs
-    additional_cols = [gi_sector, gi_origin, gi_headcount_cat, gi_revenue_cat, gi_contact_name, 
-                    gi_title, gi_tel, gi_email, 'SDF Language']
 
-    expected_columns = expected_columns_rus
+def _save_unprocessed_files(unprocessed_files, output_folder):
+    """Move files with validation errors to `unprocessed` and add an Errors sheet."""
+    if not unprocessed_files:
+        return
 
-    # Setting the columns in the final df
-    final_cols = expected_columns + additional_cols
-
-    # Creating the final df
-    # Iterate through all the files in the input folder
-    process_start = time.time()
-
-    unprocessed_files = file_processing(input_folder, output_folder, final_cols, params)
-    proces_end = time.time()
-    print(f'Обработка файлов заняла: {proces_end - process_start}')
-
-    if len(unprocessed_files) == 0:
-        print(f"\nВсе файлы проверены!")
-    else:
-        print("=" * 20 + " WARNING! " + "=" * 20)
-        print(f"List of unprocessed files:")
-        for file, issue in unprocessed_files.items():
-            data_err = [col for col, _ in issue.get('data_errors', [])]
-            unique_data_err = list(dict.fromkeys(data_err))
-            print(f'\n')
-            print(f"File: {file}, Info errors: {issue['info_errors']}\nData errors: {unique_data_err}")
-            
-            
-    # Create unprocessed folder if it doesn't exist
     unprocessed_folder = os.path.join(output_folder, 'unprocessed')
     os.makedirs(unprocessed_folder, exist_ok=True)
+    print(f"\nSaving {len(unprocessed_files)} files to 'unprocessed'...")
 
-    # Copy unprocessed files to the unprocessed folder (overwrite if exists)
-    if unprocessed_files:
-        print(f"\nСохраняем {len(unprocessed_files)} файлов в 'unprocessed'...")
+    for file_name, issue in unprocessed_files.items():
+        source_path = os.path.join(output_folder, file_name)
+        destination_path = os.path.join(unprocessed_folder, file_name)
+        try:
+            if not os.path.exists(source_path):
+                continue
+            if os.path.exists(destination_path):
+                os.remove(destination_path)
+            add_errors_to_excel(issue, source_path, destination_path)
+            os.remove(source_path)
+        except Exception as error:
+            print(f"Failed to save file {file_name} to 'unprocessed': {str(error)}")
 
-        for file_name, issue in unprocessed_files.items():
-            source_path = os.path.join(output_folder, file_name)
-            destination_path = os.path.join(unprocessed_folder, file_name)
-            # print(source_path)
-            # print(destination_path)
-            try:
-                if os.path.exists(source_path):
-                    # Если файл уже есть в папке unprocessed — удалим его
-                    if os.path.exists(destination_path):
-                        os.remove(destination_path)
-                    add_errors_to_excel(issue, source_path, destination_path)
-                    os.remove(source_path)
-            except Exception as e:
-                print(f"Не удалось сохранить файл {file_name} в unprocessed: {str(e)}")
-        
-def file_processing(input_folder, output_folder, columns, params):
-    # Creating a list for files with issues
+
+def _resolve_file_layout(sheet_names):
+    """Detect language and required sheet names for one input workbook."""
+    if 'Salary Data' in sheet_names:
+        return 'ENG', rem_data_eng, company_data_eng, [company_name_eng, job_title_eng]
+    return 'RUS', rem_data, company_data, [company_name, job_title]
+
+
+def _process_single_file(file_path, params):
+    """Read and validate one workbook, returning processed dataframe and collected errors."""
+    errors = init_errors()
+
+    with pd.ExcelFile(file_path) as workbook:
+        lang, rm_data_sheet, company_sheet, rows_to_drop = _resolve_file_layout(workbook.sheet_names)
+        expected_columns = set_expected_columns(lang)
+
+        df = workbook.parse(rm_data_sheet, header=6)
+        df = normalize_column_names(df)
+        missing_columns = [col for col in expected_columns if col not in df.columns]
+        if missing_columns:
+            errors['info_errors'].append(f"The following columns are missing from the Data: {missing_columns}")
+            return df, errors
+
+        df = df[expected_columns]
+        df = prepare_total_data(df, rows_to_drop)
+        df_company = workbook.parse(company_sheet, header=1).iloc[:, 2:]
+
+    errors, df = check_general_info(errors, df_company, lang, df)
+    errors, df = check_and_process_data(errors, df, lang, params)
+    return df, errors
+
+
+def _save_single_db(result_frames, output_folder):
+    """Save concatenated processed dataframes into one `result_db.xlsx` file."""
+    if not result_frames:
+        return
+
+    result_df = pd.concat(result_frames)
+    result_df = result_df.loc[:, ~result_df.columns.str.contains('^Unnamed')]
+    file_output_path = os.path.join(output_folder, 'result_db.xlsx')
+    result_df.to_excel(file_output_path, sheet_name="Total Data")
+    print(f"All files are combined into {output_folder}!")
+
+
+def module_1(input_folder, output_folder, params=None):
+    """Run module 1 validation and write processed/unprocessed outputs."""
+    print("Module 1: Technical Validation.")
+    process_start = time.time()
+
+    unprocessed_files = file_processing(input_folder, output_folder, params=params)
+
+    process_end = time.time()
+    print(f'File processing took: {process_end - process_start}')
+    _print_unprocessed_summary(unprocessed_files)
+    _save_unprocessed_files(unprocessed_files, output_folder)
+
+
+def file_processing(input_folder, output_folder, columns=None, params=None):
+    """Process all supported Excel files from `input_folder` and return error mapping."""
+    params = params or {}
     unprocessed_files = {}
-    single_db = params['single_db']
-    result_df = pd.DataFrame()
-    # ultimate_df = pd.DataFrame(columns=columns)
-    counter = 0
-    save_db_only_without_errors = params['save_db_only_without_errors']
+    result_frames = []
+    single_db = params.get('single_db', False)
+    save_db_only_without_errors = params.get('save_db_only_without_errors', False)
 
-    for file in os.listdir(input_folder):
-        # Check if the file is an Excel file
-        if file.endswith('.xlsx') or file.endswith('.xls') or file.endswith('.xlsm'):
-            counter += 1
-            errors = {
-                'info_errors': [], # Список ошибок на листе Общая информация
-                'data_errors': [] # Cписок ошибок в данных (row, col)
-            }
-            
-            print(f"Проверяем файл {counter}: {file}")
-            # Process the Excel file
-            file_path = os.path.join(input_folder, file)
+    excel_files = [file_name for file_name in sorted(os.listdir(input_folder)) if is_excel_file(file_name)]
+    for counter, file_name in enumerate(excel_files, start=1):
+        print(f"Checking the file {counter}: {file_name}")
+        file_path = os.path.join(input_folder, file_name)
 
-            # Language detection
-            if 'Salary Data' in pd.ExcelFile(file_path).sheet_names:
-                lang = 'ENG'
-                rm_data = rem_data_eng 
-                cmp_data = company_data_eng
-                rows_to_drop = [company_name_eng, job_title_eng]
+        df, errors = _process_single_file(file_path, params)
+        file_has_errors = has_errors(errors)
+        should_save = (not file_has_errors) or (not save_db_only_without_errors)
+
+        if should_save:
+            if single_db:
+                result_frames.append(df)
             else:
-                lang = 'RUS'
-                rm_data = rem_data
-                cmp_data = company_data
-                rows_to_drop = [company_name, job_title]
-            expected_columns = set_expected_columns(lang)
+                file_output_path = os.path.join(output_folder, file_name)
+                df.to_excel(file_output_path, sheet_name="Total Data")
+                print(f"File {file_name} is saved to {output_folder}!")
 
-            # Exporting the dataframe from an excel file
-            # For SDFs
-            df = pd.read_excel(file_path, sheet_name=rm_data, header=6)
+        if file_has_errors:
+            base, ext = os.path.splitext(file_name)
+            unprocessed_name = f'{base}_unprocessed_{ext}'
+            file_output_path = os.path.join(output_folder, unprocessed_name)
+            write_df_with_template(df, file_path, file_output_path)
+            unprocessed_files[unprocessed_name] = errors
+        else:
+            print("No errors were found in the file, congratulations!")
 
-            # Apply cleaning to column names
-            df.columns = [re.sub(r'\s+', ' ', str(col).replace('\n', ' ').replace('\r', ' ')).strip() 
-                            for col in df.columns]
-            
-            # Check if all expected columns are present
-            missing_columns_rem_data = [col for col in expected_columns if col not in df.columns]
-
-            if missing_columns_rem_data:
-                errors['info_errors'] += [f"Не хватает следующих колонок в Данных: {missing_columns_rem_data}"]
-            else:
-                # leaving only required columns
-                df = df[expected_columns]
-            
-                # Cleaning all the blanks from the columns
-                for column in rows_to_drop:
-                    df[column] = df[column].replace('', np.nan)
-
-                # Dropping rows where company name and title are empty at the same time
-                df.dropna(subset=rows_to_drop, how = 'all', inplace=True)
-
-                df_company = pd.read_excel(file_path, sheet_name=cmp_data, header=1)
-                df_company = df_company.iloc[:, 2:]
-
-
-                # Taking the data from the General Info sheet
-                errors, df = check_general_info(errors, df_company, lang, df)
-                errors, df = check_and_process_data(errors, df, lang, params)
-
-                if single_db:
-                    result_df = pd.concat([result_df, df])
-                # print(df.shape[0])
-                
-                if not single_db and ((errors['data_errors'] == [] and errors['info_errors'] == []) or not save_db_only_without_errors):
-                    # Save the processed DataFrame to the output folder
-                    file_output_path_no_format = os.path.join(output_folder, file)
-                    df.to_excel(file_output_path_no_format, sheet_name="Total Data")
-                    print(f"Анкета {file} сохранена в {output_folder}!")
-            if errors['data_errors'] != [] or errors['info_errors'] != []:
-                base, ext = os.path.splitext(file)
-                file_output_path = os.path.join(output_folder, f'{base}_unprocessed_{ext}')
-                write_df_with_template(df, file_path, file_output_path)
-                unprocessed_files[os.path.basename(file_output_path)] = errors
-            else:
-                print("В файле не обнаружено ошибок, мои поздравления!")
-    
-    if single_db and ((not save_db_only_without_errors) or (errors['data_errors'] == [] and errors['info_errors'] == [])):
-        file_output_path = os.path.join(output_folder, 'result_db.xlsx')
-        result_df = result_df.loc[:, ~df.columns.str.contains('^Unnamed')]
-        result_df.to_excel(file_output_path, sheet_name='Total Data')
-        print(f"Все анкеты объединены в {output_folder}!")
+    if single_db:
+        _save_single_db(result_frames, output_folder)
 
     return unprocessed_files

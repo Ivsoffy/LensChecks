@@ -66,7 +66,7 @@ def process_past_year(folder_py, df):
     """
 
     if not isinstance(folder_py, str) or not os.path.exists(folder_py):
-        print(f"Предупреждение: путь к папке прошлогодних файлов некорректен: {folder_py}")
+        print(f"Warning: invalid path to last year's files folder: {folder_py}")
         return df
 
     companies = df[company_name].unique()
@@ -88,8 +88,8 @@ def process_past_year(folder_py, df):
                 ]
                 df = merge_by_cols(df, df_py, cols, cols_to_copy)
         except Exception as e:
-            file_name = found_files[0] if found_files else "неизвестный файл"
-            print(f"Ошибка при обработке прошлогоднего файла '{file_name}': {e}")
+            file_name = found_files[0] if found_files else "unknown file"
+            print(f"Error processing last year's file '{file_name}': {e}")
     return df
 
 
@@ -112,8 +112,8 @@ def module_4(input_folder, output_folder, params):
             df = pd.read_excel(input_file, sheet_name='Total Data', index_col=0)
 
             if not already_fixed:
-                print("Модуль 4: Выставление грейдов.")
-                print("Проставление кодов из анкеты прошлого года (если она найдена)")
+                print("Module 4: Assigning grades.")
+                print("Assigning codes from last year's questionnaire (if found)")
                 df = process_past_year(folder_py, df)
 
                 # Делим данные на заполненные и незаполненные
@@ -121,7 +121,7 @@ def module_4(input_folder, output_folder, params):
                 filled = df[~df.index.isin(unfilled.index)]
                 empty_count = unfilled.shape[0]
 
-                print(f"Проставлено грейдов: {len(filled)}, отсутствует грейдов: {len(unfilled)}")
+                print(f"Assigned grades: {len(filled)}, missing grades: {len(unfilled)}")
 
                 filled_and_processed = process_filled(filled)
 
@@ -140,7 +140,7 @@ def module_4(input_folder, output_folder, params):
 
                 add_info(info, output_file)
             else: # Аналитик проверил и исправил анкету
-                print("Модуль 4: Проставление проверенных грейдов.")
+                print("Module 4: Assigning validated grades.")
                 df_final = pd.read_excel(input_file, sheet_name='Total Data')
                 df_final = map_prefill_to_sheet1(input_file, sheet_prefill='Prefill', df_target=df_final)
                 df_final = map_prefill_to_sheet1(input_file, sheet_prefill='Model', df_target=df_final)
@@ -150,8 +150,8 @@ def module_4(input_folder, output_folder, params):
                 output_file = os.path.join(output_folder, filename)
                 df_final = df_final.loc[:, ~df_final.columns.str.startswith("Unnamed:")]
                 df_final.to_excel(output_file, sheet_name='Total Data')
-                print(f"Файл {output_file} сохранен.")
-            print(f"--------- Обработка файла {file} окончена ---------")
+                print(f"File {output_file} saved.")
+            print(f"--------- Processing file {file} completed ---------")
 
 
 def map_prefill_to_sheet1(
@@ -163,7 +163,18 @@ def map_prefill_to_sheet1(
     sheet_target='Total Data'
 ):
     """
-    Маппит значения кодов из листа Prefill на данные в листе Sheet1 по совпадению колонок.
+    Summary: Map code values from a Prefill/Model sheet to the target sheet by match columns.
+    Args:
+        excel_file (str): Source Excel file path.
+        sheet_prefill (str): Name of the source sheet with code values.
+        df_target (pd.DataFrame | None): Optional target dataframe. If None, loaded from sheet_target.
+        match_cols (list): Columns used to match rows between sheets.
+        code_cols (list): Columns to copy from source sheet.
+        sheet_target (str): Name of the target sheet.
+    Returns:
+        pd.DataFrame: Target dataframe with mapped values.
+    Raises:
+        None
     """
 
     # --- базовый датафрейм ---
@@ -174,7 +185,7 @@ def map_prefill_to_sheet1(
         df_target = df_target.copy()
 
     if sheet_prefill not in xls.sheet_names:
-        print(f"Лист '{sheet_prefill}' не найден в файле {excel_file}.")
+        print(f"Sheet '{sheet_prefill}' not found in file {excel_file}.")
         return df_target
 
     df_prefill = pd.read_excel(excel_file, sheet_name=sheet_prefill)
@@ -196,7 +207,7 @@ def map_prefill_to_sheet1(
             df_target[col] = df_target[col].fillna('').astype(str).str.strip()
 
     if not (set(match_cols).issubset(df_prefill.columns) and set(match_cols).issubset(df_target.columns)):
-        print("Не все колонки из match_cols найдены в обоих листах.")
+        print("Not all columns from match_cols were found in both sheets.")
         return df_target
 
     df_prefill_unique = df_prefill.drop_duplicates(subset=match_cols, keep='first')
@@ -217,7 +228,7 @@ def map_prefill_to_sheet1(
                 df_merged[col] = df_merged[prefill_col]
             df_merged.drop(columns=prefill_col, inplace=True)
 
-    print(f"На лист '{sheet_target}' подтянуты значения из листа '{sheet_prefill}'.")
+    print(f"Values from sheet '{sheet_prefill}' were mapped to sheet '{sheet_target}'.")
     return df_merged
 
 def add_info(info, output_file):
@@ -240,9 +251,18 @@ def add_info(info, output_file):
 
 def process_output_file(df1, df2, cols, output_file, sheet1_name='Prefill', sheet2_name='Model'):
     """
-    Добавляет два датафрейма в существующий Excel-файл.
-    В df1 подсвечивает красным строки, где past_year_check == False.
-    В df2 подсвечивает красным строки, где function_confidence < 70.
+    Summary: Write two dataframes to an existing Excel file with conditional highlighting.
+    Args:
+        df1 (pd.DataFrame): Dataframe for sheet1_name.
+        df2 (pd.DataFrame): Dataframe for sheet2_name.
+        cols (list): Key columns for deduplication.
+        output_file (str): Output Excel file path.
+        sheet1_name (str): Name of the first output sheet.
+        sheet2_name (str): Name of the second output sheet.
+    Returns:
+        None
+    Raises:
+        None
     """
 
     # Оставляем только уникальные строки
@@ -309,17 +329,23 @@ def process_output_file(df1, df2, cols, output_file, sheet1_name='Prefill', shee
                 cell.fill = red_fill
 
     book.save(output_file)
-    print(f"Листы '{sheet1_name}' и '{sheet2_name}' добавлены в файл: {output_file}")
+    print(f"Sheets '{sheet1_name}' and '{sheet2_name}' were added to file: {output_file}")
 
 def check_unfilled_columns(df):
     """
-    Проверяет, есть ли пустые значения в колонке DataFrame. True если пропусков нет.
+    Summary: Check whether the function code column has empty values.
+    Args:
+        df (pd.DataFrame): Input dataframe.
+    Returns:
+        bool | None: True if no empty values are found, otherwise None.
+    Raises:
+        None
     """
     col = function_code
     # Приводим всё к строке и убираем пробелы
     mask_empty = df[col].astype(str).str.strip().isin(['', 'nan', 'NaN', 'None'])
     if mask_empty.any():
-        print(f"Колонка '{col}' не заполнена полностью — есть пустые значения.")
+        print(f"Column '{col}' is not fully filled - contains empty values.")
         return
     return True
 
@@ -347,11 +373,13 @@ def process_unfilled(df, df_orig):
 
 def process_filled(df):
     """
-    Сравнивает столбцы grade и 'grade_old' в датафрейме.
-    Создаёт новый столбец 'past_year_check', где:
-      - True, если значения совпадают,
-      - True, если значение func_old == NaN,
-      - False — если различаются.
+    Summary: Compare grade with grade_old and mark consistency in past_year_check.
+    Args:
+        df (pd.DataFrame): Dataframe with grade columns.
+    Returns:
+        pd.DataFrame: Updated dataframe with past_year_check.
+    Raises:
+        None
     """
     df = df.copy()
     df["past_year_check"] = True
@@ -366,23 +394,22 @@ def process_filled(df):
 
 def merge_by_cols(df, df_py, cols, cols_to_copy):
     """
-    Сравнивает строки df и df_py по списку колонок cols.
-    Если значения совпадают — копирует значения колонок cols_to_copy из df_py в df в колонку grade_old.
-
-    Параметры:
-        df (pd.DataFrame): основной датафрейм, в который копируем данные
-        df_py (pd.DataFrame): источник данных
-        cols (list): список колонок для сравнения
-        cols_to_copy (list): список колонок, которые нужно скопировать из df_py в df (ожидается одна колонка: ['grade'])
-
-    Возвращает:
-        pd.DataFrame: обновлённый df
+    Summary: Merge current data with past-year data by key columns and copy selected values.
+    Args:
+        df (pd.DataFrame): Current dataframe to update.
+        df_py (pd.DataFrame): Past-year dataframe used as source.
+        cols (list): Key columns for matching rows.
+        cols_to_copy (list): Columns to copy from df_py.
+    Returns:
+        pd.DataFrame: Merged dataframe with grade_old filled when available.
+    Raises:
+        ValueError: If required columns are missing in df_py.
     """
 
     # Проверим наличие нужных колонок
     missing_cols = [c for c in cols + cols_to_copy if c not in df_py.columns]
     if missing_cols:
-        raise ValueError(f"Отсутствуют колонки в df_py: {missing_cols}")
+        raise ValueError(f"Missing columns in df_py: {missing_cols}")
 
     df = df.copy()
     df_py = df_py.copy()
@@ -417,7 +444,7 @@ def merge_by_cols(df, df_py, cols, cols_to_copy):
 
 
 # def _normalize_val(v):
-#     """Нормализация для сравнения: на str, strip и lower (None/NaN -> '')"""
+#     """Normalize value for comparison: cast to str, strip, lower (None/NaN -> '')."""
 #     if pd.isna(v):
 #         return ""
 #     s = str(v).strip()
@@ -433,7 +460,7 @@ def check_if_past_year_exist(company, folder_py):
     
     if found_files:
         for f in found_files:
-            print(f"Найдена анкета прошлого года: {f}")
+            print(f"Found last year's questionnaire: {f}")
     else:
-        print("Не найдено анкет прошлого года.")
+        print("No last year's questionnaires found.")
     return found_files

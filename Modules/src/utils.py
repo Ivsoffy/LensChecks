@@ -14,6 +14,102 @@ import os
 import re
 import difflib
 
+NUMERIC_COLUMNS_TO_COERCE = [
+    monthly_salary,
+    salary_rate,
+    number_monthly_salaries,
+    fact_sti,
+    fact_lti,
+    fact_lti_1,
+    fact_lti_2,
+    fact_lti_3,
+    target_lti_per,
+    additional_pay,
+    grade,
+]
+
+STRING_COLUMNS_TO_COERCE = [
+    man_emp,
+    gender_id,
+    sti_eligibility,
+    lti_eligibility,
+    expat,
+    performance,
+    function_code,
+    subfunction_code,
+    specialization_code,
+]
+
+
+def init_errors():
+    """Create a standard error container used by validation modules."""
+    return {
+        'info_errors': [],
+        'data_errors': [],
+    }
+
+
+def has_errors(errors):
+    """Return True if at least one info or data error is present."""
+    return bool(errors.get('info_errors') or errors.get('data_errors'))
+
+
+def is_excel_file(file_name):
+    """Check whether file name has a supported Excel extension."""
+    return str(file_name).lower().endswith(('.xlsx', '.xls', '.xlsm'))
+
+
+def normalize_column_names(df):
+    """Normalize DataFrame column names by trimming spaces and line breaks."""
+    normalized_df = df.copy()
+    normalized_df.columns = [
+        re.sub(r'\s+', ' ', str(col).replace('\n', ' ').replace('\r', ' ')).strip()
+        for col in normalized_df.columns
+    ]
+    return normalized_df
+
+
+def prepare_total_data(df, required_columns):
+    """Drop rows where all required key columns are empty."""
+    normalized_df = df.copy()
+    existing_columns = [col for col in required_columns if col in normalized_df.columns]
+    if not existing_columns:
+        return normalized_df
+
+    for column in existing_columns:
+        normalized_df[column] = normalized_df[column].replace('', np.nan)
+    normalized_df.dropna(subset=existing_columns, how='all', inplace=True)
+    return normalized_df
+
+
+def convert_some_columns_to_numeric(df, columns=None):
+    """Convert configured numeric columns to numeric dtype with coercion."""
+    numeric_columns = columns or NUMERIC_COLUMNS_TO_COERCE
+    normalized_df = df.copy()
+    for column in numeric_columns:
+        if column not in normalized_df.columns:
+            continue
+        normalized_df[column] = (
+            normalized_df[column]
+            .astype(str)
+            .str.replace(',', '.', regex=False)
+            .str.replace(u'\xa0', '', regex=False)
+        )
+        normalized_df[column] = pd.to_numeric(normalized_df[column], errors='coerce')
+    return normalized_df
+
+
+def convert_some_columns_to_str(df, columns=None):
+    """Convert configured columns to string dtype."""
+    string_columns = columns or STRING_COLUMNS_TO_COERCE
+    normalized_df = df.copy()
+    for column in string_columns:
+        if column not in normalized_df.columns:
+            continue
+        normalized_df[column] = normalized_df[column].astype(str)
+    return normalized_df
+
+
 def man_emp_normalization(errors, text: str, index) -> str:
 
     text = text.lower().strip()
