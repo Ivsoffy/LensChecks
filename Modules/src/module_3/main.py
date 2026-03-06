@@ -419,7 +419,7 @@ def calculate_compensation_elements(df,
     # Base pay calculation
     # BP = (MS/SR*NS) + ADD + (RC/SR*NS)
     # Where MS=Month Salary, SR=Salary Rate, NS=Number salaries, ADD=Additional Pay, RC=Region Coefficient
-    df[base_pay] = df[annual_salary] + (np.where(df[additional_pay].isnull(), 0, df[additional_pay]) / df[salary_rate]) + (np.where(df[region_coeff].isnull(), 0, df[region_coeff]) * df[number_annual_salaries])
+    df[base_pay] = df[annual_salary] + (np.where(df[additional_pay].isnull(), 0, df[additional_pay]) / df[salary_rate]) + (np.where(df[region_coeff].isnull(), 0, df[region_coeff]) * df[number_annual_salaries] / df[salary_rate])
     
     # Actual STI output (with threshold filter)
     df[fact_sti_out] = np.where(
