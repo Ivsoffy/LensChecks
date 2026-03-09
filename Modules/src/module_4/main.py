@@ -1,4 +1,4 @@
-
+﻿
 # All the variables are imported from LP.py file
 import pandas as pd
 from openpyxl import load_workbook
@@ -64,7 +64,6 @@ def process_past_year(folder_py, df):
     Raises:
         ValueError: If required columns are missing.
     """
-
     if not isinstance(folder_py, str) or not os.path.exists(folder_py):
         print(f"Warning: invalid path to last year's files folder: {folder_py}")
         return df
@@ -93,6 +92,39 @@ def process_past_year(folder_py, df):
     return df
 
 
+def add_comparison_with_median(df):
+    cols = [job_title, region, function_code, subfunction_code, specialization_code]
+    df = df.copy()
+
+    required_cols = cols + [base_pay]
+    missing_cols = [col for col in required_cols if col not in df.columns]
+    if missing_cols:
+        df["median_group_id"] = pd.NA
+        df["median"] = np.nan
+        df["comparison_with_median"] = "Average"
+        return df
+
+    # Normalize pay values to numeric for median/ratio calculations.
+    df["_base_pay_numeric"] = pd.to_numeric(
+        df[base_pay].astype(str).str.replace(" ", "", regex=False).str.replace(",", ".", regex=False),
+        errors="coerce",
+    )
+
+    grouped = df.groupby(cols, dropna=False, sort=False)
+    df["median_group_id"] = (grouped.ngroup() + 1).astype("Int64")
+    median_by_group = grouped["_base_pay_numeric"].transform("median")
+    ratio_to_median = df["_base_pay_numeric"] / median_by_group
+    df["median"] = median_by_group
+
+    comparison_with_median = pd.Series("Average", index=df.index, dtype="object")
+    comparison_with_median[ratio_to_median >= 2] = "More"
+    comparison_with_median[ratio_to_median <= 0.5] = "Less"
+
+    df["comparison_with_median"] = comparison_with_median
+    df.drop(columns=["_base_pay_numeric"], inplace=True)
+    return df
+
+
 def module_4(input_folder, output_folder, params):
     folder_py = params['folder_past_year']
     already_fixed = params['after_fix']
@@ -105,18 +137,15 @@ def module_4(input_folder, output_folder, params):
             input_file = os.path.join(input_folder, file)
 
             print(f"Processing file {counter}: {file}")
-            # df = pd.read_excel(file_path, sheet_name='Total Data')
-            # df.to_excel(output_file)
-            cols = [company_name, dep_level_1, dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6,
-                                job_title]
             df = pd.read_excel(input_file, sheet_name='Total Data', index_col=0)
 
             if not already_fixed:
                 print("Module 4: Assigning grades.")
                 print("Assigning codes from last year's questionnaire (if found)")
+                df['grade_old'] = np.nan
                 df = process_past_year(folder_py, df)
+                df = add_comparison_with_median(df)
 
-                # Делим данные на заполненные и незаполненные
                 unfilled = df.loc[df[grade].apply(lambda x: str(x).lower().strip() == 'nan') == True] #add subfunction
                 filled = df[~df.index.isin(unfilled.index)]
                 empty_count = unfilled.shape[0]
@@ -128,7 +157,7 @@ def module_4(input_folder, output_folder, params):
                 df, unfilled_and_processed, count_past_year, count_model = process_unfilled(unfilled, df)
                 df.to_excel(output_file, sheet_name='Total Data')
                 
-                process_output_file(filled_and_processed, unfilled_and_processed, cols, output_file)
+                process_output_file(filled_and_processed, unfilled_and_processed, output_file)
 
                 info = {
                     "past_year_files": str(found_files) if found_files else "No files",
@@ -139,7 +168,7 @@ def module_4(input_folder, output_folder, params):
                 }
 
                 add_info(info, output_file)
-            else: # Аналитик проверил и исправил анкету
+            else:
                 print("Module 4: Assigning validated grades.")
                 df_final = pd.read_excel(input_file, sheet_name='Total Data')
                 df_final = map_prefill_to_sheet1(input_file, sheet_prefill='Prefill', df_target=df_final)
@@ -158,7 +187,7 @@ def map_prefill_to_sheet1(
     excel_file: str,
     sheet_prefill,
     df_target=None,
-    match_cols=[company_name, dep_level_1, dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6, job_title],
+    match_cols=[company_name, dep_level_1, dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6, job_title, "comparison_with_median"],
     code_cols=[grade],
     sheet_target='Total Data'
 ):
@@ -177,7 +206,6 @@ def map_prefill_to_sheet1(
         None
     """
 
-    # --- базовый датафрейм ---
     xls = pd.ExcelFile(excel_file)
     if df_target is None:
         df_target = pd.read_excel(excel_file, sheet_name=sheet_target)
@@ -199,7 +227,6 @@ def map_prefill_to_sheet1(
     if not available_code_cols:
         return df_target
 
-    # приведение типов к строке для колонок совпадений
     for col in match_cols:
         if col in df_prefill.columns:
             df_prefill[col] = df_prefill[col].fillna('').astype(str).str.strip()
@@ -218,7 +245,6 @@ def map_prefill_to_sheet1(
         suffixes=('', '_prefill')
     )
 
-    # --- заменяем коды из Prefill/Model, если там есть значения ---
     for col in available_code_cols:
         prefill_col = f"{col}_prefill"
         if prefill_col in df_merged.columns:
@@ -231,17 +257,16 @@ def map_prefill_to_sheet1(
     print(f"Values from sheet '{sheet_prefill}' were mapped to sheet '{sheet_target}'.")
     return df_merged
 
+
 def add_info(info, output_file):
     info = pd.DataFrame(data=[info])
     book = load_workbook(output_file)
 
     ws3 = book.create_sheet(title='Info')
 
-    # Записываем заголовки
     for col_idx, col_name in enumerate(info.columns, start=1):
         ws3.cell(row=1, column=col_idx, value=col_name)
 
-    # Записываем строки
     for row in info.itertuples(index=False):
         excel_row = ws3.max_row + 1
         for col_idx, value in enumerate(row, start=1):
@@ -249,9 +274,9 @@ def add_info(info, output_file):
     book.save(output_file)
 
 
-def process_output_file(df1, df2, cols, output_file, sheet1_name='Prefill', sheet2_name='Model'):
+def process_output_file(df1, df2, output_file, sheet1_name='Prefill', sheet2_name='Model'):
     """
-    Summary: Write two dataframes to an existing Excel file with conditional highlighting.
+    Summary: Write two dataframes to an existing Excel file.
     Args:
         df1 (pd.DataFrame): Dataframe for sheet1_name.
         df2 (pd.DataFrame): Dataframe for sheet2_name.
@@ -265,71 +290,30 @@ def process_output_file(df1, df2, cols, output_file, sheet1_name='Prefill', shee
         None
     """
 
-    # Оставляем только уникальные строки
-    df1 = df1.drop_duplicates(subset=cols)
-    df2 = df2.drop_duplicates(subset=cols)
-
-    if 'grade_old' in df1.columns:
-        # print(1)
-        df1 = df1.loc[:, [company_name,'Сектор', function_code, subfunction_code, specialization_code, grade,
-               'past_year_check', dep_level_1, dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6,
-                                job_title, 'grade_old']]
-    else:
-        # print(2)
-        df1 = df1.loc[:, [company_name,'Сектор', function_code, subfunction_code, specialization_code, grade,
-                        dep_level_1,
-        dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6,
-                        job_title]]
+    cols = [company_name, gi_sector, dep_level_1, dep_level_2, dep_level_3,
+            dep_level_4, dep_level_5, dep_level_6, job_title, function_code,
+            subfunction_code, specialization_code, grade, base_pay, "comparison_with_median", "median", "median_group_id"]
     
-    if len(df2.columns)>1:
-        if grade in df2.columns:
-            # print(3)
-            df2 = df2.loc[:, [company_name, function_code, subfunction_code, specialization_code, grade,'description',
-                dep_level_1, dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6, job_title, base_pay]]
-        else:
-            # print(4)
-            df2 = df2.loc[:, [company_name, function_code, subfunction_code, specialization_code,
-                    dep_level_1, dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6,
-                                    job_title]]
+    prefill_cols = cols + ['grade_old']
+    model_cols = cols
+    
+    if not df1.empty:
+        df1 = df1.loc[:, prefill_cols]
+    if not df2.empty:
+        df2 = df2.loc[:, model_cols]
 
-    book = load_workbook(output_file)
-    red_fill = PatternFill(start_color='FFC7CE', end_color='FFC7CE', fill_type='solid')
+    unique_cols = [company_name, gi_sector, dep_level_1, dep_level_2, dep_level_3,
+            dep_level_4, dep_level_5, dep_level_6,job_title, grade, "comparison_with_median"]
+    
+    df1 = df1.drop_duplicates(subset=unique_cols)
+    df2 = df2.drop_duplicates(subset=unique_cols)
 
-    # Работа с df1
-    ws1 = book.create_sheet(title=sheet1_name)
-    for col_idx, col_name in enumerate(df1.columns, start=1):
-        ws1.cell(row=1, column=col_idx, value=col_name)
+    with pd.ExcelWriter(output_file, engine='openpyxl', mode='a', if_sheet_exists='replace') as writer:
+        df1.to_excel(writer, sheet_name=sheet1_name, index=False)
+        df2.to_excel(writer, sheet_name=sheet2_name, index=False)
 
-    for _, row in df1.iterrows():
-        excel_row = ws1.max_row + 1
-        highlight = row.get('past_year_check') is False
-
-        for col_idx, value in enumerate(row, start=1):
-            cell = ws1.cell(row=excel_row, column=col_idx, value=value)
-            if highlight:
-                cell.fill = red_fill
-
-    # Работа с df2
-    ws2 = book.create_sheet(title=sheet2_name)
-    for col_idx, col_name in enumerate(df2.columns, start=1):
-        ws2.cell(row=1, column=col_idx, value=col_name)
-
-    for _, row in df2.iterrows():
-        excel_row = ws2.max_row + 1
-        try:
-            s = str(row.get('prediction_confidence'))
-            num = float(s.rstrip('%'))
-            highlight = num < 0.7
-        except:
-            highlight = False
-
-        for col_idx, value in enumerate(row, start=1):
-            cell = ws2.cell(row=excel_row, column=col_idx, value=value)
-            if highlight:
-                cell.fill = red_fill
-
-    book.save(output_file)
     print(f"Sheets '{sheet1_name}' and '{sheet2_name}' were added to file: {output_file}")
+
 
 def check_unfilled_columns(df):
     """
@@ -342,15 +326,14 @@ def check_unfilled_columns(df):
         None
     """
     col = function_code
-    # Приводим всё к строке и убираем пробелы
     mask_empty = df[col].astype(str).str.strip().isin(['', 'nan', 'NaN', 'None'])
     if mask_empty.any():
         print(f"Column '{col}' is not fully filled - contains empty values.")
         return
     return True
 
+
 def process_unfilled(df, df_orig):
-    # Подтягиваем коды прошлых лет в оригинальный датасет
     count_past_year = 0
     count_model = 0
     preds = pd.DataFrame()
@@ -362,7 +345,6 @@ def process_unfilled(df, df_orig):
         df_without_py = df_orig.loc[df_orig[grade].apply(lambda x: str(x).lower().strip() == 'nan') == True]
         count_model = df_without_py.shape[0]
         count_past_year = df.shape[0] - count_model
-        # Там где прошлого года нет, проставляем нейронкой
         if count_model != 0:
             model = GradePredictor(path_to_model='src/module_4/grade_model/model_best.cbm')
             preds = model.predict(df_without_py)
@@ -384,11 +366,10 @@ def process_filled(df):
     df = df.copy()
     df["past_year_check"] = True
 
-    if "grade_old" in df.columns:
-        df["past_year_check"] = (
-            (df[grade] == df["grade_old"]) |
-            (df["grade_old"].isna())
-        )
+    df["past_year_check"] = (
+        (df[grade] == df["grade_old"]) |
+        (df["grade_old"].isna())
+    )
     return df
 
 
@@ -406,7 +387,6 @@ def merge_by_cols(df, df_py, cols, cols_to_copy):
         ValueError: If required columns are missing in df_py.
     """
 
-    # Проверим наличие нужных колонок
     missing_cols = [c for c in cols + cols_to_copy if c not in df_py.columns]
     if missing_cols:
         raise ValueError(f"Missing columns in df_py: {missing_cols}")
@@ -414,15 +394,12 @@ def merge_by_cols(df, df_py, cols, cols_to_copy):
     df = df.copy()
     df_py = df_py.copy()
 
-    # Приведение типов к строке (чтобы избежать ValueError при merge)
     for c in cols:
         df[c] = df[c].astype(str).replace('nan', np.nan)
         df_py[c] = df_py[c].astype(str).replace('nan', np.nan)
 
-    # Уберём дубликаты по ключевым колонкам в df_py
     df_py_unique = df_py.drop_duplicates(subset=cols, keep="first")
 
-    # Выполним объединение
     df_merged = df.merge(
         df_py_unique[cols + cols_to_copy],
         on=cols,
@@ -430,8 +407,7 @@ def merge_by_cols(df, df_py, cols, cols_to_copy):
         suffixes=("", "_py")
     )
 
-    # Теперь переносим данные из df_py в grade_old
-    old_col = cols_to_copy[0]  # например, "grade"
+    old_col = cols_to_copy[0] 
     py_col = f"{old_col}_py"
 
     if py_col in df_merged.columns:
@@ -442,13 +418,6 @@ def merge_by_cols(df, df_py, cols, cols_to_copy):
 
     return df_merged
 
-
-# def _normalize_val(v):
-#     """Normalize value for comparison: cast to str, strip, lower (None/NaN -> '')."""
-#     if pd.isna(v):
-#         return ""
-#     s = str(v).strip()
-#     return s.lower()
 
 def check_if_past_year_exist(company, folder_py):
     company_str = str(company).strip()

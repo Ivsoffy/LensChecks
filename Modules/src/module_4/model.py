@@ -67,6 +67,7 @@ class Dataset:
             df: pd.DataFrame,
             train
         ):
+            df = df.copy()
             if train:
                 pt = PowerTransformer(method='box-cox', standardize=True)
                 df['BP_boxcox'] = pt.fit_transform(df[['Базовый оклад (BP)']])
