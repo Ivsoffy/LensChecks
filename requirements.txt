@@ -13,3 +13,5 @@ ipython
 sentencepiece
 pywin32
 catboost
+evaluate
+rouge_score
