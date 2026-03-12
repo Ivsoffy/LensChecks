@@ -88,14 +88,10 @@ def check_general_info(errors, df_company, lang, df):
           
 def region_normalization(errors, text: str, index: int, lang) -> str:
     not_missing = not pd.isna(text)
-    if lang == 'RUS':
-        region_values = list(set(final_region.values()))
-    else:
-        region_values = list(set(final_region_eng.values()))
+    region_values = list(set(final_region.values()))
 
     normalized_to_original = {value.strip().lower(): value for value in region_values}
     normalized_text = str(text).strip().lower() if not_missing else ""
-
     matched_text = normalized_to_original.get(normalized_text)
     if not matched_text and not_missing:
         closest_match = difflib.get_close_matches(
@@ -179,7 +175,6 @@ def eng_to_rus(df):
     df = translate_values(df, man_emp, manager_spec_map)
     df = translate_values(df, performance, performance_map)
     df = translate_values(df, gender_id, gender_map)
-    df = translate_values(df, region, region_match_map)
     df = translate_values(df, tenure, tenure_map)
     df = translate_values(df, [lti_prog_1, lti_prog_2, lti_prog_3], lti_map)
     df = translate_values(df, gi_sector, sector_map)
@@ -297,16 +292,14 @@ def add_errors_to_excel(errors, input_path, output_path):
 
 def add_regions(errors, df, lang):
     df[region] = df[region].where(
-        ~df[region].isna() & (df[region].astype(str).str.strip() != ''),
+        ~df[region].isna() & (df[region].astype(str).str.strip() != '') & (df[region].astype(str).str.strip() != '-'),
         df[region_client_fill]
     )
     df[region] = df[region].astype(str).str.lower()
+    if lang == 'ENG':
+        df = translate_values(df, region, region_match_map)
     df = translate_values(df, region, final_region)
-    if lang == 'RUS':
-        df = translate_values(df, region, final_region)
-    else:
-        df = translate_values(df, region, final_region_eng)
-    df[region] = df.apply(lambda x: region_normalization(errors, x[region_client_fill], x.name, lang), axis=1)
+    df[region] = df.apply(lambda x: region_normalization(errors, x[region], x.name, lang), axis=1)
 
     df[macroregion] = np.nan
     df = map_column_values(df, region, macroregion, region_to_macroregion_map)
