@@ -9,7 +9,8 @@ src.lnk
 *.cbm
 *.pkl
 *.xlsx
-Modules/src/module_2/function_model/__pycache__/*
 result_test/
 model/
-grade_model/
+grade_model_weights/
+function_model_weights/
+config.yml

@@ -17,10 +17,10 @@ sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 from ..LP import *
 
-sys.path.append('src/module_2/model/')
+sys.path.append('src/module_2/function_model_weights/')
 from model import FunctionModel
 
-ckpt = "src/module_2/model/ruT5_job_normalization_9"
+ckpt = "src/module_2/function_model_weights/model_weights"
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
  
@@ -68,7 +68,7 @@ class CodeModel:
 
         print('Loading codes..')
 
-        with open("src/module_2/model/codes.json", "r", encoding="utf-8") as f:
+        with open("src/module_2/function_model_weights/codes.json", "r", encoding="utf-8") as f:
             codes = json.load(f)
 
         # codes = self.model_norm._load_codes()
@@ -86,9 +86,6 @@ class CodeModel:
         code_desc_embeds = self._embed(code_descs)
         
         print('Creating embeddings..')
-        # parts = df['predicted_desc'].fillna("").astype(str).str.partition(".")
-        # df['desc'] = parts[0].str.strip()
-        # df['exp'] = parts[2].str.strip()
         pred_desc_embeds = self._embed(df['predicted_desc'].tolist())
         pred_exp_embeds = self._embed(df[job_title].tolist())
         print("Calculate cosine simularity..")
@@ -110,11 +107,6 @@ class CodeModel:
             best_sim = cos_desc[row_idx, candidates[0]].item()
             best_example = ""
             best_example_sim = float("-inf")
-
-            # best_func = codes[best_code].get('type')
-            # if best_func == 'subfunction':
-            #     print("debug")
-
 
             for cand_idx in candidates:
                 code_id = code_ids[cand_idx]

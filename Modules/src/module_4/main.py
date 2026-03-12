@@ -346,7 +346,7 @@ def process_unfilled(df, df_orig):
         count_model = df_without_py.shape[0]
         count_past_year = df.shape[0] - count_model
         if count_model != 0:
-            model = GradePredictor(path_to_model='src/module_4/grade_model/model_best.cbm')
+            model = GradePredictor(path_to_model='src/module_4/grade_model_weights/model_best.cbm')
             preds = model.predict(df_without_py)
             preds = preds.loc[preds[company_name].apply(lambda x: str(x).lower().strip() == 'nan') == False]
 

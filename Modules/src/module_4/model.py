@@ -16,8 +16,7 @@ from typing import Iterable
 from datetime import datetime
 import joblib
 from sklearn.preprocessing import PowerTransformer
-from grade_model.utils import calculate_f_new
-
+from src.module_4.grade_utils import calculate_f_new
 tqdm.pandas(desc="Processing")
 warnings.filterwarnings("ignore", category=FutureWarning, message=".*DataFrameGroupBy.apply operated on the grouping columns.*")
 # warnings.filterwarnings("ignore", category=RuntimeWarning, message=".*invalid value encountered in log*")
@@ -71,10 +70,10 @@ class Dataset:
             if train:
                 pt = PowerTransformer(method='box-cox', standardize=True)
                 df['BP_boxcox'] = pt.fit_transform(df[['Базовый оклад (BP)']])
-                joblib.dump(pt, 'src/module_4/grade_model/bp_boxcox_transformer.pkl')
+                joblib.dump(pt, 'src/module_4/grade_model_weights/bp_boxcox_transformer.pkl')
                 df['seniority'] = df['job_title'].progress_apply(lambda x: self._categorize_title(x))
             else:
-                pt = joblib.load('src/module_4/grade_model/bp_boxcox_transformer.pkl')
+                pt = joblib.load('src/module_4/grade_model_weights/bp_boxcox_transformer.pkl')
                 df['BP_boxcox'] = pt.fit_transform(df[['Базовый оклад (BP)']])
                 df['code'] = df.progress_apply(lambda x: self._process(x), axis=1)
                 df['seniority'] = df['Название должности'].progress_apply(lambda x: self._categorize_title(x))
@@ -163,7 +162,7 @@ class GradePredictor:
         out = df.loc[idx_test].copy()
         out['Грейд / Уровень обзора'] = np.floor(preds+0.5).astype(int)
 
-        with open("src/module_4/grade_model/codes.json", "r", encoding="utf-8") as f:
+        with open("src/module_4/grade_model_weights/codes.json", "r", encoding="utf-8") as f:
             codes = json.load(f)
         
         # print(df['Грейд / Уровень обзора'])
