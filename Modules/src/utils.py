@@ -840,12 +840,18 @@ def write_df_with_template(
     df,
     template_path,
     out_path,
-    sheet_name='Данные',
+    lang,
     header_row=7,
     only_common_columns=True,
 ):
     df = df.copy()
+    df = df.loc[:,expected_columns_rus]
     df.columns = df.columns.map(str)
+    if lang == 'RUS':
+        sheet_name='Данные'
+    else:
+        sheet_name='Salary Data'
+        df.columns = expected_columns_eng
 
     wb = load_workbook(template_path)
     ws = _get_sheet(wb, sheet_name)

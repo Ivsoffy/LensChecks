@@ -90,6 +90,7 @@ subfunction_eng = 'Subfunction Name'
 specialization_eng = 'Specialization Name'
 salary_rate_eng = 'Full time equivalent'
 monthly_salary_eng = 'Monthly Pay'
+region_coeff_eng = 'Regional Climate Allowance'
 number_monthly_salaries_eng = 'Basic Payments Multiplier/ Factor'
 additional_pay_eng = 'Fixed Payments'
 sti_eligibility_eng = 'Short-term Variable Payment Eligibility'
@@ -126,7 +127,7 @@ expected_columns_eng = [company_name_eng, dep_level_1_eng, dep_level_2_eng, dep_
                                  man_emp_eng, performance_eng, n_level_eng, expat_eng, gender_id_eng, bod_eng, hired_date_eng, 
                                  tenure_eng, region_client_fill_eng, region_eng, internal_grade_eng, grade_eng, function_code_eng, 
                                  subfunction_code_eng, specialization_code_eng, function_eng, subfunction_eng, specialization_eng, 
-                                 salary_rate_eng, monthly_salary_eng, number_monthly_salaries_eng, additional_pay_eng, 
+                                 salary_rate_eng, monthly_salary_eng, region_coeff_eng, number_monthly_salaries_eng, additional_pay_eng, 
                                  sti_eligibility_eng, fact_sti_eng, target_sti_eng, lti_eligibility_eng, fact_lti_eng, 
                                  target_lti_per_eng, lti_prog_1_eng, fact_lti_1_eng, target_lti_1_eng, lti_pay_freq_1_eng, 
                                  lti_prog_2_eng, fact_lti_2_eng, target_lti_2_eng, lti_pay_freq_2_eng, lti_prog_3_eng, 
@@ -136,8 +137,8 @@ expected_columns_eng = [company_name_eng, dep_level_1_eng, dep_level_2_eng, dep_
 gi_company_name = 'Название компании на английском языке'
 gi_sector = 'Сектор'
 gi_origin = 'Тип компании'
-gi_headcount_cat = 'Общее количество сотрудников по состоянию на 1 мая 2025 года'
-gi_revenue_cat = 'Выручка за 2024 год, руб.'
+gi_headcount_cat = 'Общее количество сотрудников по состоянию на 1 мая 2026 года'
+gi_revenue_cat = 'Выручка за 2025 год, руб.'
 gi_contact_name = 'ФИО контактного лица'
 gi_title = 'Должность'
 gi_tel = 'Телефон'

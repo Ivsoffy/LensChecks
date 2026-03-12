@@ -55,6 +55,7 @@ def get_valid_path(prompt):
 
 def check_general_info(errors, df_company, lang, df):
     # Setting columns names to the russian version
+
     df.columns = expected_columns_rus
 
     try: #добавить проверку на выпадающий список
@@ -391,7 +392,7 @@ def _process_single_file(file_path, params):
         missing_columns = [col for col in expected_columns if col not in df.columns]
         if missing_columns:
             errors['info_errors'].append(f"The following columns are missing from the Data: {missing_columns}")
-            return df, errors
+            return df, errors, lang
 
         df = df[expected_columns]
         df = prepare_total_data(df, rows_to_drop)
@@ -399,7 +400,7 @@ def _process_single_file(file_path, params):
 
     errors, df = check_general_info(errors, df_company, lang, df)
     errors, df = check_and_process_data(errors, df, lang, params)
-    return df, errors
+    return df, errors, lang
 
 
 def _save_single_db(result_frames, output_folder):
@@ -440,7 +441,7 @@ def file_processing(input_folder, output_folder, columns=None, params=None):
         print(f"Checking the file {counter}: {file_name}")
         file_path = os.path.join(input_folder, file_name)
 
-        df, errors = _process_single_file(file_path, params)
+        df, errors, lang = _process_single_file(file_path, params)
         file_has_errors = has_errors(errors)
         should_save = (not file_has_errors) or (not save_db_only_without_errors)
 
@@ -456,7 +457,7 @@ def file_processing(input_folder, output_folder, columns=None, params=None):
             base, ext = os.path.splitext(file_name)
             unprocessed_name = f'{base}_unprocessed_{ext}'
             file_output_path = os.path.join(output_folder, unprocessed_name)
-            write_df_with_template(df, file_path, file_output_path)
+            write_df_with_template(df, file_path, file_output_path, lang)
             unprocessed_files[unprocessed_name] = errors
         else:
             print("No errors were found in the file, congratulations!")
