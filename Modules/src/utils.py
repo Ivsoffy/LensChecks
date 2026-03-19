@@ -656,15 +656,15 @@ def check_codes(errors, df):
         FileNotFoundError: If the SDF file is missing.
         ValueError: If required columns are missing.
     """
-    sdf_path = "src/module_2/SDF_2026.xlsx"
+    sdf_path = "src/module_2/funcs_2026.parquet"
     if not os.path.exists(sdf_path):
-        raise FileNotFoundError(f"Ошибка: файл SDF не найден: {sdf_path}")
+        raise FileNotFoundError(f"Error: SDF file not found: {sdf_path}")
+
+    sdf = pd.read_parquet(sdf_path)
 
     function_code = LP.function_code
     subfunction_code = LP.subfunction_code
     specialization_code = LP.specialization_code
-
-    sdf = pd.read_excel(sdf_path, sheet_name="Каталог функций", header=4)
 
     allowed_funcs = sdf[function_code]
     allowed_subfuncs = sdf[subfunction_code]
