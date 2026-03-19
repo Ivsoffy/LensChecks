@@ -1,38 +1,38 @@
-
 # All the variables are imported from LP.py file
-import pandas as pd
-import numpy as np
 import os
-import sys
-import warnings
 import re
-import time
 import shutil
+import sys
+import time
 import warnings
-import os
+
+import numpy as np
+import pandas as pd
 import win32com.client
-import shutil, os
 from win32com.client import makepy
 
 # warnings.filterwarnings("ignore", category=UserWarning)
 warnings.simplefilter("ignore", category=UserWarning, lineno=329, append=False)
-warnings.filterwarnings('ignore', message='The behavior of DataFrame concatenation with empty or all-NA entries is deprecated.*',
-                       category=FutureWarning)
-pd.set_option('future.no_silent_downcasting', True)
+warnings.filterwarnings(
+    "ignore",
+    message="The behavior of DataFrame concatenation with empty or all-NA entries is deprecated.*",
+    category=FutureWarning,
+)
+pd.set_option("future.no_silent_downcasting", True)
 parent_dir = os.path.dirname(os.getcwd())
 sys.path.insert(0, parent_dir)
 
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
-from ..LP import *
-from ..utils import (
-    main_checks,
+from .. import LP  # noqa: E402
+from ..utils import (  # noqa: E402
     convert_some_columns_to_numeric,
     convert_some_columns_to_str,
-    is_empty_value,
-    init_errors,
     has_errors,
+    init_errors,
+    is_empty_value,
     is_excel_file,
+    main_checks,
     normalize_column_names,
     prepare_total_data,
 )
@@ -47,22 +47,32 @@ def get_valid_path(prompt):
         else:
             print("Invalid path. Please try again.")
 
+
 def check_general_info(errors, df):
     # Setting columns names to the russian version
 
-    for col, value in df.loc[1, [company_name,gi_sector,gi_origin,gi_headcount_cat,gi_revenue_cat]].items():
+    for col, value in df.loc[
+        1,
+        [
+            LP.company_name,
+            LP.gi_sector,
+            LP.gi_origin,
+            LP.gi_headcount_cat,
+            LP.gi_revenue_cat,
+        ],
+    ].items():
         # value = row[col]                     # Значение
         if is_empty_value(value):
-            errors['info_errors'].append(f"Incorrect General Info: {col}")
-        
+            errors["info_errors"].append(f"Incorrect General Info: {col}")
 
-    comp_name = df[company_name][0]
+    comp_name = df[LP.company_name][0]
     if not re.fullmatch(r"[A-Za-z0-9_]+", str(comp_name)):
-        errors['info_errors'] += [f"Incorrect company name format: {comp_name}"]
-            # print(df[gi_company_name
+        errors["info_errors"] += [f"Incorrect company name format: {comp_name}"]
+        # print(df[gi_company_name
 
     # df['SDF Language'] = lang
-    return errors, df 
+    return errors, df
+
 
 def add_errors_to_excel(errors, input_path, output_path):
     """Добавляет лист 'Errors' и подсвечивает ячейки с ошибками с использованием win32com."""
@@ -75,18 +85,19 @@ def add_errors_to_excel(errors, input_path, output_path):
         makepy.main(["Microsoft Excel * Object Library"])
         excel = win32com.client.Dispatch("Excel.Application")
 
-
     input_path = os.path.abspath(input_path)
     output_path = os.path.abspath(output_path)
     # --- Формирование таблицы ошибок ---
-    info = errors.get('info_errors', [])
-    data = [col for col, _ in errors.get('data_errors', [])]
+    info = errors.get("info_errors", [])
+    data = [col for col, _ in errors.get("data_errors", [])]
     unique_data = list(dict.fromkeys(data))
     n = max(len(info), len(unique_data))
-    df_errors = pd.DataFrame({
-        'info_errors': info + [None] * (n - len(info)),
-        'data_errors': unique_data + [None] * (n - len(unique_data))
-    })
+    df_errors = pd.DataFrame(
+        {
+            "info_errors": info + [None] * (n - len(info)),
+            "data_errors": unique_data + [None] * (n - len(unique_data)),
+        }
+    )
 
     # --- Открытие Excel ---
     # excel = win32com.client.Dispatch("Excel.Application")
@@ -111,7 +122,7 @@ def add_errors_to_excel(errors, input_path, output_path):
     # --- Форматирование заголовка ---
     header_range = ws_err.Range(ws_err.Cells(1, 1), ws_err.Cells(1, 2))
     header_range.Font.Bold = True
-    header_range.Font.Color = 0xFFFFFF      # Белый
+    header_range.Font.Color = 0xFFFFFF  # Белый
     header_range.Interior.Color = 0x4472C4  # Синий (BGR)
     header_range.HorizontalAlignment = -4108  # xlCenter
     header_range.Borders.Weight = 2
@@ -119,7 +130,9 @@ def add_errors_to_excel(errors, input_path, output_path):
     # --- Форматирование тела таблицы ---
     used_range = ws_err.UsedRange
     used_range.Columns.AutoFit()
-    for row in ws_err.Range(ws_err.Cells(2, 1), ws_err.Cells(df_errors.shape[0] + 1, 2)):
+    for row in ws_err.Range(
+        ws_err.Cells(2, 1), ws_err.Cells(df_errors.shape[0] + 1, 2)
+    ):
         row.Borders.Weight = 2
         row.WrapText = True
         row.VerticalAlignment = -4160  # xlTop
@@ -128,7 +141,7 @@ def add_errors_to_excel(errors, input_path, output_path):
     data_sheet = None
     for s in wb.Sheets:
         name = s.Name.strip().lower()
-        if name in ("данные", "salary data", 'total data'):
+        if name in ("данные", "salary data", "total data"):
             data_sheet = s
             break
     if not data_sheet:
@@ -146,19 +159,22 @@ def add_errors_to_excel(errors, input_path, output_path):
         return str(s).strip().lower() if pd.notna(s) else ""
 
     col_map = {
-        norm(col_name): col_idx + 1
-        for col_idx, col_name in enumerate(df_data.columns)
+        norm(col_name): col_idx + 1 for col_idx, col_name in enumerate(df_data.columns)
     }
     row_map = {idx: idx + 2 for idx in range(len(df_data))}
     try:
-        df_data_indexed = pd.read_excel(input_path, sheet_name=ws_data.Name, header=0, index_col=0)
-        row_map_by_label = {label: pos + 2 for pos, label in enumerate(df_data_indexed.index)}
+        df_data_indexed = pd.read_excel(
+            input_path, sheet_name=ws_data.Name, header=0, index_col=0
+        )
+        row_map_by_label = {
+            label: pos + 2 for pos, label in enumerate(df_data_indexed.index)
+        }
     except Exception:
         row_map_by_label = {}
 
     # --- Подсветка ошибок ---
     orange_color = 0x00C0FF  # BGR = (0xFF, 0xC0, 0x00) → оранжевый
-    for col_name, idx in errors.get('data_errors', []):
+    for col_name, idx in errors.get("data_errors", []):
         col_idx = col_map.get(norm(col_name))
         if not col_idx:
             print(f"Не найдена колонка: {col_name}")
@@ -187,28 +203,42 @@ def add_errors_to_excel(errors, input_path, output_path):
 
     print(f"Лист 'Errors' добавлен, ячейки подсвечены. Файл: {output_path}")
 
+
 def check_one_interval(errors, grade_num, val, min, max, index, col):
     if not is_empty_value(val):
         try:
             if not (min[grade_num] < val < max[grade_num]):
-                errors['data_errors'] += [(col, index)]
-        except:
-            errors['data_errors'] += [(grade, index)]
+                errors["data_errors"] += [(col, index)]
+        except Exception:
+            errors["data_errors"] += [(LP.grade, index)]
     return val
 
-def check_intervals(errors, df):
-    cols_to_check = [base_pay,tc_pay,ttc_pay,tdc_pay,target_sti_out]
 
-    intervals_path = 'src/module_5/intervals.parquet'
+def check_intervals(errors, df):
+    cols_to_check = [LP.base_pay, LP.tc_pay, LP.ttc_pay, LP.tdc_pay, LP.target_sti_out]
+
+    intervals_path = "src/module_5/intervals.parquet"
     if not os.path.exists(intervals_path):
         raise FileNotFoundError(f"Ошибка: файл intervals не найден: {intervals_path}")
     intervals = pd.read_parquet(intervals_path)
     intervals = intervals.set_index(intervals.columns[0])
 
     for col in cols_to_check:
-        col_min = col+'_Min'
-        col_max = col+'_Max'
-        df[col] = df.apply(lambda x: check_one_interval(errors, x[grade], x[col], intervals[col_min], intervals[col_max], x.name, col), axis=1)
+        col_min = col + "_Min"
+        col_max = col + "_Max"
+        df[col] = df.apply(
+            lambda x: check_one_interval(
+                errors,
+                x[LP.grade],
+                x[col],
+                intervals[col_min],
+                intervals[col_max],
+                x.name,
+                col,
+            ),
+            axis=1,
+        )
+
 
 def find_outliers_iqr(data):
     data = np.array(data)
@@ -223,15 +253,16 @@ def find_outliers_iqr(data):
     outliers = data[(data < lower_bound) | (data > upper_bound)]
     return [(outlier, lower_bound, upper_bound) for outlier in outliers.tolist()]
 
+
 def check_outliers(errors, df):
-    cols_to_check = [base_pay,tc_pay,ttc_pay]
-    df['outlier'] = False
+    cols_to_check = [LP.base_pay, LP.tc_pay, LP.ttc_pay]
+    df["outlier"] = False
     for col in cols_to_check:
-        df[f'{col}_lower_bound'] = np.nan
-        df[f'{col}_upper_bound'] = np.nan
+        df[f"{col}_lower_bound"] = np.nan
+        df[f"{col}_upper_bound"] = np.nan
 
     for col in cols_to_check:
-        for _, group_df in df.groupby(grade):
+        for _, group_df in df.groupby(LP.grade):
             series = group_df[col].dropna()
             if series.empty:
                 continue
@@ -244,12 +275,13 @@ def check_outliers(errors, df):
             upper_bound = outlier_info[0][2]
             outlier_series = series[series.isin(outliers)]
             for ind, _ in outlier_series.items():
-                errors['data_errors'] += [(col, ind)]
-                df.loc[ind, 'outlier'] = True
-                df.loc[ind, f'{col}_lower_bound'] = lower_bound
-                df.loc[ind, f'{col}_upper_bound'] = upper_bound
+                errors["data_errors"] += [(col, ind)]
+                df.loc[ind, "outlier"] = True
+                df.loc[ind, f"{col}_lower_bound"] = lower_bound
+                df.loc[ind, f"{col}_upper_bound"] = upper_bound
 
     return df
+
 
 def check_and_process_data(errors, df, params):
     df = convert_some_columns_to_numeric(df)
@@ -264,6 +296,7 @@ def check_and_process_data(errors, df, params):
 
     return errors, df
 
+
 def _process_single_file(file_path, params):
     """Read, validate and process one SDF file."""
     errors = init_errors()
@@ -271,15 +304,15 @@ def _process_single_file(file_path, params):
     df = normalize_column_names(df)
 
     missing_columns = [
-        col for col in expected_columns_market_df_preload if col not in df.columns
+        col for col in LP.expected_columns_market_df_preload if col not in df.columns
     ]
     if missing_columns:
-        errors['info_errors'].append(
+        errors["info_errors"].append(
             f"Missing required columns in 'Total Data': {missing_columns}"
         )
         return None, errors
 
-    df = prepare_total_data(df, [company_name, job_title])
+    df = prepare_total_data(df, [LP.company_name, LP.job_title])
     print("Checking General Info section...")
     errors, df = check_general_info(errors, df)
     print("Checking employee data...")
@@ -300,9 +333,9 @@ def _save_single_db(dataframes, output_folder):
         return
 
     result_df = pd.concat(dataframes)
-    result_df = result_df.loc[:, ~result_df.columns.str.contains('^Unnamed')]
-    file_output_path = os.path.join(output_folder, 'result_db.xlsx')
-    result_df.to_excel(file_output_path, sheet_name='Total Data')
+    result_df = result_df.loc[:, ~result_df.columns.str.contains("^Unnamed")]
+    file_output_path = os.path.join(output_folder, "result_db.xlsx")
+    result_df.to_excel(file_output_path, sheet_name="Total Data")
     print(f"Combined database was saved to {output_folder}.")
 
 
@@ -315,14 +348,16 @@ def _print_unprocessed_summary(unprocessed_files):
     print("=" * 20 + " WARNING! " + "=" * 20)
     print("List of unprocessed files:")
     for file_name, issue in unprocessed_files.items():
-        data_err = [col for col, _ in issue.get('data_errors', [])]
+        data_err = [col for col, _ in issue.get("data_errors", [])]
         unique_data_err = list(dict.fromkeys(data_err))
-        print(f"\nFile: {file_name}, Info errors: {issue['info_errors']}\nData errors: {unique_data_err}")
+        print(
+            f"\nFile: {file_name}, Info errors: {issue['info_errors']}\nData errors: {unique_data_err}"
+        )
 
 
 def _save_unprocessed_files(unprocessed_files, output_folder):
     """Copy files with issues to 'unprocessed' and write error details to Excel."""
-    unprocessed_folder = os.path.join(output_folder, 'unprocessed')
+    unprocessed_folder = os.path.join(output_folder, "unprocessed")
     os.makedirs(unprocessed_folder, exist_ok=True)
     if not unprocessed_files:
         return
@@ -348,7 +383,7 @@ def module_5(input_folder, output_folder, params=None):
 
     unprocessed_files = file_processing(input_folder, output_folder, params)
     process_end = time.time()
-    print(f'File processing took: {process_end - process_start}')
+    print(f"File processing took: {process_end - process_start}")
 
     _print_unprocessed_summary(unprocessed_files)
     _save_unprocessed_files(unprocessed_files, output_folder)
@@ -359,10 +394,12 @@ def file_processing(input_folder, output_folder, params):
     params = params or {}
     unprocessed_files = {}
     result_frames = []
-    single_db = params.get('single_db', False)
-    save_db_only_without_errors = params.get('save_db_only_without_errors', False)
+    single_db = params.get("single_db", False)
+    save_db_only_without_errors = params.get("save_db_only_without_errors", False)
 
-    excel_files = [file_name for file_name in os.listdir(input_folder) if is_excel_file(file_name)]
+    excel_files = [
+        file_name for file_name in os.listdir(input_folder) if is_excel_file(file_name)
+    ]
     for counter, file_name in enumerate(excel_files, start=1):
         print(f"Processing file {counter}: {file_name}")
         file_path = os.path.join(input_folder, file_name)
@@ -370,7 +407,9 @@ def file_processing(input_folder, output_folder, params):
         has_validation_errors = has_errors(errors)
 
         if df is not None:
-            should_save = (not has_validation_errors) or (not save_db_only_without_errors)
+            should_save = (not has_validation_errors) or (
+                not save_db_only_without_errors
+            )
             if single_db and should_save:
                 result_frames.append(df)
             if not single_db and should_save:

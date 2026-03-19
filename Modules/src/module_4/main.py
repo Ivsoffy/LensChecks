@@ -1,43 +1,42 @@
-﻿
 # All the variables are imported from LP.py file
-import pandas as pd
-from openpyxl import load_workbook
-import openpyxl
-from openpyxl.utils.dataframe import dataframe_to_rows
-from openpyxl.styles import Font, Alignment, PatternFill, Border, Side, numbers
 import os
 import sys
 import warnings
-import re
-from openpyxl import utils
-import warnings
-import uuid
+
+import numpy as np
+import pandas as pd
+from openpyxl import load_workbook
+
 # warnings.filterwarnings("ignore", category=UserWarning)
 warnings.simplefilter("ignore", category=UserWarning, lineno=329, append=False)
-warnings.filterwarnings('ignore', message='The behavior of DataFrame concatenation with empty or all-NA entries is deprecated.*',
-                       category=FutureWarning)
-warnings.simplefilter(action='ignore', category=FutureWarning)
-warnings.simplefilter(action='ignore', category=pd.errors.SettingWithCopyWarning)
+warnings.filterwarnings(
+    "ignore",
+    message="The behavior of DataFrame concatenation with empty or all-NA entries is deprecated.*",
+    category=FutureWarning,
+)
+warnings.simplefilter(action="ignore", category=FutureWarning)
+warnings.simplefilter(action="ignore", category=pd.errors.SettingWithCopyWarning)
 
-pd.set_option('future.no_silent_downcasting', True)
+pd.set_option("future.no_silent_downcasting", True)
 parent_dir = os.path.dirname(os.getcwd())
 sys.path.insert(0, parent_dir)
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
-from ..LP import *
-from src.module_4.model import GradePredictor
+from src.module_4.model import GradePredictor  # noqa: E402
 
+from .. import LP  # noqa: E402
 
 cols = [
-    company_name,
-    dep_level_1,
-    dep_level_2,
-    dep_level_3,
-    dep_level_4,
-    dep_level_5,
-    dep_level_6,
-    job_title,
+    LP.company_name,
+    LP.dep_level_1,
+    LP.dep_level_2,
+    LP.dep_level_3,
+    LP.dep_level_4,
+    LP.dep_level_5,
+    LP.dep_level_6,
+    LP.job_title,
 ]
+
 
 def _is_excel_file(filename):
     """
@@ -52,6 +51,7 @@ def _is_excel_file(filename):
     if not isinstance(filename, str):
         return False
     return filename.lower().endswith((".xlsx", ".xls", ".xlsm"))
+
 
 def process_past_year(folder_py, df):
     """
@@ -68,7 +68,7 @@ def process_past_year(folder_py, df):
         print(f"Warning: invalid path to last year's files folder: {folder_py}")
         return df
 
-    companies = df[company_name].unique()
+    companies = df[LP.company_name].unique()
 
     for company in companies:
         found_files = []
@@ -76,14 +76,16 @@ def process_past_year(folder_py, df):
             found_files = check_if_past_year_exist(company, folder_py)
             if found_files:
                 file_to_cmp = os.path.join(folder_py, found_files[0])
-                df_py = pd.read_excel(file_to_cmp, sheet_name=rem_data, header=6, index_col=None)
+                df_py = pd.read_excel(
+                    file_to_cmp, sheet_name=LP.rem_data, header=6, index_col=None
+                )
                 cols_to_copy = [
-                    function_code,
-                    subfunction_code,
-                    specialization_code,
-                    function,
-                    subfunction,
-                    specialization,
+                    LP.function_code,
+                    LP.subfunction_code,
+                    LP.specialization_code,
+                    LP.function,
+                    LP.subfunction,
+                    LP.specialization,
                 ]
                 df = merge_by_cols(df, df_py, cols, cols_to_copy)
         except Exception as e:
@@ -93,10 +95,16 @@ def process_past_year(folder_py, df):
 
 
 def add_comparison_with_median(df):
-    cols = [job_title, region, function_code, subfunction_code, specialization_code]
+    cols = [
+        LP.job_title,
+        LP.region,
+        LP.function_code,
+        LP.subfunction_code,
+        LP.specialization_code,
+    ]
     df = df.copy()
 
-    required_cols = cols + [base_pay]
+    required_cols = cols + [LP.base_pay]
     missing_cols = [col for col in required_cols if col not in df.columns]
     if missing_cols:
         df["median_group_id"] = pd.NA
@@ -106,7 +114,10 @@ def add_comparison_with_median(df):
 
     # Normalize pay values to numeric for median/ratio calculations.
     df["_base_pay_numeric"] = pd.to_numeric(
-        df[base_pay].astype(str).str.replace(" ", "", regex=False).str.replace(",", ".", regex=False),
+        df[LP.base_pay]
+        .astype(str)
+        .str.replace(" ", "", regex=False)
+        .str.replace(",", ".", regex=False),
         errors="coerce",
     )
 
@@ -126,38 +137,44 @@ def add_comparison_with_median(df):
 
 
 def module_4(input_folder, output_folder, params):
-    folder_py = params['folder_past_year']
-    already_fixed = params['after_fix']
-    
+    folder_py = params["folder_past_year"]
+    already_fixed = params["after_fix"]
+
     counter = 0
-    found_files=[]
+    found_files = []
     for file in os.listdir(input_folder):
         if _is_excel_file(file):
             output_file = os.path.join(output_folder, file)
             input_file = os.path.join(input_folder, file)
 
             print(f"Processing file {counter}: {file}")
-            df = pd.read_excel(input_file, sheet_name='Total Data', index_col=0)
+            df = pd.read_excel(input_file, sheet_name="Total Data", index_col=0)
 
             if not already_fixed:
                 print("Module 4: Assigning grades.")
                 print("Assigning codes from last year's questionnaire (if found)")
-                df['grade_old'] = np.nan
+                df["grade_old"] = np.nan
                 df = process_past_year(folder_py, df)
                 df = add_comparison_with_median(df)
 
-                unfilled = df.loc[df[grade].apply(lambda x: str(x).lower().strip() == 'nan') == True] #add subfunction
+                unfilled = df.loc[df[LP.grade].isna()]
                 filled = df[~df.index.isin(unfilled.index)]
                 empty_count = unfilled.shape[0]
 
-                print(f"Assigned grades: {len(filled)}, missing grades: {len(unfilled)}")
+                print(
+                    f"Assigned grades: {len(filled)}, missing grades: {len(unfilled)}"
+                )
 
                 filled_and_processed = process_filled(filled)
 
-                df, unfilled_and_processed, count_past_year, count_model = process_unfilled(unfilled, df)
-                df.to_excel(output_file, sheet_name='Total Data')
-                
-                process_output_file(filled_and_processed, unfilled_and_processed, output_file)
+                df, unfilled_and_processed, count_past_year, count_model = (
+                    process_unfilled(unfilled, df)
+                )
+                df.to_excel(output_file, sheet_name="Total Data")
+
+                process_output_file(
+                    filled_and_processed, unfilled_and_processed, output_file
+                )
 
                 info = {
                     "past_year_files": str(found_files) if found_files else "No files",
@@ -170,15 +187,19 @@ def module_4(input_folder, output_folder, params):
                 add_info(info, output_file)
             else:
                 print("Module 4: Assigning validated grades.")
-                df_final = pd.read_excel(input_file, sheet_name='Total Data')
-                df_final = map_prefill_to_sheet1(input_file, sheet_prefill='Prefill', df_target=df_final)
-                df_final = map_prefill_to_sheet1(input_file, sheet_prefill='Model', df_target=df_final)
+                df_final = pd.read_excel(input_file, sheet_name="Total Data")
+                df_final = map_prefill_to_sheet1(
+                    input_file, sheet_prefill="Prefill", df_target=df_final
+                )
+                df_final = map_prefill_to_sheet1(
+                    input_file, sheet_prefill="Model", df_target=df_final
+                )
 
                 _, filename = os.path.split(output_file)
 
                 output_file = os.path.join(output_folder, filename)
                 df_final = df_final.loc[:, ~df_final.columns.str.startswith("Unnamed:")]
-                df_final.to_excel(output_file, sheet_name='Total Data')
+                df_final.to_excel(output_file, sheet_name="Total Data")
                 print(f"File {output_file} saved.")
             print(f"--------- Processing file {file} completed ---------")
 
@@ -187,9 +208,19 @@ def map_prefill_to_sheet1(
     excel_file: str,
     sheet_prefill,
     df_target=None,
-    match_cols=[company_name, dep_level_1, dep_level_2, dep_level_3, dep_level_4, dep_level_5, dep_level_6, job_title, "comparison_with_median"],
-    code_cols=[grade],
-    sheet_target='Total Data'
+    match_cols=[
+        LP.company_name,
+        LP.dep_level_1,
+        LP.dep_level_2,
+        LP.dep_level_3,
+        LP.dep_level_4,
+        LP.dep_level_5,
+        LP.dep_level_6,
+        LP.job_title,
+        "comparison_with_median",
+    ],
+    code_cols=[LP.grade],
+    sheet_target="Total Data",
 ):
     """
     Summary: Map code values from a Prefill/Model sheet to the target sheet by match columns.
@@ -229,20 +260,23 @@ def map_prefill_to_sheet1(
 
     for col in match_cols:
         if col in df_prefill.columns:
-            df_prefill[col] = df_prefill[col].fillna('').astype(str).str.strip()
+            df_prefill[col] = df_prefill[col].fillna("").astype(str).str.strip()
         if col in df_target.columns:
-            df_target[col] = df_target[col].fillna('').astype(str).str.strip()
+            df_target[col] = df_target[col].fillna("").astype(str).str.strip()
 
-    if not (set(match_cols).issubset(df_prefill.columns) and set(match_cols).issubset(df_target.columns)):
+    if not (
+        set(match_cols).issubset(df_prefill.columns)
+        and set(match_cols).issubset(df_target.columns)
+    ):
         print("Not all columns from match_cols were found in both sheets.")
         return df_target
 
-    df_prefill_unique = df_prefill.drop_duplicates(subset=match_cols, keep='first')
+    df_prefill_unique = df_prefill.drop_duplicates(subset=match_cols, keep="first")
     df_merged = df_target.merge(
         df_prefill_unique[match_cols + available_code_cols],
         on=match_cols,
-        how='left',
-        suffixes=('', '_prefill')
+        how="left",
+        suffixes=("", "_prefill"),
     )
 
     for col in available_code_cols:
@@ -262,7 +296,7 @@ def add_info(info, output_file):
     info = pd.DataFrame(data=[info])
     book = load_workbook(output_file)
 
-    ws3 = book.create_sheet(title='Info')
+    ws3 = book.create_sheet(title="Info")
 
     for col_idx, col_name in enumerate(info.columns, start=1):
         ws3.cell(row=1, column=col_idx, value=col_name)
@@ -274,7 +308,9 @@ def add_info(info, output_file):
     book.save(output_file)
 
 
-def process_output_file(df1, df2, output_file, sheet1_name='Prefill', sheet2_name='Model'):
+def process_output_file(
+    df1, df2, output_file, sheet1_name="Prefill", sheet2_name="Model"
+):
     """
     Summary: Write two dataframes to an existing Excel file.
     Args:
@@ -290,29 +326,48 @@ def process_output_file(df1, df2, output_file, sheet1_name='Prefill', sheet2_nam
         None
     """
 
-    cols = [company_name, gi_sector, dep_level_1, dep_level_2, dep_level_3,
-            dep_level_4, dep_level_5, dep_level_6, job_title, function_code,
-            subfunction_code, specialization_code, grade, base_pay, "comparison_with_median", "median", "median_group_id"]
-    
-    prefill_cols = cols + ['grade_old']
+    cols = [
+        LP.company_name,
+        LP.gi_sector,
+        LP.dep_level_1,
+        LP.dep_level_2,
+        LP.dep_level_3,
+        LP.dep_level_4,
+        LP.dep_level_5,
+        LP.dep_level_6,
+        LP.job_title,
+        LP.function_code,
+        LP.subfunction_code,
+        LP.specialization_code,
+        LP.grade,
+        LP.base_pay,
+        "comparison_with_median",
+        "median",
+        "median_group_id",
+    ]
+
+    prefill_cols = cols + ["grade_old"]
     model_cols = cols
-    
+
     if not df1.empty:
         df1 = df1.loc[:, prefill_cols]
     if not df2.empty:
         df2 = df2.loc[:, model_cols]
 
-    unique_cols = [company_name, gi_sector, dep_level_1, dep_level_2, dep_level_3,
-            dep_level_4, dep_level_5, dep_level_6,job_title, grade, "comparison_with_median"]
-    
+    unique_cols = LP.unique_cols_for_grade
+
     df1 = df1.drop_duplicates(subset=unique_cols)
     df2 = df2.drop_duplicates(subset=unique_cols)
 
-    with pd.ExcelWriter(output_file, engine='openpyxl', mode='a', if_sheet_exists='replace') as writer:
+    with pd.ExcelWriter(
+        output_file, engine="openpyxl", mode="a", if_sheet_exists="replace"
+    ) as writer:
         df1.to_excel(writer, sheet_name=sheet1_name, index=False)
         df2.to_excel(writer, sheet_name=sheet2_name, index=False)
 
-    print(f"Sheets '{sheet1_name}' and '{sheet2_name}' were added to file: {output_file}")
+    print(
+        f"Sheets '{sheet1_name}' and '{sheet2_name}' were added to file: {output_file}"
+    )
 
 
 def check_unfilled_columns(df):
@@ -325,8 +380,8 @@ def check_unfilled_columns(df):
     Raises:
         None
     """
-    col = function_code
-    mask_empty = df[col].astype(str).str.strip().isin(['', 'nan', 'NaN', 'None'])
+    col = LP.function_code
+    mask_empty = df[col].astype(str).str.strip().isin(["", "nan", "NaN", "None"])
     if mask_empty.any():
         print(f"Column '{col}' is not fully filled - contains empty values.")
         return
@@ -339,19 +394,21 @@ def process_unfilled(df, df_orig):
     preds = pd.DataFrame()
 
     if check_unfilled_columns(df):
-        if 'grade_old' in df_orig.columns:
-            df_orig[function_code].update(df['grade_old'])
+        if "grade_old" in df_orig.columns:
+            df_orig[LP.function_code].update(df["grade_old"])
 
-        df_without_py = df_orig.loc[df_orig[grade].apply(lambda x: str(x).lower().strip() == 'nan') == True]
+        df_without_py = df_orig.loc[df_orig[LP.grade].isna()]
         count_model = df_without_py.shape[0]
         count_past_year = df.shape[0] - count_model
         if count_model != 0:
-            model = GradePredictor(path_to_model='src/module_4/grade_model_weights/model_best.cbm')
+            model = GradePredictor(
+                path_to_model="src/module_4/grade_model_weights/model_best.cbm"
+            )
             preds = model.predict(df_without_py)
-            preds = preds.loc[preds[company_name].apply(lambda x: str(x).lower().strip() == 'nan') == False]
+            preds = preds.loc[~preds[LP.company_name].isna()]
 
     return df_orig, preds, count_past_year, count_model
-    
+
 
 def process_filled(df):
     """
@@ -366,10 +423,7 @@ def process_filled(df):
     df = df.copy()
     df["past_year_check"] = True
 
-    df["past_year_check"] = (
-        (df[grade] == df["grade_old"]) |
-        (df["grade_old"].isna())
-    )
+    df["past_year_check"] = (df[LP.grade] == df["grade_old"]) | (df["grade_old"].isna())
     return df
 
 
@@ -395,19 +449,16 @@ def merge_by_cols(df, df_py, cols, cols_to_copy):
     df_py = df_py.copy()
 
     for c in cols:
-        df[c] = df[c].astype(str).replace('nan', np.nan)
-        df_py[c] = df_py[c].astype(str).replace('nan', np.nan)
+        df[c] = df[c].astype(str).replace("nan", np.nan)
+        df_py[c] = df_py[c].astype(str).replace("nan", np.nan)
 
     df_py_unique = df_py.drop_duplicates(subset=cols, keep="first")
 
     df_merged = df.merge(
-        df_py_unique[cols + cols_to_copy],
-        on=cols,
-        how="left",
-        suffixes=("", "_py")
+        df_py_unique[cols + cols_to_copy], on=cols, how="left", suffixes=("", "_py")
     )
 
-    old_col = cols_to_copy[0] 
+    old_col = cols_to_copy[0]
     py_col = f"{old_col}_py"
 
     if py_col in df_merged.columns:
@@ -426,7 +477,7 @@ def check_if_past_year_exist(company, folder_py):
     for filename in os.listdir(folder_py):
         if company_str.lower() in filename.lower():
             found_files.append(filename)
-    
+
     if found_files:
         for f in found_files:
             print(f"Found last year's questionnaire: {f}")
