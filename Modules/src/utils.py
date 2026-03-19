@@ -616,7 +616,7 @@ def check_codes(errors, df):
         FileNotFoundError: If the SDF file is missing.
         ValueError: If required columns are missing.
     """
-    sdf_path = "src/module_2/SDF.xlsx"
+    sdf_path = "src/module_2/SDF_2026.xlsx"
     if not os.path.exists(sdf_path):
         raise FileNotFoundError(f"Ошибка: файл SDF не найден: {sdf_path}")
 

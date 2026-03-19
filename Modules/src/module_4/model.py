@@ -74,7 +74,7 @@ class Dataset:
                 df['seniority'] = df['job_title'].progress_apply(lambda x: self._categorize_title(x))
             else:
                 pt = joblib.load('src/module_4/grade_model_weights/bp_boxcox_transformer.pkl')
-                df['BP_boxcox'] = pt.fit_transform(df[['Базовый оклад (BP)']])
+                df['BP_boxcox'] = pt.transform(df[['Базовый оклад (BP)']])
                 df['code'] = df.progress_apply(lambda x: self._process(x), axis=1)
                 df['seniority'] = df['Название должности'].progress_apply(lambda x: self._categorize_title(x))
             
@@ -165,7 +165,6 @@ class GradePredictor:
         with open("src/module_4/grade_model_weights/codes.json", "r", encoding="utf-8") as f:
             codes = json.load(f)
         
-        # print(df['Грейд / Уровень обзора'])
         data = Dataset()
         out['code'] = out.progress_apply(lambda x: data._process(row=x), axis=1)
         out['description'] = out['code'].apply(lambda x: codes[x]['description'])

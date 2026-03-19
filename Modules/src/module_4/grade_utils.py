@@ -51,14 +51,14 @@ def calculate_f_new(df):
         'Код специализации': 'spec',
         'Базовый оклад (BP)': 'BP',
         'Индустрия': 'industry',
-        'Количество сотрудников категория': 'headcount_cat',
-        'Выручка категория': 'revenue_cat'
+        'Общее количество сотрудников по состоянию на 1 мая 2026 года': 'headcount_cat',
+        'Выручка за 2025 год, руб.': 'revenue_cat'
     }, inplace=True)
 
     df = normalize(df, ['company'], 'BP', 'Scaled_BP')
-    df = normalize(df, ['region'], 'BP', 'Scaled_BP_Region')
+    df = normalize(df, ['company', 'region'], 'BP', 'Scaled_BP_Region')
     df = normalize(df, ['company', 'code'], 'BP', 'Scaled_BP_Code')
-    df = normalize(df, ['region', 'code', 'seniority'], 'BP', 'Scaled_BP_rcs')
+    df = normalize(df, ['company', 'region', 'code', 'seniority'], 'BP', 'Scaled_BP_rcs')
     df = add_salary_to_headcount_ratio(df, ['company'], 'STH_C')
     df = add_salary_to_headcount_ratio(df, ['company', 'code'], 'STH_SP')
     df = add_salary_to_headcount_ratio(df, ['company', 'region'], 'STH_C_R')
@@ -73,10 +73,10 @@ def calculate_f_new(df):
     ).reset_index()
     df = df.merge(grouped, on=['company', 'function'], how='left')
 
-    median = df.groupby(['code', 'region']).agg(
+    median = df.groupby(['company', 'code', 'region']).agg(
         median_sp_r=('BP', "median")
     ).reset_index()
-    df = df.merge(median, on=['code', 'region'], how='left')
+    df = df.merge(median, on=['company', 'code', 'region'], how='left')
     
     df['CR_SP_R'] = df['BP'] / df['median_sp_r']
     df = log_function(df, 'CR_SP_R', 'Logged_CR_SP_R')
@@ -85,9 +85,6 @@ def calculate_f_new(df):
     df = df.drop(["EmpBP_Portion_C",'Logged_CR_SP_R', 'CR_SP_R',
                  "Logged_EmpBP_Portion_C", 'BP'], axis=1)
     
-    df = df[~((df["company"] == "3Logic_Group") & (df["grade"] < 17))]
-    df = df[~((df["company"] == "VK") & (df["grade"] < 18))]
-    
     def sanitize_text(text):
         text = text.lower()
         text = re.sub(r'[^a-zа-я0-9\s]', '', text)
@@ -95,16 +92,12 @@ def calculate_f_new(df):
         return text
     
     
-    print("Размер датасета: ",df.shape[0])
     cols = ["job_title", "industry", "region", "headcount_cat", "revenue_cat", "code"]
     bad = {"", "-", "none", "nan", "null"}
 
     norm = df[cols].astype(str).apply(lambda s: s.str.strip().str.lower())
     bad_mask = norm.isin(bad) | df[cols].isna()
-    empty_cols = bad_mask.apply(lambda r: list(r[r].index), axis=1)
     to_drop = bad_mask.any(axis=1)
-    print(df.loc[to_drop, cols].assign(empty_cols=empty_cols[to_drop]))
-    print("Размер датасета: ", df.shape[0])
     df = df[~to_drop]
     print("Размер датасета после удаления строк с пустыми значениями в обязательных колонках: ", df.shape[0])
     df['job_title_cleaned'] = df['job_title'].apply(sanitize_text)

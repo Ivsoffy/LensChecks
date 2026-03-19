@@ -67,7 +67,7 @@ def module_2(input_folder, output_folder, params):
             input_file = os.path.join(input_folder, file)
 
             try:
-                df = pd.read_excel(input_file, sheet_name="Total Data", index_col=0)
+                df = pd.read_excel(input_file, sheet_name="Total Data")
             except:
                 try:
                     df = pd.read_excel(input_file, sheet_name="Данные", header=6)
@@ -191,7 +191,7 @@ def process_past_year(folder_py, df):
         ValueError: If required columns are missing.
     """
     if company_name not in df.columns:
-        raise ValueError("Error: required column 'Company name' is missing.")
+        raise ValueError(f"Error: required column {company_name} is missing.")
 
     if not isinstance(folder_py, str) or not os.path.exists(folder_py):
         print(f"Warning: invalid path to last year's files folder: {folder_py}")
@@ -204,6 +204,7 @@ def process_past_year(folder_py, df):
         try:
             found_files = check_if_past_year_exist(company, folder_py)
             if found_files:
+                print(f'Found file {found_files[0]} from last year.')
                 file_to_cmp = os.path.join(folder_py, found_files[0])
                 df_py = pd.read_excel(file_to_cmp, sheet_name=rem_data, header=6, index_col=None)
                 cols_to_copy = [
@@ -264,11 +265,11 @@ def check_the_result(df):
         FileNotFoundError: If the SDF file is missing.
         ValueError: If required columns are missing.
     """
-    sdf_path = "src/module_2/SDF.xlsx"
+    sdf_path = "src/module_2/funcs_2026.parquet"
     if not os.path.exists(sdf_path):
         raise FileNotFoundError(f"Error: SDF file not found: {sdf_path}")
 
-    sdf = pd.read_excel(sdf_path, sheet_name="Каталог функций", header=4)
+    sdf = pd.read_parquet(sdf_path)
     allowed_funcs = sdf[function_code]
     allowed_subfuncs = sdf[subfunction_code]
     allowed_specs = sdf[specialization_code]
@@ -553,6 +554,7 @@ def process_output_file(df1, df2, cols, output_file, sheet1_name="Prefill", shee
     _write_df_to_sheet(ws2, df2, highlight_fn=_low_confidence, fill=red_fill)
 
     book.save(output_file)
+    print(f"File saved!")
 
 
 def process_unfilled(df, df_orig):
