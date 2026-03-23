@@ -8,9 +8,9 @@ import joblib
 import numpy as np
 import pandas as pd
 from catboost import CatBoostRegressor
+from modules.module_4.grade_utils import calculate_f_new
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import PowerTransformer
-from src.module_4.grade_utils import calculate_f_new
 from tqdm import tqdm
 
 tqdm.pandas(desc="Processing")
@@ -74,14 +74,14 @@ class Dataset:
             pt = PowerTransformer(method="box-cox", standardize=True)
             df["BP_boxcox"] = pt.fit_transform(df[["Базовый оклад (BP)"]])
             joblib.dump(
-                pt, "src/module_4/grade_model_weights/bp_boxcox_transformer.pkl"
+                pt, "modules/module_4/grade_model_weights/bp_boxcox_transformer.pkl"
             )
             df["seniority"] = df["job_title"].progress_apply(
                 lambda x: self._categorize_title(x)
             )
         else:
             pt = joblib.load(
-                "src/module_4/grade_model_weights/bp_boxcox_transformer.pkl"
+                "modules/module_4/grade_model_weights/bp_boxcox_transformer.pkl"
             )
             df["BP_boxcox"] = pt.transform(df[["Базовый оклад (BP)"]])
             df["code"] = df.progress_apply(lambda x: self._process(x), axis=1)
@@ -192,7 +192,7 @@ class GradePredictor:
         out["Грейд / Уровень обзора"] = np.floor(preds + 0.5).astype(int)
 
         with open(
-            "src/module_4/grade_model_weights/codes.json", "r", encoding="utf-8"
+            "modules/module_4/grade_model_weights/codes.json", "r", encoding="utf-8"
         ) as f:
             codes = json.load(f)
 

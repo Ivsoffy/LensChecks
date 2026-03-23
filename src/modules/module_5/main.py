@@ -217,7 +217,7 @@ def check_one_interval(errors, grade_num, val, min, max, index, col):
 def check_intervals(errors, df):
     cols_to_check = [LP.base_pay, LP.tc_pay, LP.ttc_pay, LP.tdc_pay, LP.target_sti_out]
 
-    intervals_path = "src/module_5/intervals.parquet"
+    intervals_path = "modules/module_5/intervals.parquet"
     if not os.path.exists(intervals_path):
         raise FileNotFoundError(f"Ошибка: файл intervals не найден: {intervals_path}")
     intervals = pd.read_parquet(intervals_path)

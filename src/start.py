@@ -2,11 +2,11 @@ import shutil
 import warnings
 from pathlib import Path
 
-from src.module_1.main import module_1
-from src.module_2.main import module_2
-from src.module_3.main import module_3
-from src.module_4.main import module_4
-from src.module_5.main import module_5
+from modules.module_1.main import module_1
+from modules.module_2.main import module_2
+from modules.module_3.main import module_3
+from modules.module_4.main import module_4
+from modules.module_5.main import module_5
 from yaml import SafeLoader, load
 
 warnings.filterwarnings("ignore", category=UserWarning)
@@ -19,18 +19,18 @@ def find_input_folder(input_folder, module, already_fixed):
             and module != 4
             or ((module == 2 or module == 4) and not already_fixed)
         ):
-            input = "src/module_" + str(module - 1) + "/output"
+            input = "modules/module_" + str(module - 1) + "/output"
             if Path(input).is_dir():
                 return input
-            input = "src/module_" + str(module) + "/input"
+            input = "modules/module_" + str(module) + "/input"
             if Path(input).is_dir():
                 return input
         else:
-            input = "src/module_" + str(module) + "/output/require_check"
+            input = "modules/module_" + str(module) + "/output/require_check"
             if Path(input).is_dir():
                 return input
     elif module == 1:
-        input = "src/module_" + str(module) + "/input"
+        input = "modules/module_" + str(module) + "/input"
         print(input)
         if Path(input).is_dir():
             return input
@@ -45,16 +45,16 @@ def find_output_folder(module, already_fixed):
     if (module != 2 and module != 4) or (
         (module == 2 or module == 4) and already_fixed
     ):
-        output_folder = Path(f"src/module_{module}/output")
+        output_folder = Path(f"modules/module_{module}/output")
     else:
-        output_folder = Path(f"src/module_{module}/output/require_check")
+        output_folder = Path(f"modules/module_{module}/output/require_check")
     output_folder.mkdir(parents=True, exist_ok=True)
     return output_folder
 
 
 def cleaning_folders():
-    src = Path("src/module_5/output")
-    dst = Path("src/results")
+    src = Path("modules/module_5/output")
+    dst = Path("modules/results")
     dst.mkdir(exist_ok=True)
     for p in src.iterdir():
         if p.is_file():

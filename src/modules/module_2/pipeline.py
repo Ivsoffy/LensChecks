@@ -13,10 +13,10 @@ sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 from .. import LP  # noqa: E402
 
-sys.path.append("src/module_2/function_model_weights/")
+sys.path.append("modules/module_2/function_model_weights/")
 from model import FunctionModel  # noqa: E402
 
-ckpt = "src/module_2/function_model_weights/model_weights"
+ckpt = "modules/module_2/function_model_weights/model_weights"
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
 
@@ -64,7 +64,7 @@ class CodeModel:
         print("Loading codes..")
 
         with open(
-            "src/module_2/function_model_weights/codes.json", "r", encoding="utf-8"
+            "modules/module_2/function_model_weights/codes.json", "r", encoding="utf-8"
         ) as f:
             codes = json.load(f)
 

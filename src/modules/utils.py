@@ -8,10 +8,10 @@ import numpy as np
 
 # All the variables are imported from LP.py file
 import pandas as pd
+from modules import LP
 from openpyxl import load_workbook
 from openpyxl.cell.cell import MergedCell
 from openpyxl.utils.dataframe import dataframe_to_rows
-from src import LP
 
 NUMERIC_COLUMNS_TO_COERCE = [
     LP.monthly_salary,
@@ -656,7 +656,7 @@ def check_codes(errors, df):
         FileNotFoundError: If the SDF file is missing.
         ValueError: If required columns are missing.
     """
-    sdf_path = "src/module_2/funcs_2026.parquet"
+    sdf_path = "modules/module_2/funcs_2026.parquet"
     if not os.path.exists(sdf_path):
         raise FileNotFoundError(f"Error: SDF file not found: {sdf_path}")
 

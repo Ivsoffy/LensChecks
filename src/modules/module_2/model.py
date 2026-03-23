@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 import torch
 from datasets import Dataset
-from src.LP import (
+from modules.LP import (
     dep_level_1,
     dep_level_2,
     dep_level_3,

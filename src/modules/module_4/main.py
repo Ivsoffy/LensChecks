@@ -22,7 +22,7 @@ parent_dir = os.path.dirname(os.getcwd())
 sys.path.insert(0, parent_dir)
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
-from src.module_4.model import GradePredictor  # noqa: E402
+from modules.module_4.model import GradePredictor  # noqa: E402
 
 from .. import LP  # noqa: E402
 
@@ -402,7 +402,7 @@ def process_unfilled(df, df_orig):
         count_past_year = df.shape[0] - count_model
         if count_model != 0:
             model = GradePredictor(
-                path_to_model="src/module_4/grade_model_weights/model_best.cbm"
+                path_to_model="modules/module_4/grade_model_weights/model_best.cbm"
             )
             preds = model.predict(df_without_py)
             preds = preds.loc[~preds[LP.company_name].isna()]

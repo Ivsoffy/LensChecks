@@ -1,14 +1,14 @@
-Modules/src/module_1/companies/*
-Modules/src/module_*/output*
-Modules/src/module_*/input*
+src/modules/module_1/companies/*
+src/modules/module_*/output*
+src/modules/module_*/input*
 
 __pycache__/
-Modules/src/demo/
-src.lnk
+*.lnk
 *.pth
 *.cbm
 *.pkl
 *.xlsx
+*_cache
 result_test/
 model/
 grade_model_weights/
