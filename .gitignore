@@ -14,5 +14,4 @@ result_test/
 model/
 grade_model_weights/
 function_model_weights/
-config.yml
 .venv/
