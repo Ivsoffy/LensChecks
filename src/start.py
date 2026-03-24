@@ -12,7 +12,15 @@ from yaml import SafeLoader, load
 warnings.filterwarnings("ignore", category=UserWarning)
 
 
+def load_config(config_path="config.yml"):
+    with open(config_path, "r") as f:
+        return load(f, Loader=SafeLoader)
+
+
 def find_input_folder(input_folder, module, already_fixed):
+    if input_folder and Path(input_folder).is_dir():
+        return input_folder
+
     if module > 1:
         if (
             module != 2
@@ -31,12 +39,8 @@ def find_input_folder(input_folder, module, already_fixed):
                 return input
     elif module == 1:
         input = "modules/module_" + str(module) + "/input"
-        print(input)
         if Path(input).is_dir():
             return input
-
-    if input_folder and Path(input_folder).is_dir():
-        return input_folder
 
     return None
 
@@ -79,7 +83,7 @@ def cleaning_folders():
                     shutil.move(str(item), str(dst_item))
 
 
-def main():
+def run_checks(config):
     modules = [module_1, module_2, module_3, module_4, module_5]
 
     params_for_each_module = [
@@ -94,9 +98,6 @@ def main():
         # module_5
         ["save_db_only_without_errors", "drop_empty_month_salary", "single_db"],
     ]
-
-    with open("config.yml", "r") as f:
-        config = load(f, Loader=SafeLoader)
 
     input_folder = config["input_folder"]
     module_num = config["module"] - 1
@@ -127,4 +128,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    config = load_config()
+    run_checks(config)

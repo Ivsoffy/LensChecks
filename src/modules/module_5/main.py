@@ -250,8 +250,13 @@ def find_outliers_iqr(data):
     lower_bound = max(0, q1 - 1.5 * iqr)
     upper_bound = q3 + 1.5 * iqr
 
-    outliers = data[(data < lower_bound) | (data > upper_bound)]
-    return [(outlier, lower_bound, upper_bound) for outlier in outliers.tolist()]
+    outlier_mask = (data < lower_bound) | (data > upper_bound)
+    return lower_bound, upper_bound, outlier_mask
+
+
+def get_outlier_strength(values, lower_bound, upper_bound):
+    values = np.asarray(values, dtype=float)
+    return np.where(values < lower_bound, lower_bound - values, values - upper_bound)
 
 
 def check_outliers(errors, df):
@@ -267,14 +272,24 @@ def check_outliers(errors, df):
             if series.empty:
                 continue
 
-            outlier_info = find_outliers_iqr(series.to_numpy())
-            if not outlier_info:
+            lower_bound, upper_bound, outlier_mask = find_outliers_iqr(
+                series.to_numpy()
+            )
+            if not outlier_mask.any():
                 continue
-            outliers = [item[0] for item in outlier_info]
-            lower_bound = outlier_info[0][1]
-            upper_bound = outlier_info[0][2]
-            outlier_series = series[series.isin(outliers)]
-            for ind, _ in outlier_series.items():
+
+            outlier_series = series[outlier_mask]
+            outlier_strength = pd.Series(
+                get_outlier_strength(
+                    outlier_series.to_numpy(), lower_bound, upper_bound
+                ),
+                index=outlier_series.index,
+            )
+
+            top_count = max(1, int(np.ceil(len(outlier_strength) * 0.05)))
+            top_outlier_indices = outlier_strength.nlargest(top_count).index
+
+            for ind in top_outlier_indices:
                 errors["data_errors"] += [(col, ind)]
                 df.loc[ind, "outlier"] = True
                 df.loc[ind, f"{col}_lower_bound"] = lower_bound

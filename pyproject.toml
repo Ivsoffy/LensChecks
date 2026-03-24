@@ -1,3 +1,26 @@
+[project]
+name = "lenschecks"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "catboost>=1.2.10",
+    "evaluate>=0.4.6",
+    "fastparquet>=2026.3.0",
+    "ipython>=9.10.0",
+    "matplotlib==3.10.6",
+    "numpy>=2.4.3",
+    "openpyxl>=3.1.5",
+    "pandas==2.3.2",
+    "pywin32>=311",
+    "rouge-score>=0.1.2",
+    "scikit-learn==1.7.2",
+    "seaborn==0.13.2",
+    "sentencepiece>=0.2.1",
+    "spacy>=3.8.13",
+    "torch>=2.11.0",
+    "transformers==4.56.1",
+]
+
 [tool.ruff]
 line-length = 88
 target-version = "py311"
@@ -8,3 +31,16 @@ ignore = ["E501"]
 
 [tool.ruff.format]
 quote-style = "double"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+filterwarnings = [
+    "ignore:builtin type SwigPyPacked has no __module__ attribute:DeprecationWarning",
+    "ignore:builtin type SwigPyObject has no __module__ attribute:DeprecationWarning",
+    "ignore:builtin type swigvarlink has no __module__ attribute:DeprecationWarning",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+]
