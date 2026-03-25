@@ -8,6 +8,7 @@ import joblib
 import numpy as np
 import pandas as pd
 from catboost import CatBoostRegressor
+from modules import LP
 from modules.module_4.grade_utils import calculate_f_new
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import PowerTransformer
@@ -34,6 +35,28 @@ TEAMLEAD_PHRASES: tuple[str, ...] = ("team lead",)
 SENIOR_STEMS: set[str] = {"ведущ", "глав", "senior", "прораб"}
 MIDDLE_STEMS: set[str] = {"старш", "mid", "middle"}
 JUNIOR_STEMS: set[str] = {"junior", "jr", "младш", "начинающ"}
+
+
+MODEL_CATEGORICAL_FEATURES: tuple[str, ...] = (
+    "code",
+    "industry_cleaned",
+    "region_cleaned",
+    "headcount_cat_cleaned",
+    "revenue_cat_cleaned",
+    "seniority",
+)
+MODEL_NUMERICAL_FEATURES: tuple[str, ...] = (
+    "Scaled_BP",
+    "Scaled_BP_Region",
+    "Scaled_BP_Code",
+    "Scaled_BP_rcs",
+    "STH_C",
+    "STH_SP",
+    "STH_C_R",
+    "Scaled_EmpBP_Portion_C",
+    "Scaled_CR_SP_R",
+    "subfunc_num",
+)
 
 
 class Dataset:
@@ -70,6 +93,8 @@ class Dataset:
 
     def prepare_features(self, df: pd.DataFrame, train):
         df = df.copy()
+        if "__row_id__" not in df.columns:
+            df["__row_id__"] = np.arange(len(df))
         if train:
             pt = PowerTransformer(method="box-cox", standardize=True)
             df["BP_boxcox"] = pt.fit_transform(df[["Базовый оклад (BP)"]])
@@ -92,41 +117,29 @@ class Dataset:
         df["Базовый оклад (BP)"] = df["BP_boxcox"]
         print(f"Lambda Box-Cox: {pt.lambdas_[0]}")
 
-        categorical_features = [
-            "code",
-            "industry_cleaned",
-            "region_cleaned",
-            "headcount_cat_cleaned",
-            "revenue_cat_cleaned",
-            "seniority",
-        ]
-        numerical_features = [
-            "Scaled_BP",
-            "Scaled_BP_Region",
-            "Scaled_BP_Code",
-            "Scaled_BP_rcs",
-            "STH_C",
-            "STH_SP",
-            "STH_C_R",
-            "Scaled_EmpBP_Portion_C",
-            "Scaled_CR_SP_R",
-            "subfunc_num",
-        ]
-
-        df = df.drop_duplicates()
+        if train:
+            df = df.drop_duplicates()
         print("Calculating features...")
         df = calculate_f_new(df)
-        df[categorical_features] = (
-            df[categorical_features].fillna("missing").astype(str)
+        df[list(MODEL_CATEGORICAL_FEATURES)] = (
+            df[list(MODEL_CATEGORICAL_FEATURES)].fillna("missing").astype(str)
         )
 
-        df_cat = df[categorical_features]
-        df_num = df[numerical_features].astype(float)
+        row_ids = df["__row_id__"].astype(int) if "__row_id__" in df.columns else None
+        df_cat = df[list(MODEL_CATEGORICAL_FEATURES)]
+        df_num = df[list(MODEL_NUMERICAL_FEATURES)].astype(float)
         X = pd.concat([df_cat, df_num], axis=1)
+        if row_ids is not None:
+            X.index = row_ids.to_numpy()
 
-        cat_feature_indices = [X.columns.get_loc(col) for col in categorical_features]
+        cat_feature_indices = [
+            X.columns.get_loc(col) for col in MODEL_CATEGORICAL_FEATURES
+        ]
 
-        return X, cat_feature_indices, df["grade"]
+        y = df["grade"]
+        if row_ids is not None:
+            y.index = row_ids.to_numpy()
+        return X, cat_feature_indices, y
 
 
 class GradePredictor:
@@ -188,8 +201,14 @@ class GradePredictor:
         return X_test
 
     def _attach_predictions(self, df, idx_test, preds):
-        out = df.loc[idx_test].copy()
-        out["Грейд / Уровень обзора"] = np.floor(preds + 0.5).astype(int)
+        out = df.copy()
+        out[LP.grade] = "-"
+
+        if len(idx_test) > 0:
+            rounded = np.floor(np.asarray(preds, dtype=float) + 0.5).astype(int)
+            row_pos = np.asarray(idx_test, dtype=int)
+            grade_col_pos = out.columns.get_loc(LP.grade)
+            out.iloc[row_pos, grade_col_pos] = rounded
 
         with open(
             "modules/module_4/grade_model_weights/codes.json", "r", encoding="utf-8"
@@ -198,16 +217,34 @@ class GradePredictor:
 
         data = Dataset()
         out["code"] = out.progress_apply(lambda x: data._process(row=x), axis=1)
-        out["description"] = out["code"].apply(lambda x: codes[x]["description"])
+        out["description"] = out["code"].apply(
+            lambda x: codes.get(str(x), {}).get("description", "-")
+        )
+        out.loc[out[LP.grade] == "-", "description"] = "-"
         out = out.drop(columns=["code"])
         return out
 
     def predict(self, df):
-        prepare = Dataset(df)
+        if df.empty:
+            return self._attach_predictions(
+                df, pd.Index([], dtype=int), np.array([], dtype=float)
+            )
+
+        df_for_pred = df.copy()
+        df_for_pred["__row_id__"] = np.arange(len(df_for_pred))
+        prepare = Dataset(df_for_pred)
         print("Preparing features...")
-        X, _, _ = prepare.prepare_features(df, train=False)
-        print("Predicting...")
-        preds = self.model.predict(X)
+        X, _, _ = prepare.prepare_features(df_for_pred, train=False)
+
+        if X.empty:
+            print("No valid rows for model prediction. Returning placeholders.")
+            preds = np.array([], dtype=float)
+            idx_test = pd.Index([], dtype=int)
+        else:
+            print("Predicting...")
+            preds = self.model.predict(X)
+            idx_test = X.index
+
         print("Mapping predictions...")
-        df_preds = self._attach_predictions(df, df.index, preds)
+        df_preds = self._attach_predictions(df, idx_test, preds)
         return df_preds
