@@ -279,7 +279,7 @@ def check_the_result(df):
         FileNotFoundError: If the SDF file is missing.
         ValueError: If required columns are missing.
     """
-    sdf_path = "modules/module_2/funcs_2026.parquet"
+    sdf_path = "modules/funcs_2026.parquet"
     if not os.path.exists(sdf_path):
         raise FileNotFoundError(f"Error: SDF file not found: {sdf_path}")
 

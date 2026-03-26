@@ -1362,7 +1362,6 @@ dependencies = [
     { name = "openpyxl" },
     { name = "pandas" },
     { name = "pywin32" },
-    { name = "rouge-score" },
     { name = "scikit-learn" },
     { name = "seaborn" },
     { name = "sentencepiece" },
@@ -1387,7 +1386,6 @@ requires-dist = [
     { name = "openpyxl", specifier = ">=3.1.5" },
     { name = "pandas", specifier = "==2.3.2" },
     { name = "pywin32", specifier = ">=311" },
-    { name = "rouge-score", specifier = ">=0.1.2" },
     { name = "scikit-learn", specifier = "==1.7.2" },
     { name = "seaborn", specifier = "==0.13.2" },
     { name = "sentencepiece", specifier = ">=0.2.1" },
@@ -2828,18 +2826,6 @@ sdist = { url = "https://files.pythonhosted.org/packages/b3/c6/f3b320c27991c46f4
 wheels = [
     { url = "https://files.pythonhosted.org/packages/14/25/b208c5683343959b670dc001595f2f3737e051da617f66c31f7c4fa93abc/rich-14.3.3-py3-none-any.whl", hash = "sha256:793431c1f8619afa7d3b52b2cdec859562b950ea0d4b6b505397612db8d5362d", size = 310458, upload-time = "2026-02-19T17:23:13.732Z" },
 ]
-
-[[package]]
-name = "rouge-score"
-version = "0.1.2"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "absl-py" },
-    { name = "nltk" },
-    { name = "numpy" },
-    { name = "six" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/e2/c5/9136736c37022a6ad27fea38f3111eb8f02fe75d067f9a985cc358653102/rouge_score-0.1.2.tar.gz", hash = "sha256:c7d4da2683e68c9abf0135ef915d63a46643666f848e558a1b9f7ead17ff0f04", size = 17400, upload-time = "2022-07-22T22:46:22.909Z" }
 
 [[package]]
 name = "safetensors"
