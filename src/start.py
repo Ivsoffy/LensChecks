@@ -88,15 +88,15 @@ def run_checks(config):
 
     params_for_each_module = [
         # module_1
-        ["save_db_only_without_errors", "drop_empty_month_salary", "single_db"],
+        ["save_db_only_without_errors", "single_db"],
         # module_2
         ["folder_past_year", "after_fix"],
         # module_3
-        ["save_to_parquet"],
+        [],
         # module_4
         ["folder_past_year", "after_fix"],
         # module_5
-        ["save_db_only_without_errors", "drop_empty_month_salary", "single_db"],
+        ["save_db_only_without_errors", "single_db"],
     ]
 
     input_folder = config["input_folder"]
@@ -119,12 +119,15 @@ def run_checks(config):
     params = {}
     for param in param_names:
         params[param] = config[param]
-    modules[module_num](
+    module_result = modules[module_num](
         input_folder=input_folder, output_folder=output_folder, params=params
     )
 
     if (config["module"] == 5) and config["clean"]:
         cleaning_folders()
+
+    if config["module"] == 1:
+        return module_result
 
 
 if __name__ == "__main__":

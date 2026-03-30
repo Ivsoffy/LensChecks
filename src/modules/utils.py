@@ -546,33 +546,29 @@ def check_column_rules(df, col_name, allowed_values):
     if allowed_values is None:
         raise ValueError("Ошибка: список допустимых значений не задан.")
 
-    function_code = LP.function_code
-    subfunction_code = LP.subfunction_code
-    specialization_code = LP.specialization_code
-
     df = df.copy()
-    series = df[col_name]
-    mask_empty = series.apply(is_empty_value) | series.isna()
-
-    normalized = series.astype(str).str.strip().str.upper()
+    normalized = df[col_name].astype(str).str.strip().str.upper()
+    mask_empty = normalized.isin({"", "NAN", "NONE", "NULL"})
     allowed_set = {
         str(v).strip().upper() for v in allowed_values if not is_empty_value(v)
     }
     mask_allowed = normalized.isin(allowed_set)
+    if col_name == LP.specialization_code:
+        # Empty specialization code is valid, other code columns must not be empty.
+        mask_invalid = (~mask_empty) & (~mask_allowed)
+    else:
+        mask_invalid = mask_empty | (~mask_allowed)
 
-    invalid = (~mask_empty) & (~mask_allowed)
+    flag_col = f"errors_not_allowed__{col_name}"
+    df[flag_col] = mask_invalid
+    if "errors_not_allowed" not in df.columns:
+        df["errors_not_allowed"] = False
+    df["errors_not_allowed"] = df["errors_not_allowed"] | mask_invalid
 
-    # Replace invalid values with empty
-    df.loc[invalid, [function_code, subfunction_code, specialization_code]] = ""
-    # Normalize empties to empty string
-    df.loc[mask_empty, [function_code, subfunction_code, specialization_code]] = ""
-
-    func = df[function_code].astype(str).str.strip()
-    subfunc = df[subfunction_code].astype(str).str.strip()
-    spec = df[specialization_code].astype(str).str.strip()
-
-    df["errors_subfunc"] = func != subfunc.str[:2]
-    df["errors_spec"] = ~((subfunc == spec.str[:3]) | (spec == "NAN"))
+    # Keep invalid values normalized to empty to simplify downstream matching.
+    df.loc[mask_invalid, col_name] = ""
+    if col_name == LP.specialization_code:
+        df.loc[mask_empty, col_name] = ""
 
     return df
 
@@ -674,6 +670,20 @@ def check_codes(errors, df):
     df = check_column_rules(df, subfunction_code, allowed_subfuncs)
     df = check_column_rules(df, specialization_code, allowed_specs)
 
+    row_invalid_any = pd.Series(False, index=df.index, dtype=bool)
+    for flag_col in (
+        f"errors_not_allowed__{function_code}",
+        f"errors_not_allowed__{subfunction_code}",
+        f"errors_not_allowed__{specialization_code}",
+    ):
+        if flag_col in df.columns:
+            row_invalid_any = row_invalid_any | df[flag_col].astype(bool)
+
+    if row_invalid_any.any():
+        df.loc[
+            row_invalid_any, [function_code, subfunction_code, specialization_code]
+        ] = ""
+
     df = fill_function_name_from_sdf(
         df,
         sdf,
@@ -700,8 +710,14 @@ def check_codes(errors, df):
     subfunc = df[subfunction_code].astype(str).str.strip()
     spec = df[specialization_code].astype(str).str.strip()
 
-    df["errors_subfunc"] = func != subfunc.str[:2]
-    df["errors_spec"] = ~((subfunc == spec.str[:3]) | (spec == "NAN"))
+    code_is_empty = {"", "NAN", "NONE", "NULL"}
+    func_is_empty = func.isin(code_is_empty)
+    subfunc_is_empty = subfunc.isin(code_is_empty)
+    df["errors_subfunc"] = (
+        (~func_is_empty) & (~subfunc_is_empty) & (func != subfunc.str[:2])
+    )
+    spec_is_empty = spec.isin(["", "NAN", "NONE", "NULL"])
+    df["errors_spec"] = ~((subfunc == spec.str[:3]) | spec_is_empty)
 
     df.apply(
         lambda x: codes_not_correspond(
@@ -715,6 +731,26 @@ def check_codes(errors, df):
         ),
         axis=1,
     )
+
+    spec_flag_col = f"errors_not_allowed__{specialization_code}"
+    if spec_flag_col in df.columns:
+        df.apply(
+            lambda x: codes_not_correspond(
+                errors, x[spec_flag_col], x.name, specialization_code
+            ),
+            axis=1,
+        )
+
+    helper_cols = [
+        f"errors_not_allowed__{function_code}",
+        f"errors_not_allowed__{subfunction_code}",
+        f"errors_not_allowed__{specialization_code}",
+        "errors_not_allowed",
+    ]
+    drop_cols = [col for col in helper_cols if col in df.columns]
+    if drop_cols:
+        df.drop(columns=drop_cols, inplace=True)
+
     return df
 
 

@@ -449,6 +449,8 @@ def module_1(input_folder, output_folder, params=None):
     print(f"File processing took: {process_end - process_start}")
     _print_unprocessed_summary(unprocessed_files)
     _save_unprocessed_files(unprocessed_files, output_folder)
+    print(unprocessed_files)
+    return unprocessed_files
 
 
 def file_processing(input_folder, output_folder, columns=None, params=None):

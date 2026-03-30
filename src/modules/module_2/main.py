@@ -254,12 +254,16 @@ def check_column_rules(df, col_name, allowed_values):
         raise ValueError("Error: allowed values list is not provided.")
 
     df = df.copy()
-    df[col_name] = df[col_name].astype(str).str.strip().str.upper()
+    normalized = df[col_name].astype(str).str.strip().str.upper()
+    df[col_name] = normalized
+    empty_values = {"", "NAN", "NONE", "NULL"}
+    mask_empty = normalized.isin(empty_values)
 
     allowed_set = {str(v).strip().upper() for v in allowed_values}
-    mask_allowed = df[col_name].isin(allowed_set)
+    mask_allowed = normalized.isin(allowed_set)
     if col_name == LP.specialization_code:
-        mask_allowed = mask_allowed | (df[col_name] == "")
+        # Empty specialization code is allowed, all other codes must be filled.
+        mask_allowed = mask_allowed | mask_empty
 
     if "errors_not_allowed" not in df.columns:
         df["errors_not_allowed"] = False
@@ -292,12 +296,22 @@ def check_the_result(df):
     df = check_column_rules(df, LP.subfunction_code, allowed_subfuncs)
     df = check_column_rules(df, LP.specialization_code, allowed_specs)
 
+    invalid_rows = pd.Series(False, index=df.index, dtype=bool)
+    if "errors_not_allowed" in df.columns:
+        invalid_rows = df["errors_not_allowed"].astype(bool)
+    if invalid_rows.any():
+        df.loc[
+            invalid_rows,
+            [LP.function_code, LP.subfunction_code, LP.specialization_code],
+        ] = ""
+
     func = df[LP.function_code].astype(str).str.strip()
     subfunc = df[LP.subfunction_code].astype(str).str.strip()
     spec = df[LP.specialization_code].astype(str).str.strip()
 
     df["errors_subfunc"] = func != subfunc.str[:2]
-    df["errors_spec"] = ~((subfunc == spec.str[:3]) | (spec == "NAN"))
+    spec_is_empty = spec.isin(["", "NAN", "NONE", "NULL"])
+    df["errors_spec"] = ~((subfunc == spec.str[:3]) | spec_is_empty)
 
     df = fill_function_name_from_sdf(
         df,

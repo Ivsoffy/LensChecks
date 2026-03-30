@@ -266,8 +266,13 @@ def check_outliers(errors, df):
         df[f"{col}_lower_bound"] = np.nan
         df[f"{col}_upper_bound"] = np.nan
 
+    outlier_candidates = []
+
     for col in cols_to_check:
         for _, group_df in df.groupby(LP.grade):
+            if len(group_df) < 5:
+                continue
+
             series = group_df[col].dropna()
             if series.empty:
                 continue
@@ -286,14 +291,31 @@ def check_outliers(errors, df):
                 index=outlier_series.index,
             )
 
-            top_count = max(1, int(np.ceil(len(outlier_strength) * 0.05)))
-            top_outlier_indices = outlier_strength.nlargest(top_count).index
+            for ind, strength in outlier_strength.items():
+                outlier_candidates.append(
+                    {
+                        "col": col,
+                        "ind": ind,
+                        "strength": float(strength),
+                        "lower_bound": lower_bound,
+                        "upper_bound": upper_bound,
+                    }
+                )
 
-            for ind in top_outlier_indices:
-                errors["data_errors"] += [(col, ind)]
-                df.loc[ind, "outlier"] = True
-                df.loc[ind, f"{col}_lower_bound"] = lower_bound
-                df.loc[ind, f"{col}_upper_bound"] = upper_bound
+    if not outlier_candidates:
+        return df
+
+    outlier_candidates_df = pd.DataFrame(outlier_candidates)
+    top_count = max(1, int(np.ceil(len(outlier_candidates_df) * 0.05)))
+    top_outliers = outlier_candidates_df.nlargest(top_count, "strength")
+
+    for _, row in top_outliers.iterrows():
+        col = row["col"]
+        ind = row["ind"]
+        errors["data_errors"] += [(col, ind)]
+        df.loc[ind, "outlier"] = True
+        df.loc[ind, f"{col}_lower_bound"] = row["lower_bound"]
+        df.loc[ind, f"{col}_upper_bound"] = row["upper_bound"]
 
     return df
 

@@ -60,11 +60,17 @@ def isolated_workdir(tmp_path, monkeypatch):
         REPO_ROOT / "src" / "modules" / "funcs_2026.parquet",
         dst_module2_dir / "funcs_2026.parquet",
     )
+    dst_modules_dir = tmp_path / "modules"
+    dst_modules_dir.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(
+        REPO_ROOT / "src" / "modules" / "funcs_2026.parquet",
+        dst_modules_dir / "funcs_2026.parquet",
+    )
     monkeypatch.chdir(tmp_path)
 
 
 def test_run_checks_module2_basic_questionnaire(capsys):
-    input_folder = REPO_ROOT / "tests" / "data" / "module2_basic"
+    input_folder = REPO_ROOT / "tests" / "module2_basic"
     config = {
         "input_folder": str(input_folder),
         "module": 2,
@@ -79,20 +85,49 @@ def test_run_checks_module2_basic_questionnaire(capsys):
     assert "Traceback" not in (captured.out + captured.err)
 
 
-# def test_run_checks_module2_after_fix_questionnaire(capsys):
-#     input_folder = REPO_ROOT / "tests" / "data" / "module2_after_fix"
-#     config = {
-#         "input_folder": str(input_folder),
-#         "module": 2,
-#         "after_fix": True,
-#         "folder_past_year": "missing_folder_for_tests",
-#     }
+def test_run_checks_module1_basic(capsys):
+    input_folder = REPO_ROOT / "tests" / "module1_basic"
+    config = {
+        "input_folder": str(input_folder),
+        "module": 1,
+        "after_fix": False,
+        "folder_past_year": "missing_folder_for_tests",
+        "save_db_only_without_errors": False,
+        "single_db": False,
+    }
 
-#     run_checks(config)
-#     captured = capsys.readouterr()
+    result = run_checks(config)
+    true_result = {
+        "Apteki_36_6_Prefilled_SDF_2026_unprocessed_.xlsx": {
+            "info_errors": [],
+            "data_errors": [
+                ("Код специализации", 3),
+                ("Районный коэффициент и северная надбавка в месяц", 3),
+                ("Районный коэффициент и северная надбавка в месяц", 7),
+            ],
+        }
+    }
 
-#     assert Path("modules/module_2/output").is_dir()
-#     assert "Traceback" not in (captured.out + captured.err)
+    captured = capsys.readouterr()
+
+    assert result == true_result
+    assert "Traceback" not in (captured.out + captured.err)
+
+
+def test_run_checks_module2_after_fix(capsys):
+    input_folder = REPO_ROOT / "tests" / "module2_after_fix"
+    config = {
+        "input_folder": str(input_folder),
+        "module": 2,
+        "after_fix": True,
+        "folder_past_year": "missing_folder_for_tests",
+    }
+
+    run_checks(config)
+    captured = capsys.readouterr()
+
+    assert Path("modules/module_2/output").is_dir()
+    assert "Traceback" not in (captured.out + captured.err)
 
 
 # def test_run_checks_module3_basic_questionnaire(capsys):

@@ -38,6 +38,7 @@ filterwarnings = [
     "ignore:builtin type SwigPyPacked has no __module__ attribute:DeprecationWarning",
     "ignore:builtin type SwigPyObject has no __module__ attribute:DeprecationWarning",
     "ignore:builtin type swigvarlink has no __module__ attribute:DeprecationWarning",
+    "ignore:Data Validation extension is not supported and will be removed:UserWarning:openpyxl\\..*",
 ]
 
 [dependency-groups]

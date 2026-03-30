@@ -8,12 +8,12 @@
 1. Клонирование репозитория \
 ```git clone https://github.com/Ivsoffy/LensChecks.git```
 2. Установка библиотеки для зависимостей \
-```pip install uv```
+```wget -qO- https://astral.sh/uv/install.sh | sh```
 3. Установка зависимостей \
 ```cd LensChecks```\
 ```uv sync```
 4. Скачивание весов для моделей \
-```python scripts\download_weights.py```
+```uv run scripts\download_weights.py```
 
 ## Инструкция по использованию
 Запуск любого модуля проверки состоит из двух шагов:
@@ -46,7 +46,7 @@ git reset --hard origin/main
 ### Запуск start.py
 Запустить код можно в jupyter terminal: \
 ```cd src``` \
-```python start.py```
+```uv run start.py```
 
 ## Информация по каждому модулю
 ### Модуль 1
