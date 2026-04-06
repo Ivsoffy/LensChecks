@@ -8,7 +8,7 @@
 1. Клонирование репозитория \
 ```git clone https://github.com/Ivsoffy/LensChecks.git```
 2. Установка библиотеки для зависимостей \
-```wget -qO- https://astral.sh/uv/install.sh | sh```
+```powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"```
 3. Установка зависимостей \
 ```cd LensChecks```\
 ```uv sync```
