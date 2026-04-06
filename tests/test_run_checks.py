@@ -19,6 +19,8 @@ def isolated_workdir(tmp_path, monkeypatch):
     src_module2_dir = REPO_ROOT / "src" / "modules" / "module_2"
     dst_module2_dir = tmp_path / "modules" / "module_2"
     dst_module2_dir.mkdir(parents=True, exist_ok=True)
+    dst_module5_dir = tmp_path / "modules" / "module_5"
+    dst_module5_dir.mkdir(parents=True, exist_ok=True)
 
     src_weights_dir = src_module2_dir / "function_model_weights"
     dst_weights_dir = dst_module2_dir / "function_model_weights"
@@ -66,10 +68,14 @@ def isolated_workdir(tmp_path, monkeypatch):
         REPO_ROOT / "src" / "modules" / "funcs_2026.parquet",
         dst_modules_dir / "funcs_2026.parquet",
     )
+    shutil.copy2(
+        REPO_ROOT / "src" / "modules" / "module_5" / "intervals.parquet",
+        dst_module5_dir / "intervals.parquet",
+    )
     monkeypatch.chdir(tmp_path)
 
 
-def test_run_checks_module2_basic_questionnaire(capsys):
+def test_run_checks_module2_basic(capsys):
     input_folder = REPO_ROOT / "tests" / "module2_basic"
     config = {
         "input_folder": str(input_folder),
@@ -130,17 +136,34 @@ def test_run_checks_module2_after_fix(capsys):
     assert "Traceback" not in (captured.out + captured.err)
 
 
-# def test_run_checks_module3_basic_questionnaire(capsys):
-#     input_folder = REPO_ROOT / "tests" / "data" / "module3_basic"
-#     config = {
-#         "input_folder": str(input_folder),
-#         "module": 3,
-#         "after_fix": False,
-#         "save_to_parquet": False,
-#     }
+def test_run_checks_module5_basic(capsys):
+    input_folder = REPO_ROOT / "tests" / "module5_basic"
+    config = {
+        "input_folder": str(input_folder),
+        "module": 5,
+        "after_fix": False,
+        "folder_past_year": "missing_folder_for_tests",
+        "save_db_only_without_errors": False,
+        "single_db": False,
+        "clean": False,
+    }
 
-#     run_checks(config)
-#     captured = capsys.readouterr()
+    result = run_checks(config)
+    true_result = {
+        "Multon_TestSDF.xlsx": {
+            "info_errors": [
+                "Incorrect General Info: Тип компании",
+                "Incorrect company name format: Multon Partners",
+            ],
+            "data_errors": [
+                ("Код специализации", 4),
+                ("Базовый оклад (BP)", 3),
+                ("Целевое совокупное вознаграждение (TTC)", 10),
+            ],
+        }
+    }
 
-#     assert Path("modules/module_3/output").is_dir()
-#     assert "Traceback" not in (captured.out + captured.err)
+    captured = capsys.readouterr()
+
+    assert result == true_result
+    assert "Traceback" not in (captured.out + captured.err)

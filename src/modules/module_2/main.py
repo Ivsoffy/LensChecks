@@ -272,6 +272,31 @@ def check_column_rules(df, col_name, allowed_values):
     return df
 
 
+def fill_code_names_from_sdf(df, sdf):
+    df = fill_function_name_from_sdf(
+        df,
+        sdf,
+        col_name=LP.function_code,
+        new_col_name=LP.function,
+        col_sdf="Название функции",
+    )
+    df = fill_function_name_from_sdf(
+        df,
+        sdf,
+        col_name=LP.subfunction_code,
+        new_col_name=LP.subfunction,
+        col_sdf="Название подфункции",
+    )
+    df = fill_function_name_from_sdf(
+        df,
+        sdf,
+        col_name=LP.specialization_code,
+        new_col_name=LP.specialization,
+        col_sdf="Специализация",
+    )
+    return df
+
+
 def check_the_result(df):
     """
     Summary: Validate codes against the SDF reference file and fill names.
@@ -313,27 +338,7 @@ def check_the_result(df):
     spec_is_empty = spec.isin(["", "NAN", "NONE", "NULL"])
     df["errors_spec"] = ~((subfunc == spec.str[:3]) | spec_is_empty)
 
-    df = fill_function_name_from_sdf(
-        df,
-        sdf,
-        col_name=LP.function_code,
-        new_col_name=LP.function,
-        col_sdf="Название функции",
-    )
-    df = fill_function_name_from_sdf(
-        df,
-        sdf,
-        col_name=LP.subfunction_code,
-        new_col_name=LP.subfunction,
-        col_sdf="Название подфункции",
-    )
-    df = fill_function_name_from_sdf(
-        df,
-        sdf,
-        col_name=LP.specialization_code,
-        new_col_name=LP.specialization,
-        col_sdf="Специализация",
-    )
+    df = fill_code_names_from_sdf(df, sdf)
     return df
 
 
@@ -535,15 +540,19 @@ def process_output_file(
         FileNotFoundError: If the output file is missing.
         ValueError: If required columns are missing.
     """
+
     df1 = df1.drop_duplicates(subset=cols)
     df2 = df2.drop_duplicates(subset=cols)
+
+    sdf_path = "modules/funcs_2026.parquet"
+    if not os.path.exists(sdf_path):
+        raise FileNotFoundError(f"Error: SDF file not found: {sdf_path}")
+
+    sdf = pd.read_parquet(sdf_path)
 
     base_cols_1 = [
         LP.company_name,
         LP.gi_sector,
-        LP.function_code,
-        LP.subfunction_code,
-        LP.specialization_code,
         LP.dep_level_1,
         LP.dep_level_2,
         LP.dep_level_3,
@@ -551,6 +560,12 @@ def process_output_file(
         LP.dep_level_5,
         LP.dep_level_6,
         LP.job_title,
+        LP.function_code,
+        LP.subfunction_code,
+        LP.specialization_code,
+        LP.function,
+        LP.subfunction,
+        LP.specialization,
     ]
     extra_cols_1 = ["past_year_check", "func_old", "subfunc_old", "spec_old"]
     df1_cols = base_cols_1 + extra_cols_1 if "func_old" in df1.columns else base_cols_1
@@ -568,14 +583,10 @@ def process_output_file(
         LP.dep_level_6,
         LP.job_title,
     ]
-    conf_cols = ["description"]
-    df2_cols = (
-        base_cols_2[:5] + conf_cols + base_cols_2[5:]
-        if "description" in df2.columns
-        else base_cols_2
-    )
+    df2_cols = base_cols_2
     df2 = df2[[c for c in df2_cols if c in df2.columns]]
 
+    df1 = fill_code_names_from_sdf(df1, sdf)
     if "predicted_code" in df2.columns:
         # raise ValueError("Error: missing column predicted_code.")
 
@@ -585,6 +596,8 @@ def process_output_file(
         df2[LP.specialization_code] = pred_codes.apply(
             lambda x: x[:5] if "-" in x else ""
         )
+        df2 = fill_code_names_from_sdf(df2, sdf)
+        df2.drop(columns=["predicted_code"], inplace=True)
 
     try:
         book = load_workbook(output_file)

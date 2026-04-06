@@ -126,7 +126,7 @@ def run_checks(config):
     if (config["module"] == 5) and config["clean"]:
         cleaning_folders()
 
-    if config["module"] == 1:
+    if config["module"] == 1 or config["module"] == 5:
         return module_result
 
 

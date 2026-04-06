@@ -360,6 +360,7 @@ def _process_single_file(file_path, params):
 def _save_processed_file(df, file_name, output_folder):
     """Save one processed file to the output folder."""
     file_output_path = os.path.join(output_folder, file_name)
+    df = df.loc[:, LP.expected_columns_market_df]
     df.to_excel(file_output_path, sheet_name="Total Data")
     print(f"File {file_name} was saved to {output_folder}.")
 
@@ -424,6 +425,7 @@ def module_5(input_folder, output_folder, params=None):
 
     _print_unprocessed_summary(unprocessed_files)
     _save_unprocessed_files(unprocessed_files, output_folder)
+    return unprocessed_files
 
 
 def file_processing(input_folder, output_folder, params):
