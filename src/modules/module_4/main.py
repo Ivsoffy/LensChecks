@@ -26,8 +26,10 @@ from modules.module_4.pipeline import GradePredictor  # noqa: E402
 
 from .. import LP  # noqa: E402
 
-DEFAULT_SUB_MODEL_PATH = "models/model_1/grade_model_weights/model.cbm"
-DEFAULT_LEAD_MODEL_PATH = "models/model_2/grade_model_weights/model.cbm"
+DEFAULT_SUB_MODEL_PATH = "modules/module_4/models/model_1/grade_model_weights/model.cbm"
+DEFAULT_LEAD_MODEL_PATH = (
+    "modules/module_4/models/model_2/grade_model_weights/model.cbm"
+)
 cols = [
     LP.company_name,
     LP.dep_level_1,

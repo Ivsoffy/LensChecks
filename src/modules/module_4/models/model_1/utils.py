@@ -13,13 +13,13 @@ CYRILLIC_RE = re.compile(r"[а-яА-ЯёЁ]")
 
 JOB_TITLE_CATALOGS = {
     "ru": {
-        "filename": "Salary_data_rus_2026.xlsx",
+        "filename": "model_1/Salary_data_rus_2026.xlsx",
         "sheet_name": "Каталог функций",
         "code_columns": ("Код функции", "Код подфункции", "Код специализации"),
         "examples_column": "Примеры должностей",
     },
     "en": {
-        "filename": "Salary data_eng_2026.xlsx",
+        "filename": "model_1/Salary data_eng_2026.xlsx",
         "sheet_name": "Functions",
         "code_columns": ("Function Code", "Subfunction Code", "Specialization Code"),
         "examples_column": "Job titles examples",
