@@ -37,6 +37,42 @@ cols = [
 ]
 
 
+def _drop_rows_without_job_title(df, context="dataset"):
+    if LP.job_title not in df.columns:
+        raise ValueError(f"Error: missing column '{LP.job_title}' in {context}.")
+
+    normalized = df[LP.job_title].astype(str).str.strip().str.lower()
+    empty_mask = df[LP.job_title].isna() | normalized.isin(
+        {"", "nan", "none", "null", "na", "n/a", "nil", "undefined", "<na>"}
+    )
+    removed_count = int(empty_mask.sum())
+    if removed_count:
+        print(
+            f"Removed {removed_count} rows with empty '{LP.job_title}' from {context}."
+        )
+    return df.loc[~empty_mask].copy(), removed_count
+
+
+def _empty_code_mask(series):
+    normalized = series.astype(str).str.strip().str.lower()
+    return series.isna() | normalized.isin({"", "nan", "none", "null"})
+
+
+def _fill_missing_codes_from_old(df):
+    df = df.copy()
+    old_to_new = {
+        "func_old": LP.function_code,
+        "subfunc_old": LP.subfunction_code,
+        "spec_old": LP.specialization_code,
+    }
+    for old_col, new_col in old_to_new.items():
+        if old_col not in df.columns or new_col not in df.columns:
+            continue
+        empty_mask = _empty_code_mask(df[new_col])
+        df.loc[empty_mask, new_col] = df.loc[empty_mask, old_col]
+    return df
+
+
 def module_2(input_folder, output_folder, params):
     """
     Summary: Process input Excel files and produce outputs for module 2.
@@ -97,25 +133,29 @@ def module_2(input_folder, output_folder, params):
                 )
                 continue
 
+            df, removed_empty_job_title_count = _drop_rows_without_job_title(
+                df, context=f"file '{input_file}'"
+            )
+
             if not already_fixed:
                 print("Module 2: Assigning function codes.")
                 print("Assigning codes from last year's questionnaire (if found)")
-                df = process_past_year(folder_py, df)
+                initial_empty_mask = _empty_code_mask(df[LP.function_code])
+                df, found_files = process_past_year(folder_py, df)
+                df = _fill_missing_codes_from_old(df)
 
-                unfilled = df.loc[
-                    df[LP.function_code]
-                    .astype(str)
-                    .str.lower()
-                    .str.strip()
-                    .isin(["nan", "none", "null", ""])
-                ]
-                filled = df[~df.index.isin(unfilled.index)]
-                empty_count = unfilled.shape[0]
+                remaining_empty_mask = _empty_code_mask(df[LP.function_code])
+                unfilled = df.loc[remaining_empty_mask]
+                filled = df.loc[~remaining_empty_mask]
+                # empty_count = unfilled.shape[0]
+                empty_count = initial_empty_mask.sum()
+                count_past_year = int(
+                    initial_empty_mask.sum() - remaining_empty_mask.sum()
+                )
+                count_model = int(remaining_empty_mask.sum())
 
                 filled_and_processed = process_filled(filled)
-                df, unfilled_and_processed, count_past_year, count_model = (
-                    process_unfilled(unfilled, df)
-                )
+                df, unfilled_and_processed = process_unfilled(unfilled, df)
                 df.to_excel(output_file, sheet_name="Total Data")
 
                 process_output_file(
@@ -126,6 +166,7 @@ def module_2(input_folder, output_folder, params):
                     "past_year_files": str(found_files) if found_files else "No files",
                     "empty_count": empty_count,
                     "total_count": df.shape[0],
+                    # "removed_empty_job_title_count": removed_empty_job_title_count,
                     "count_past_year": count_past_year,
                     "count_model": count_model,
                 }
@@ -233,7 +274,7 @@ def process_past_year(folder_py, df):
         except Exception as e:
             file_name = found_files[0] if found_files else "unknown file"
             print(f"Error processing last year's file '{file_name}': {e}")
-    return df
+    return df, found_files
 
 
 def check_column_rules(df, col_name, allowed_values):
@@ -440,6 +481,13 @@ def map_prefill_to_sheet1(
             print(f"Error reading Excel: {e}")
             return df_merged, output_path
 
+        df_prefill, _ = _drop_rows_without_job_title(
+            df_prefill, context=f"sheet '{sheet_prefill}' in '{excel_file}'"
+        )
+        df_target, _ = _drop_rows_without_job_title(
+            df_target, context=f"sheet '{sheet_target}' in '{excel_file}'"
+        )
+
         if df_prefill.empty:
             return df_target, output_path
 
@@ -635,32 +683,24 @@ def process_unfilled(df, df_orig):
         df (pd.DataFrame): Unfilled rows to predict.
         df_orig (pd.DataFrame): Original dataframe to update.
     Returns:
-        tuple[pd.DataFrame, pd.DataFrame, int, int]: Updated df, predictions, past-year count, model count.
+        tuple[pd.DataFrame, pd.DataFrame]: Updated df and model predictions.
     Raises:
         ValueError: If required columns are missing.
     """
-    count_past_year = 0
     preds = pd.DataFrame()
-
-    if "func_old" in df_orig.columns:
-        df_orig[LP.function_code].update(df["func_old"])
-        df_orig[LP.subfunction_code].update(df["subfunc_old"])
-        df_orig[LP.specialization_code].update(df["spec_old"])
 
     if LP.function_code not in df_orig.columns:
         raise ValueError("Error: missing column function_code.")
 
-    df_without_py = df_orig.loc[
-        df_orig[LP.function_code].astype(str).str.lower().str.strip().eq("nan")
-    ]
+    df_orig = _fill_missing_codes_from_old(df_orig)
+    df_without_py = df_orig.loc[_empty_code_mask(df_orig[LP.function_code])]
     count_model = df_without_py.shape[0]
-    count_past_year = df.shape[0] - count_model
     if count_model != 0:
         print("Assigning codes with neural network")
         model = CodeModel()
         preds = model.predict(df_without_py, test=True)
 
-    return df_orig, preds, count_past_year, count_model
+    return df_orig, preds
 
 
 def process_filled(df):

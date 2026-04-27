@@ -27,7 +27,27 @@ class CodeModel:
         self.model_encode.eval()
         self.model_norm = FunctionModel(model=ckpt)
 
+    @staticmethod
+    def _normalize_sentence(value):
+        if value is None:
+            return ""
+        text = str(value).strip()
+        if text.lower() in {
+            "",
+            "nan",
+            "none",
+            "null",
+            "na",
+            "n/a",
+            "nil",
+            "undefined",
+            "<na>",
+        }:
+            return ""
+        return text
+
     def _embed(self, sentences, batch_size=64):
+        sentences = [self._normalize_sentence(sentence) for sentence in sentences]
         embeddings = []
         for i in range(0, len(sentences), batch_size):
             batch_sents = sentences[i : i + batch_size]
