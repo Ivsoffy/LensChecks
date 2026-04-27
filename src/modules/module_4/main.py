@@ -42,6 +42,20 @@ cols = [
 ]
 
 
+def _empty_grade_mask(series):
+    normalized = series.astype(str).str.strip().str.lower()
+    return series.isna() | normalized.isin({"", "nan", "none", "null"})
+
+
+def _fill_missing_grades_from_old(df):
+    df = df.copy()
+    if "grade_old" not in df.columns or LP.grade not in df.columns:
+        return df
+    empty_mask = _empty_grade_mask(df[LP.grade])
+    df.loc[empty_mask, LP.grade] = df.loc[empty_mask, "grade_old"]
+    return df
+
+
 def _is_excel_file(filename):
     """
     Summary: Check if a filename is an Excel file.
@@ -59,18 +73,18 @@ def _is_excel_file(filename):
 
 def process_past_year(folder_py, df):
     """
-    Summary: Merge past-year codes into the current dataset by company.
+    Summary: Merge past-year grades into the current dataset by company.
     Args:
         folder_py (str): Folder path with past-year files.
         df (pd.DataFrame): Current input dataframe.
     Returns:
-        pd.DataFrame: Updated dataframe with past-year codes if found.
+        pd.DataFrame: Updated dataframe with past-year grades if found.
     Raises:
         ValueError: If required columns are missing.
     """
     if not isinstance(folder_py, str) or not os.path.exists(folder_py):
         print(f"Warning: invalid path to last year's files folder: {folder_py}")
-        return df
+        return df, []
 
     companies = df[LP.company_name].unique()
 
@@ -83,19 +97,12 @@ def process_past_year(folder_py, df):
                 df_py = pd.read_excel(
                     file_to_cmp, sheet_name=LP.rem_data, header=6, index_col=None
                 )
-                cols_to_copy = [
-                    LP.function_code,
-                    LP.subfunction_code,
-                    LP.specialization_code,
-                    LP.function,
-                    LP.subfunction,
-                    LP.specialization,
-                ]
+                cols_to_copy = [LP.grade]
                 df = merge_by_cols(df, df_py, cols, cols_to_copy)
         except Exception as e:
             file_name = found_files[0] if found_files else "unknown file"
             print(f"Error processing last year's file '{file_name}': {e}")
-    return df
+    return df, found_files
 
 
 def add_comparison_with_median(df):
@@ -156,14 +163,22 @@ def module_4(input_folder, output_folder, params):
 
             if not already_fixed:
                 print("Module 4: Assigning grades.")
-                print("Assigning codes from last year's questionnaire (if found)")
+                print("Assigning grades from last year's questionnaire (if found)")
                 df["grade_old"] = np.nan
-                df = process_past_year(folder_py, df)
+                initial_empty_mask = _empty_grade_mask(df[LP.grade])
+                df, found_files = process_past_year(folder_py, df)
+                df = _fill_missing_grades_from_old(df)
                 df = add_comparison_with_median(df)
 
-                unfilled = df.loc[df[LP.grade].isna()]
-                filled = df[~df.index.isin(unfilled.index)]
-                empty_count = unfilled.shape[0]
+                remaining_empty_mask = _empty_grade_mask(df[LP.grade])
+                unfilled = df.loc[remaining_empty_mask]
+                filled = df.loc[~remaining_empty_mask]
+                # empty_count = unfilled.shape[0]
+                empty_count = initial_empty_mask.sum()
+                count_past_year = int(
+                    initial_empty_mask.sum() - remaining_empty_mask.sum()
+                )
+                count_model = int(remaining_empty_mask.sum())
 
                 print(
                     f"Assigned grades: {len(filled)}, missing grades: {len(unfilled)}"
@@ -171,9 +186,7 @@ def module_4(input_folder, output_folder, params):
 
                 filled_and_processed = process_filled(filled)
 
-                df, unfilled_and_processed, count_past_year, count_model = (
-                    process_unfilled(unfilled, df)
-                )
+                df, unfilled_and_processed = process_unfilled(unfilled, df)
                 df.to_excel(output_file, sheet_name="Total Data")
 
                 process_output_file(
@@ -376,7 +389,7 @@ def process_output_file(
 
 def check_unfilled_columns(df):
     """
-    Summary: Check whether the function code column has empty values.
+    Summary: Check whether the grade column has empty values.
     Args:
         df (pd.DataFrame): Input dataframe.
     Returns:
@@ -384,7 +397,7 @@ def check_unfilled_columns(df):
     Raises:
         None
     """
-    col = LP.function_code
+    col = LP.grade
     mask_empty = df[col].astype(str).str.strip().isin(["", "nan", "NaN", "None"])
     if mask_empty.any():
         print(f"Column '{col}' is not fully filled - contains empty values.")
@@ -393,26 +406,20 @@ def check_unfilled_columns(df):
 
 
 def process_unfilled(df, df_orig):
-    count_past_year = 0
-    count_model = 0
     preds = pd.DataFrame()
 
-    if check_unfilled_columns(df):
-        if "grade_old" in df_orig.columns:
-            df_orig[LP.function_code].update(df["grade_old"])
+    df_orig = _fill_missing_grades_from_old(df_orig)
+    df_without_py = df_orig.loc[_empty_grade_mask(df_orig[LP.grade])]
+    count_model = df_without_py.shape[0]
+    if count_model != 0:
+        model = GradePredictor(
+            sub_predictor_kwargs={"path_to_model": DEFAULT_SUB_MODEL_PATH},
+            lead_predictor_kwargs={"path_to_model": DEFAULT_LEAD_MODEL_PATH},
+        )
+        preds = model.predict(df_without_py)
+        preds = preds.loc[~preds[LP.company_name].isna()]
 
-        df_without_py = df_orig.loc[df_orig[LP.grade].isna()]
-        count_model = df_without_py.shape[0]
-        count_past_year = df.shape[0] - count_model
-        if count_model != 0:
-            model = GradePredictor(
-                sub_predictor_kwargs={"path_to_model": DEFAULT_SUB_MODEL_PATH},
-                lead_predictor_kwargs={"path_to_model": DEFAULT_LEAD_MODEL_PATH},
-            )
-            preds = model.predict(df_without_py)
-            preds = preds.loc[~preds[LP.company_name].isna()]
-
-    return df_orig, preds, count_past_year, count_model
+    return df_orig, preds
 
 
 def process_filled(df):
