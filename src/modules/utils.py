@@ -1,8 +1,11 @@
 import difflib
 import os
 import re
+import tempfile
+import zipfile
 from copy import copy
 from datetime import date, datetime
+from xml.etree import ElementTree as ET
 
 import numpy as np
 
@@ -12,6 +15,14 @@ from modules import LP
 from openpyxl import load_workbook
 from openpyxl.cell.cell import MergedCell
 from openpyxl.utils.dataframe import dataframe_to_rows
+
+PACKAGE_REL_NS = "http://schemas.openxmlformats.org/package/2006/relationships"
+CONTENT_TYPES_NS = "http://schemas.openxmlformats.org/package/2006/content-types"
+SPREADSHEET_NS = "http://schemas.openxmlformats.org/spreadsheetml/2006/main"
+
+ET.register_namespace("", PACKAGE_REL_NS)
+ET.register_namespace("", CONTENT_TYPES_NS)
+ET.register_namespace("", SPREADSHEET_NS)
 
 NUMERIC_COLUMNS_TO_COERCE = [
     LP.monthly_salary,
@@ -1048,6 +1059,175 @@ def _extend_styles(ws, header_row, last_data_row):
                 dst.comment = copy(src.comment)
 
 
+def _remove_xml_children_by_localname(root, local_names):
+    for child in list(root):
+        if child.tag.rsplit("}", 1)[-1] in local_names:
+            root.remove(child)
+
+
+def _sanitize_relationships_xml(xml_bytes):
+    root = ET.fromstring(xml_bytes)
+    removable_suffixes = {
+        "activeXControl",
+        "chart",
+        "chartUserShapes",
+        "comments",
+        "control",
+        "ctrlProp",
+        "customXml",
+        "diagramData",
+        "diagramLayout",
+        "diagramStyle",
+        "diagramColors",
+        "drawing",
+        "externalLink",
+        "hyperlinkImage",
+        "image",
+        "legacyDiagramText",
+        "oleObject",
+        "package",
+        "printerSettings",
+        "vmlDrawing",
+    }
+    removable_prefixes = (
+        "customXml/",
+        "xl/activeX/",
+        "xl/charts/",
+        "xl/comments/",
+        "xl/ctrlProps/",
+        "xl/drawings/",
+        "xl/embeddings/",
+        "xl/externalLinks/",
+        "xl/media/",
+        "xl/persons/",
+        "xl/printerSettings/",
+        "xl/threadedComments/",
+    )
+
+    for rel in list(root):
+        rel_type = rel.get("Type", "")
+        rel_target = rel.get("Target", "").lstrip("/")
+        suffix = rel_type.rsplit("/", 1)[-1]
+        if suffix in removable_suffixes or any(
+            rel_target.startswith(prefix) for prefix in removable_prefixes
+        ):
+            root.remove(rel)
+
+    if len(root) == 0:
+        return None
+    return ET.tostring(root, encoding="utf-8", xml_declaration=True)
+
+
+def _sanitize_workbook_xml(xml_bytes):
+    root = ET.fromstring(xml_bytes)
+    _remove_xml_children_by_localname(root, {"externalReferences"})
+    _remove_xml_children_by_localname(root, {"definedNames"})
+    return ET.tostring(root, encoding="utf-8", xml_declaration=True)
+
+
+def _sanitize_worksheet_xml(xml_bytes):
+    root = ET.fromstring(xml_bytes)
+    _remove_xml_children_by_localname(
+        root,
+        {
+            "control",
+            "controls",
+            "drawing",
+            "legacyDrawing",
+            "legacyDrawingHF",
+            "oleObjects",
+            "picture",
+        },
+    )
+    return ET.tostring(root, encoding="utf-8", xml_declaration=True)
+
+
+def _sanitize_content_types_xml(xml_bytes):
+    root = ET.fromstring(xml_bytes)
+    removable_parts = (
+        "/customXml/",
+        "/xl/activeX/",
+        "/xl/charts/",
+        "/xl/comments/",
+        "/xl/ctrlProps/",
+        "/xl/drawings/",
+        "/xl/embeddings/",
+        "/xl/externalLinks/",
+        "/xl/media/",
+        "/xl/persons/",
+        "/xl/printerSettings/",
+        "/xl/threadedComments/",
+    )
+    for child in list(root):
+        part_name = child.get("PartName", "")
+        if part_name and any(
+            part_name.startswith(prefix) for prefix in removable_parts
+        ):
+            root.remove(child)
+    return ET.tostring(root, encoding="utf-8", xml_declaration=True)
+
+
+def sanitize_workbook_package(workbook_path):
+    """Strip unsupported workbook artifacts so Excel opens saved files cleanly."""
+    workbook_path = os.path.abspath(workbook_path)
+    drop_prefixes = (
+        "customXml/",
+        "xl/activeX/",
+        "xl/charts/",
+        "xl/comments/",
+        "xl/ctrlProps/",
+        "xl/drawings/",
+        "xl/embeddings/",
+        "xl/externalLinks/",
+        "xl/media/",
+        "xl/persons/",
+        "xl/printerSettings/",
+        "xl/threadedComments/",
+    )
+    drop_exact = {
+        "xl/calcChain.xml",
+    }
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx") as temp_file:
+        temp_path = temp_file.name
+
+    try:
+        with zipfile.ZipFile(workbook_path, "r") as source_zip:
+            with zipfile.ZipFile(
+                temp_path, "w", compression=zipfile.ZIP_DEFLATED
+            ) as target_zip:
+                for zip_info in source_zip.infolist():
+                    member_name = zip_info.filename
+                    if member_name in drop_exact or any(
+                        member_name.startswith(prefix) for prefix in drop_prefixes
+                    ):
+                        continue
+
+                    data = source_zip.read(member_name)
+                    if member_name == "[Content_Types].xml":
+                        data = _sanitize_content_types_xml(data)
+                    elif member_name == "xl/workbook.xml":
+                        data = _sanitize_workbook_xml(data)
+                    elif member_name == "xl/_rels/workbook.xml.rels":
+                        data = _sanitize_relationships_xml(data)
+                    elif member_name.startswith(
+                        "xl/worksheets/_rels/"
+                    ) and member_name.endswith(".rels"):
+                        data = _sanitize_relationships_xml(data)
+                        if data is None:
+                            continue
+                    elif member_name.startswith(
+                        "xl/worksheets/sheet"
+                    ) and member_name.endswith(".xml"):
+                        data = _sanitize_worksheet_xml(data)
+
+                    target_zip.writestr(member_name, data)
+        os.replace(temp_path, workbook_path)
+    except Exception:
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
+        raise
+
+
 def write_df_with_template(
     df,
     template_path,
@@ -1065,20 +1245,25 @@ def write_df_with_template(
         sheet_name = "Salary Data"
         df.columns = LP.expected_columns_eng
 
-    wb = load_workbook(template_path)
-    ws = _get_sheet(wb, sheet_name)
+    wb = load_workbook(template_path, keep_links=False)
+    try:
+        ws = _get_sheet(wb, sheet_name)
 
-    header_map = _build_header_map(ws, header_row)
-    _clear_values_below(ws, header_row)
+        header_map = _build_header_map(ws, header_row)
+        _clear_values_below(ws, header_row)
 
-    if only_common_columns:
-        common_cols = [c for c in df.columns if _norm(c) in header_map]
-        df = df[common_cols]
-        _write_common_columns(ws, df, header_row, header_map)
-    else:
-        _write_full(ws, df, header_row)
+        if only_common_columns:
+            common_cols = [c for c in df.columns if _norm(c) in header_map]
+            df = df[common_cols]
+            _write_common_columns(ws, df, header_row, header_map)
+        else:
+            _write_full(ws, df, header_row)
 
-    last_data_row = header_row + df.shape[0]
-    _extend_styles(ws, header_row, last_data_row)
+        last_data_row = header_row + df.shape[0]
+        _extend_styles(ws, header_row, last_data_row)
 
-    wb.save(out_path)
+        wb.save(out_path)
+    finally:
+        wb.close()
+
+    sanitize_workbook_package(out_path)

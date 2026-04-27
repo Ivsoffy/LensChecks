@@ -2,15 +2,15 @@
 import difflib
 import os
 import re
-import shutil
 import sys
 import time
 import warnings
 
 import numpy as np
 import pandas as pd
-import win32com.client
-from win32com.client import makepy
+from openpyxl import load_workbook
+from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
+from openpyxl.utils import get_column_letter
 
 # warnings.filterwarnings("ignore", category=UserWarning)
 warnings.simplefilter("ignore", category=UserWarning, lineno=329, append=False)
@@ -36,6 +36,7 @@ from ..utils import (  # noqa: E402
     main_checks,
     normalize_column_names,
     prepare_total_data,
+    sanitize_workbook_package,
     write_df_with_template,
 )
 
@@ -185,118 +186,121 @@ def eng_to_rus(df):
     return df
 
 
-def add_errors_to_excel(errors, input_path, output_path):
-    """Добавляет лист 'Errors' и подсвечивает ячейки с ошибками с использованием win32com."""
-    try:
-        excel = win32com.client.Dispatch("Excel.Application")
-    except AttributeError:
-        # Если кэш повреждён или не создан — чистим и пробуем снова
-        gen_py = os.path.join(os.path.expanduser("~"), "AppData\\Local\\Temp\\gen_py")
-        shutil.rmtree(gen_py, ignore_errors=True)
-        makepy.main(["Microsoft Excel * Object Library"])
-        excel = win32com.client.Dispatch("Excel.Application")
+def _normalize_excel_label(value):
+    return str(value).strip().lower() if value is not None else ""
 
+
+def _autofit_columns(ws, min_width=12, max_width=80):
+    for col_idx in range(1, ws.max_column + 1):
+        column_cells = next(
+            ws.iter_cols(
+                min_col=col_idx, max_col=col_idx, min_row=1, max_row=ws.max_row
+            )
+        )
+        values = [
+            len(str(cell.value)) for cell in column_cells if cell.value is not None
+        ]
+        if not values:
+            continue
+        width = max(min_width, min(max_width, max(values) + 2))
+        ws.column_dimensions[get_column_letter(col_idx)].width = width
+
+
+def add_errors_to_excel(errors, input_path, output_path):
+    """Add an `Errors` sheet and highlight invalid cells without Excel COM."""
     input_path = os.path.abspath(input_path)
     output_path = os.path.abspath(output_path)
-    # --- Формирование таблицы ошибок ---
-    info = errors.get("info_errors", [])
-    data = [col for col, _ in errors.get("data_errors", [])]
-    unique_data = list(dict.fromkeys(data))
-    n = max(len(info), len(unique_data))
-    df_errors = pd.DataFrame(
-        {
-            "info_errors": info + [None] * (n - len(info)),
-            "data_errors": unique_data + [None] * (n - len(unique_data)),
+
+    info_errors = errors.get("info_errors", [])
+    data_errors = errors.get("data_errors", [])
+    unique_data_errors = list(dict.fromkeys(col for col, _ in data_errors))
+    row_count = max(len(info_errors), len(unique_data_errors), 1)
+
+    wb = load_workbook(input_path, keep_links=False)
+    try:
+        if "Errors" in wb.sheetnames:
+            del wb["Errors"]
+        ws_err = wb.create_sheet("Errors", 0)
+
+        thin_side = Side(style="thin", color="000000")
+        header_fill = PatternFill("solid", fgColor="4472C4")
+        error_fill = PatternFill("solid", fgColor="FFC000")
+        header_font = Font(bold=True, color="FFFFFF")
+        centered = Alignment(horizontal="center", vertical="center")
+        wrapped = Alignment(vertical="top", wrap_text=True)
+        border = Border(
+            left=thin_side, right=thin_side, top=thin_side, bottom=thin_side
+        )
+
+        ws_err["A1"] = "info_errors"
+        ws_err["B1"] = "data_errors"
+        for cell in ws_err[1]:
+            cell.font = header_font
+            cell.fill = header_fill
+            cell.alignment = centered
+            cell.border = border
+
+        for row_idx in range(row_count):
+            ws_err.cell(
+                row=row_idx + 2,
+                column=1,
+                value=info_errors[row_idx] if row_idx < len(info_errors) else None,
+            )
+            ws_err.cell(
+                row=row_idx + 2,
+                column=2,
+                value=(
+                    unique_data_errors[row_idx]
+                    if row_idx < len(unique_data_errors)
+                    else None
+                ),
+            )
+            for col_idx in (1, 2):
+                cell = ws_err.cell(row=row_idx + 2, column=col_idx)
+                cell.alignment = wrapped
+                cell.border = border
+
+        _autofit_columns(ws_err)
+
+        data_sheet = next(
+            (
+                wb[sheet_name]
+                for sheet_name in wb.sheetnames
+                if _normalize_excel_label(sheet_name)
+                in {"\u0434\u0430\u043d\u043d\u044b\u0435", "salary data"}
+            ),
+            None,
+        )
+        if data_sheet is None:
+            raise ValueError("Expected data sheet not found.")
+
+        header_row = 7
+        data_start_row = header_row + 1
+        header_map = {
+            _normalize_excel_label(
+                data_sheet.cell(row=header_row, column=col_idx).value
+            ): col_idx
+            for col_idx in range(1, data_sheet.max_column + 1)
+            if data_sheet.cell(row=header_row, column=col_idx).value is not None
         }
-    )
 
-    # --- Открытие Excel ---
-    # excel = win32com.client.Dispatch("Excel.Application")
-    excel.Visible = False
-    excel.DisplayAlerts = False
-    wb = excel.Workbooks.Open(input_path)
+        for col_name, idx in data_errors:
+            col_idx = header_map.get(_normalize_excel_label(col_name))
+            if not col_idx:
+                print(f"Column {col_name} not found.")
+                continue
 
-    # --- Проверка и создание листа Errors ---
-    for sheet in wb.Sheets:
-        if sheet.Name.lower().strip() == "errors":
-            sheet.Delete()
-    ws_err = wb.Sheets.Add(Before=wb.Sheets(1))
-    ws_err.Name = "Errors"
+            excel_row = data_start_row + idx
+            if 1 <= excel_row <= data_sheet.max_row:
+                data_sheet.cell(row=excel_row, column=col_idx).fill = error_fill
+            else:
+                print(f"Row {excel_row} doesn't exist.")
 
-    # --- Запись таблицы ошибок ---
-    ws_err.Cells(1, 1).Value = "info_errors"
-    ws_err.Cells(1, 2).Value = "data_errors"
-    for r in range(len(df_errors)):
-        ws_err.Cells(r + 2, 1).Value = df_errors.iloc[r, 0]
-        ws_err.Cells(r + 2, 2).Value = df_errors.iloc[r, 1]
+        wb.save(output_path)
+    finally:
+        wb.close()
 
-    # --- Форматирование заголовка ---
-    header_range = ws_err.Range(ws_err.Cells(1, 1), ws_err.Cells(1, 2))
-    header_range.Font.Bold = True
-    header_range.Font.Color = 0xFFFFFF  # Белый
-    header_range.Interior.Color = 0x4472C4  # Синий (BGR)
-    header_range.HorizontalAlignment = -4108  # xlCenter
-    header_range.Borders.Weight = 2
-
-    # --- Форматирование тела таблицы ---
-    used_range = ws_err.UsedRange
-    used_range.Columns.AutoFit()
-    for row in ws_err.Range(
-        ws_err.Cells(2, 1), ws_err.Cells(df_errors.shape[0] + 1, 2)
-    ):
-        row.Borders.Weight = 2
-        row.WrapText = True
-        row.VerticalAlignment = -4160  # xlTop
-
-    # --- Определение листа "Данные" ---
-    data_sheet = None
-    for s in wb.Sheets:
-        name = s.Name.strip().lower()
-        if name in ("данные", "salary data"):
-            data_sheet = s
-            break
-    if not data_sheet:
-        wb.Close(SaveChanges=False)
-        excel.Quit()
-        raise ValueError("Sheet 'Данные'/'Salary Data' not found.")
-
-    ws_data = data_sheet
-
-    # --- Определяем начало данных ---
-    df_head = pd.read_excel(input_path, sheet_name=ws_data.Name, header=None, nrows=40)
-    non_empty = df_head.notna().sum(axis=1)
-    header_end = max(
-        (i for i, v in enumerate(non_empty) if v >= max(3, df_head.shape[1] * 0.05)),
-        default=0,
-    )
-
-    def norm(s):
-        return str(s).strip().lower() if pd.notna(s) else ""
-
-    col_map = {
-        norm(df_head.iat[r, c]): c + 1
-        for r in range(header_end + 1)
-        for c in range(df_head.shape[1])
-        if pd.notna(df_head.iat[r, c])
-    }
-
-    # --- Подсветка ошибок ---
-    orange_color = 0x00C0FF  # BGR = (0xFF, 0xC0, 0x00) → оранжевый
-    for col_name, idx in errors.get("data_errors", []):
-        col_idx = col_map.get(norm(col_name))
-        if not col_idx:
-            print(f"Column {col_name} not found.")
-            continue
-        excel_row = 8 + idx
-        if 1 <= excel_row <= ws_data.UsedRange.Rows.Count:
-            ws_data.Cells(excel_row, col_idx).Interior.Color = orange_color
-        else:
-            print(f"Row {excel_row} doesn't exist.")
-
-    # --- Сохранение и закрытие ---
-    wb.SaveAs(output_path)
-    wb.Close(SaveChanges=True)
-    excel.Quit()
+    sanitize_workbook_package(output_path)
 
     print(
         f"The 'Errors' sheet has been added, and the cells are highlighted. File: {output_path}"
