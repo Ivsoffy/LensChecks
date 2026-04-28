@@ -82,6 +82,11 @@ def process_past_year(folder_py, df):
     Raises:
         ValueError: If required columns are missing.
     """
+    files = []
+
+    if LP.company_name not in df.columns:
+        raise ValueError(f"Error: required column {LP.company_name} is missing.")
+
     if not isinstance(folder_py, str) or not os.path.exists(folder_py):
         print(f"Warning: invalid path to last year's files folder: {folder_py}")
         return df, []
@@ -99,10 +104,11 @@ def process_past_year(folder_py, df):
                 )
                 cols_to_copy = [LP.grade]
                 df = merge_by_cols(df, df_py, cols, cols_to_copy)
+                files += found_files
         except Exception as e:
             file_name = found_files[0] if found_files else "unknown file"
             print(f"Error processing last year's file '{file_name}': {e}")
-    return df, found_files
+    return df, files
 
 
 def add_comparison_with_median(df):
