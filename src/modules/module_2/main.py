@@ -251,9 +251,8 @@ def process_past_year(folder_py, df):
         return df
 
     companies = df[LP.company_name].unique()
-
+    found_files = []
     for company in companies:
-        found_files = []
         try:
             found_files = check_if_past_year_exist(company, folder_py)
             if found_files:

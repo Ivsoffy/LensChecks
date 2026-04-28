@@ -84,7 +84,7 @@ class FunctionModel:
         s = re.sub(r"\s+", " ", s)
         return s
 
-    def predict(self, df, batch_size=64, num_beams=4):
+    def predict(self, df, batch_size=64, num_beams=3):
         self.model.eval()
         df["input_text"] = df.progress_apply(lambda x: self._process_row(x), axis=1)
         print("Predicting...")
@@ -102,7 +102,7 @@ class FunctionModel:
             ).to(device)
             with torch.inference_mode():
                 gen_ids = self.model.generate(
-                    **encoded, max_length=64, num_beams=num_beams, early_stopping=True
+                    **encoded, max_length=32, num_beams=num_beams, early_stopping=True
                 )
             preds.extend(self.tokenizer.batch_decode(gen_ids, skip_special_tokens=True))
         df["predicted_desc"] = preds
