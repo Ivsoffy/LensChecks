@@ -153,6 +153,37 @@ def add_comparison_with_median(df):
     return df
 
 
+def _split_by_company(df):
+    if LP.company_name not in df.columns:
+        return [df.copy()]
+    return [
+        company_df.copy()
+        for _, company_df in df.groupby(LP.company_name, dropna=False, sort=False)
+    ]
+
+
+def _concat_company_results(frames):
+    valid_frames = [frame for frame in frames if frame is not None]
+    non_empty_frames = [frame for frame in valid_frames if not frame.empty]
+    if not non_empty_frames:
+        return valid_frames[0].copy() if valid_frames else pd.DataFrame()
+    return pd.concat(non_empty_frames).sort_index(kind="stable")
+
+
+def _process_company_df(company_df, folder_py):
+    company_df, company_found_files = process_past_year(folder_py, company_df)
+    company_df = _fill_missing_grades_from_old(company_df)
+    company_df = add_comparison_with_median(company_df)
+
+    remaining_empty_mask = _empty_grade_mask(company_df[LP.grade])
+    filled = company_df.loc[~remaining_empty_mask]
+    unfilled = company_df.loc[remaining_empty_mask]
+
+    filled_processed = process_filled(filled)
+    processed_company_df, model_processed = process_unfilled(unfilled, company_df)
+    return processed_company_df, filled_processed, model_processed, company_found_files
+
+
 def module_4(input_folder, output_folder, params):
     folder_py = params["folder_past_year"]
     already_fixed = params["after_fix"]
@@ -172,14 +203,38 @@ def module_4(input_folder, output_folder, params):
                 print("Assigning grades from last year's questionnaire (if found)")
                 df["grade_old"] = np.nan
                 initial_empty_mask = _empty_grade_mask(df[LP.grade])
-                df, found_files = process_past_year(folder_py, df)
-                df = _fill_missing_grades_from_old(df)
-                df = add_comparison_with_median(df)
+                processed_companies = []
+                filled_companies = []
+                unfilled_companies = []
+                found_files = []
+
+                for company_df in _split_by_company(df):
+                    company_name = company_df[LP.company_name].dropna()
+                    company_label = (
+                        company_name.iloc[0]
+                        if not company_name.empty
+                        else "Unknown company"
+                    )
+                    print(f"Processing company separately: {company_label}")
+
+                    (
+                        processed_company_df,
+                        filled_processed,
+                        unfilled_processed,
+                        company_found_files,
+                    ) = _process_company_df(company_df, folder_py)
+                    processed_companies.append(processed_company_df)
+                    filled_companies.append(filled_processed)
+                    unfilled_companies.append(unfilled_processed)
+                    found_files.extend(company_found_files)
+
+                df = _concat_company_results(processed_companies)
+                filled_and_processed = _concat_company_results(filled_companies)
+                unfilled_and_processed = _concat_company_results(unfilled_companies)
 
                 remaining_empty_mask = _empty_grade_mask(df[LP.grade])
                 unfilled = df.loc[remaining_empty_mask]
                 filled = df.loc[~remaining_empty_mask]
-                # empty_count = unfilled.shape[0]
                 empty_count = initial_empty_mask.sum()
                 count_past_year = int(
                     initial_empty_mask.sum() - remaining_empty_mask.sum()
@@ -189,10 +244,6 @@ def module_4(input_folder, output_folder, params):
                 print(
                     f"Assigned grades: {len(filled)}, missing grades: {len(unfilled)}"
                 )
-
-                filled_and_processed = process_filled(filled)
-
-                df, unfilled_and_processed = process_unfilled(unfilled, df)
                 df.to_excel(output_file, sheet_name="Total Data")
 
                 process_output_file(

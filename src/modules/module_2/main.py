@@ -73,6 +73,25 @@ def _fill_missing_codes_from_old(df):
     return df
 
 
+OLD_CODE_COLS = {
+    LP.function_code: "func_old",
+    LP.subfunction_code: "subfunc_old",
+    LP.specialization_code: "spec_old",
+}
+
+
+def _drop_merge_service_columns(df):
+    service_cols = [
+        col
+        for col in df.columns
+        if isinstance(col, str)
+        and (col.startswith("__py_") or col.endswith("_py") or col.endswith("_prefill"))
+    ]
+    if service_cols:
+        df = df.drop(columns=service_cols)
+    return df
+
+
 def module_2(input_folder, output_folder, params):
     """
     Summary: Process input Excel files and produce outputs for module 2.
@@ -268,16 +287,13 @@ def process_past_year(folder_py, df):
                     LP.function_code,
                     LP.subfunction_code,
                     LP.specialization_code,
-                    LP.function,
-                    LP.subfunction,
-                    LP.specialization,
                 ]
                 df = merge_by_cols(df, df_py, cols, cols_to_copy)
                 files += found_files
         except Exception as e:
             file_name = found_files[0] if found_files else "unknown file"
             print(f"Error processing last year's file '{file_name}': {e}")
-    return df, files
+    return _drop_merge_service_columns(df), files
 
 
 def check_column_rules(df, col_name, allowed_values):
@@ -541,7 +557,7 @@ def map_prefill_to_sheet1(
     except Exception as e:
         print(f"Error processing Prefill: {e}")
         return df_merged, output_path
-    return df_merged, processed_path
+    return _drop_merge_service_columns(df_merged), processed_path
 
 
 def add_info(info, output_file):
@@ -752,24 +768,28 @@ def merge_by_cols(df, df_py, cols, cols_to_copy):
         df_py[c] = df_py[c].astype(str).replace("nan", np.nan)
 
     df_py_unique = df_py.drop_duplicates(subset=cols, keep="first")
+    rename_map = {
+        source_col: f"__py_{target_col}"
+        for source_col, target_col in OLD_CODE_COLS.items()
+        if source_col in cols_to_copy
+    }
+    merge_cols = cols + list(rename_map.values())
 
-    df_merged = df.merge(
-        df_py_unique[cols + cols_to_copy],
-        on=cols,
-        how="left",
-        suffixes=("", "_py"),
-    )
+    df_py_prepared = df_py_unique[cols + list(rename_map)].rename(columns=rename_map)
+    df_merged = df.merge(df_py_prepared[merge_cols], on=cols, how="left")
 
-    func_cols = ["func_old", "subfunc_old", "spec_old"]
+    for source_col, target_col in OLD_CODE_COLS.items():
+        if source_col not in cols_to_copy:
+            continue
 
-    for old_col, new_col in zip(cols_to_copy, func_cols):
-        py_col = f"{old_col}_py"
-        if py_col in df_merged.columns:
-            df_merged[new_col] = df_merged[py_col]
-            df_merged.drop(columns=[py_col], inplace=True)
-        else:
-            df_merged[new_col] = np.nan
-    return df_merged
+        py_col = rename_map[source_col]
+        if target_col not in df_merged.columns:
+            df_merged[target_col] = np.nan
+
+        fill_mask = _empty_code_mask(df_merged[target_col])
+        df_merged.loc[fill_mask, target_col] = df_merged.loc[fill_mask, py_col]
+        df_merged.drop(columns=[py_col], inplace=True)
+    return _drop_merge_service_columns(df_merged)
 
 
 def check_if_past_year_exist(company, folder_py):
