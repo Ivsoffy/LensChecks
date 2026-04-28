@@ -194,9 +194,14 @@ def module_2(input_folder, output_folder, params):
             else:
                 print("Module 2: Assigning validated function codes.")
 
-                map_prefill_to_sheet1(input_file, output_file, sheet_prefill="Prefill")
                 df, _ = map_prefill_to_sheet1(
-                    input_file, output_file, sheet_prefill="Model"
+                    input_file, output_file, sheet_prefill="Prefill"
+                )
+                df, _ = map_prefill_to_sheet1(
+                    input_file,
+                    output_file,
+                    sheet_prefill="Model",
+                    target_df=df,
                 )
                 df = check_the_result(df)
 
@@ -463,6 +468,7 @@ def map_prefill_to_sheet1(
     ],
     code_cols=(LP.function_code, LP.subfunction_code, LP.specialization_code),
     sheet_target="Total Data",
+    target_df=None,
 ):
     """
     Summary: Map codes from a Prefill sheet to the target sheet using match columns.
@@ -489,7 +495,10 @@ def map_prefill_to_sheet1(
     try:
         try:
             df_prefill = pd.read_excel(excel_file, sheet_name=sheet_prefill)
-            df_target = pd.read_excel(excel_file, sheet_name=sheet_target)
+            if target_df is None:
+                df_target = pd.read_excel(excel_file, sheet_name=sheet_target)
+            else:
+                df_target = target_df.copy()
         except FileNotFoundError:
             print(f"Error: file not found: '{excel_file}'.")
             return df_merged, output_path
@@ -499,6 +508,9 @@ def map_prefill_to_sheet1(
         except Exception as e:
             print(f"Error reading Excel: {e}")
             return df_merged, output_path
+
+        if df_prefill.empty and LP.job_title not in df_prefill.columns:
+            return df_target, output_path
 
         df_prefill, _ = _drop_rows_without_job_title(
             df_prefill, context=f"sheet '{sheet_prefill}' in '{excel_file}'"
