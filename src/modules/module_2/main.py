@@ -204,9 +204,11 @@ def module_2(input_folder, output_folder, params):
                     target_df=df,
                 )
                 df = check_the_result(df)
-
+                if "subfunc_old" in df.columns:
+                    df = df.drop(columns=["func_old", "subfunc_old", "spec_old"])
                 df = df.loc[:, ~df.columns.str.startswith("Unnamed:")]
                 df.to_excel(output_file, sheet_name="Total Data")
+                highlight_false_validation_rows(output_file, already_fixed)
                 print(f"File {output_file} saved.")
             print(f"--------- Processing file {file} completed ---------")
 
@@ -254,6 +256,60 @@ def _write_df_to_sheet(ws, df, highlight_fn=None, fill=None):
             cell = ws.cell(row=excel_row, column=col_idx, value=value)
             if highlight and fill is not None:
                 cell.fill = fill
+
+
+def _is_false_validation_value(value):
+    if value is False:
+        return True
+    if isinstance(value, str):
+        return value.strip().lower() == "false"
+    return False
+
+
+def highlight_false_validation_rows(
+    output_file,
+    already_fixed,
+    sheet_name="Total Data",
+    error_columns=("errors_not_allowed", "errors_subfunc", "errors_spec"),
+):
+    """
+    Highlight rows with False validation flags in the final file after manual fixes.
+    """
+    if not already_fixed:
+        return
+
+    try:
+        book = load_workbook(output_file)
+    except FileNotFoundError:
+        print(f"Error: output file not found: {output_file}")
+        return
+
+    if sheet_name not in book.sheetnames:
+        print(f"Error: sheet '{sheet_name}' not found in file '{output_file}'.")
+        return
+
+    ws = book[sheet_name]
+    header_to_column = {
+        cell.value: cell.column for cell in ws[1] if isinstance(cell.value, str)
+    }
+    flag_columns = [
+        header_to_column[col] for col in error_columns if col in header_to_column
+    ]
+    if not flag_columns:
+        book.save(output_file)
+        return
+
+    fill = PatternFill(start_color="FFC7CE", end_color="FFC7CE", fill_type="solid")
+    for row_idx in range(2, ws.max_row + 1):
+        should_highlight = any(
+            _is_false_validation_value(ws.cell(row=row_idx, column=col_idx).value)
+            for col_idx in flag_columns
+        )
+        if should_highlight:
+            for col_idx in range(1, ws.max_column + 1):
+                ws.cell(row=row_idx, column=col_idx).fill = fill
+
+    book.save(output_file)
 
 
 def process_past_year(folder_py, df):
@@ -331,8 +387,8 @@ def check_column_rules(df, col_name, allowed_values):
         mask_allowed = mask_allowed | mask_empty
 
     if "errors_not_allowed" not in df.columns:
-        df["errors_not_allowed"] = False
-    df.loc[~mask_allowed, "errors_not_allowed"] = True
+        df["errors_not_allowed"] = True
+    df.loc[~mask_allowed, "errors_not_allowed"] = False
 
     return df
 
@@ -399,9 +455,9 @@ def check_the_result(df):
     subfunc = df[LP.subfunction_code].astype(str).str.strip()
     spec = df[LP.specialization_code].astype(str).str.strip()
 
-    df["errors_subfunc"] = func != subfunc.str[:2]
+    df["errors_subfunc"] = func == subfunc.str[:2]
     spec_is_empty = spec.isin(["", "NAN", "NONE", "NULL"])
-    df["errors_spec"] = ~((subfunc == spec.str[:3]) | spec_is_empty)
+    df["errors_spec"] = (subfunc == spec.str[:3]) | spec_is_empty
 
     df = fill_code_names_from_sdf(df, sdf)
     return df

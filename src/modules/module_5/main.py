@@ -216,6 +216,7 @@ def check_one_interval(errors, grade_num, val, min, max, index, col):
 
 def check_intervals(errors, df):
     cols_to_check = [LP.base_pay, LP.tc_pay, LP.ttc_pay, LP.tdc_pay, LP.target_sti_out]
+    df["interval"] = False
 
     intervals_path = "modules/module_5/intervals.parquet"
     if not os.path.exists(intervals_path):
@@ -238,6 +239,11 @@ def check_intervals(errors, df):
             ),
             axis=1,
         )
+        invalid_mask = df[col].notna() & (
+            (df[col] <= df[LP.grade].map(intervals[col_min]))
+            | (df[col] >= df[LP.grade].map(intervals[col_max]))
+        )
+        df.loc[invalid_mask, "interval"] = True
 
 
 def find_outliers_iqr(data):
@@ -259,12 +265,18 @@ def get_outlier_strength(values, lower_bound, upper_bound):
     return np.where(values < lower_bound, lower_bound - values, values - upper_bound)
 
 
+def get_bound_column_name(col_name):
+    match = re.search(r"\(([^()]+)\)", str(col_name))
+    return match.group(1).strip() if match else col_name
+
+
 def check_outliers(errors, df):
     cols_to_check = [LP.base_pay, LP.tc_pay, LP.ttc_pay]
     df["outlier"] = False
     for col in cols_to_check:
-        df[f"{col}_lower_bound"] = np.nan
-        df[f"{col}_upper_bound"] = np.nan
+        bound_col = get_bound_column_name(col)
+        df[f"{bound_col}_lower_bound"] = np.nan
+        df[f"{bound_col}_upper_bound"] = np.nan
 
     outlier_candidates = []
 
@@ -311,11 +323,12 @@ def check_outliers(errors, df):
 
     for _, row in top_outliers.iterrows():
         col = row["col"]
+        bound_col = get_bound_column_name(col)
         ind = row["ind"]
         errors["data_errors"] += [(col, ind)]
         df.loc[ind, "outlier"] = True
-        df.loc[ind, f"{col}_lower_bound"] = row["lower_bound"]
-        df.loc[ind, f"{col}_upper_bound"] = row["upper_bound"]
+        df.loc[ind, f"{bound_col}_lower_bound"] = row["lower_bound"]
+        df.loc[ind, f"{bound_col}_upper_bound"] = row["upper_bound"]
 
     return df
 
@@ -360,7 +373,7 @@ def _process_single_file(file_path, params):
 def _save_processed_file(df, file_name, output_folder):
     """Save one processed file to the output folder."""
     file_output_path = os.path.join(output_folder, file_name)
-    df = df.loc[:, LP.expected_columns_market_df]
+    # df = df.loc[:, LP.expected_columns_market_df]
     df.to_excel(file_output_path, sheet_name="Total Data")
     print(f"File {file_name} was saved to {output_folder}.")
 
@@ -372,6 +385,7 @@ def _save_single_db(dataframes, output_folder):
 
     result_df = pd.concat(dataframes)
     result_df = result_df.loc[:, ~result_df.columns.str.contains("^Unnamed")]
+    # result_df = result_df.loc[:, LP.expected_columns_market_df]
     file_output_path = os.path.join(output_folder, "result_db.xlsx")
     result_df.to_excel(file_output_path, sheet_name="Total Data")
     print(f"Combined database was saved to {output_folder}.")

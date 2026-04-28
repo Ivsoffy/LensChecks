@@ -176,29 +176,29 @@ def module_3(input_folder, output_folder, params=None):
                 axis=1,
             )
 
-            ultimate_df = validate_compensation_ranges(
-                ultimate_df,
-                comp_column=LP.base_pay,
-                grade_col=LP.grade,
-                output_col="BP_within_range",
-                comp_type="BP",
-            )
+            # ultimate_df = validate_compensation_ranges(
+            #     ultimate_df,
+            #     comp_column=LP.base_pay,
+            #     grade_col=LP.grade,
+            #     output_col="BP_within_range",
+            #     comp_type="BP",
+            # )
 
-            ultimate_df = validate_compensation_ranges(
-                ultimate_df,
-                comp_column=LP.tc_pay,
-                grade_col=LP.grade,
-                output_col="TC_within_range",
-                comp_type="TC",
-            )
+            # ultimate_df = validate_compensation_ranges(
+            #     ultimate_df,
+            #     comp_column=LP.tc_pay,
+            #     grade_col=LP.grade,
+            #     output_col="TC_within_range",
+            #     comp_type="TC",
+            # )
 
-            ultimate_df = validate_compensation_ranges(
-                ultimate_df,
-                comp_column=LP.ttc_pay,
-                grade_col=LP.grade,
-                output_col="TTC_within_range",
-                comp_type="TTC",
-            )
+            # ultimate_df = validate_compensation_ranges(
+            #     ultimate_df,
+            #     comp_column=LP.ttc_pay,
+            #     grade_col=LP.grade,
+            #     output_col="TTC_within_range",
+            #     comp_type="TTC",
+            # )
 
             # Make sure to delete whitespaces from
             ultimate_df[LP.gi_origin] = ultimate_df[LP.gi_origin].where(
@@ -234,61 +234,6 @@ def module_3(input_folder, output_folder, params=None):
         print("-------------------------")
         # if company_files:
         #     process_with_past_year(company_files, df)
-
-
-# def save_db_to_parquet(ultimate_df, output_folder):
-#     # сохранение в паркет для дозагрузки
-#     final_df = ultimate_df.copy()
-#     final_df = final_df[LP.expected_columns_market_df]
-#     final_df.info()
-
-#     # Setting the datatype for sting columns
-#     string_columns = LP.string_columns_for_parquet
-
-#     # Setting sting types
-#     for col in string_columns:
-#         final_df[col] = final_df[col].astype(str)
-#         final_df[col] = final_df[col].str.strip()
-
-#     # Removing nan after thew data was stringged
-#     for col in string_columns:
-#         final_df[col] = final_df[col].replace("nan", np.nan)
-
-#     # Replacing np.nan in specialization with '-'
-#     final_df[LP.specialization] = final_df[LP.specialization].replace(np.nan, "-")
-
-#     # Setting the datatype for float columns
-#     float_columns = LP.float_columns_for_parquet
-
-#     for col in float_columns:
-#         # Remove non-numeric values by coercing errors
-#         final_df[col] = pd.to_numeric(final_df[col], errors="coerce")
-#         final_df[col] = final_df[col].astype(float)
-
-#     # Setting the datatype for int columns
-#     int_columns = [LP.grade]
-
-#     for col in int_columns:
-#         # Remove non-numeric values by coercing errors
-#         final_df[col] = pd.to_numeric(final_df[col], errors="coerce")
-
-#         # Find all non-finite values (NaN, inf, -inf)
-#         # non_finite_values = final_df[col][
-#         #     ~np.isfinite(final_df[col])
-#         # ]  # ~np.isfinite() selects non-finite values
-#         # # non_finite_values.to_excel("NON-finite.xlsx")
-#         # print("Non-finite values causing issues:")
-#         # # print(non_finite_values)
-
-#         final_df[col] = final_df[col].astype(
-#             "Int64"
-#         )  # лучше чем int, потому что поддерживает NaN
-#         output_file = os.path.join(
-#             output_folder, "Rawdata_2025_before_reload.parquet.gzip"
-#         )
-#         final_df.to_parquet(output_file, compression="gzip")
-
-#         print(f"Файл сохранен в {output_file}")
 
 
 # Function to compare how realistic is the certain compensation element

@@ -880,6 +880,8 @@ def main_checks(errors, df):
     )
     # Ежемесячный оклад
     df.dropna(subset=[LP.monthly_salary], inplace=True)
+    df = df.loc[df[LP.monthly_salary] != 0]
+
     # Районный коэффициент и северная надбавка в месяц
     df.apply(
         lambda x: region_coeff_normalization(
