@@ -22,6 +22,31 @@ sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 from .. import LP  # noqa: E402
 
 
+def _empty_value_mask(series):
+    normalized = series.astype(str).str.strip().str.lower()
+    return series.isna() | normalized.isin({"", "nan", "none", "null"})
+
+
+def _has_unfilled_required_columns(df):
+    required_columns = [LP.grade, LP.subfunction_code]
+    missing_columns = [col for col in required_columns if col not in df.columns]
+    if missing_columns:
+        raise ValueError(
+            f"Error: missing required columns for checks: {missing_columns}"
+        )
+
+    for column in required_columns:
+        empty_mask = _empty_value_mask(df[column])
+        if empty_mask.any():
+            print(
+                f"Skipping file: column '{column}' contains empty values "
+                f"({int(empty_mask.sum())} rows)."
+            )
+            return True
+
+    return False
+
+
 def module_3(input_folder, output_folder, params=None):
     # save_to_parquet = params["save_to_parquet"]
     counter = 0
@@ -73,6 +98,13 @@ def module_3(input_folder, output_folder, params=None):
                 ).strip()
                 for col in df.columns
             ]
+
+            try:
+                if _has_unfilled_required_columns(df):
+                    continue
+            except ValueError as e:
+                print(f"Error in file '{file_path}': {e}")
+                continue
 
             ultimate_df = calculate_compensation_elements(
                 df,
@@ -152,28 +184,23 @@ def module_3(input_folder, output_folder, params=None):
                 LP.target_lti_3,
                 "Target LTI = Target LTI Parts",
             )
-            ultimate_df["LTI & grade >= 13"] = ultimate_df.apply(
-                lambda x: not (x[LP.grade] < 13 and (not str(x[LP.fact_lti]) == "nan")),
-                axis=1,
+            grade_numeric = pd.to_numeric(ultimate_df[LP.grade], errors="coerce")
+            subfunction_code = (
+                ultimate_df[LP.subfunction_code].astype("string").str.strip()
             )
 
-            ultimate_df["EMA & grade >= 17"] = ultimate_df.apply(
-                lambda x: (
-                    not ((x[LP.grade] < 17) and (x[LP.subfunction_code] == "EMA"))
-                ),
-                axis=1,
+            ultimate_df["LTI & grade >= 13"] = (grade_numeric >= 13) | ultimate_df[
+                LP.fact_lti
+            ].isna()
+
+            ultimate_df["EMA & grade >= 17"] = ~(
+                (grade_numeric < 17) & (subfunction_code == "EMA")
             )
-            ultimate_df["PRB & grade <= 14"] = ultimate_df.apply(
-                lambda x: (
-                    not ((x[LP.grade] > 14) and (x[LP.subfunction_code] == "PRB"))
-                ),
-                axis=1,
+            ultimate_df["PRB & grade <= 14"] = ~(
+                (grade_numeric > 14) & (subfunction_code == "PRB")
             )
-            ultimate_df["XXZ & grade >= 14"] = ultimate_df.apply(
-                lambda x: (
-                    not ((x[LP.grade] < 14) and (x[LP.subfunction_code][2] == "Z"))
-                ),
-                axis=1,
+            ultimate_df["XXZ & grade >= 14"] = ~(
+                (grade_numeric < 14) & subfunction_code.str[2].eq("Z")
             )
 
             # ultimate_df = validate_compensation_ranges(
