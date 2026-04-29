@@ -12,7 +12,7 @@ from sklearn.preprocessing import PowerTransformer
 from tqdm import tqdm
 
 BASE_DIR = Path(__file__).resolve().parent
-from models.model_2.utils import calculate_f_new  # noqa: E402
+from utils_2 import calculate_f_new  # noqa: E402
 
 tqdm.pandas(desc="Processing")
 

@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import numpy as np
 import pandas as pd
-from models.model_1.model import SubPredictor
-from models.model_2.model import LeadPredictor
-from models.model_2.utils import get_lead_mask
+from model_1 import SubPredictor
+from model_2 import LeadPredictor
+from utils_2 import get_lead_mask
 
 TARGET_COL = "Грейд / Уровень обзора"
 PREDICTION_COL = "predicted_grade"

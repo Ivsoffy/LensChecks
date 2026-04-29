@@ -11,7 +11,7 @@ from tqdm import tqdm
 
 BASE_DIR = Path(__file__).resolve().parent
 
-from models.model_1.utils import (  # noqa: E402
+from utils_1 import (  # noqa: E402
     E5TextEmbedder,
     JobTitleExampleNormalizer,
     calculate_f_new,
